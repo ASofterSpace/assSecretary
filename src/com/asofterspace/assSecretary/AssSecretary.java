@@ -82,23 +82,45 @@ public class AssSecretary {
 			engine.compileTo(webRoot);
 
 
+			// TODO :: do this whenever index.htm is opened, rather than just once, so that we can always
+			// get the latest info (even re-loading Mari database and so on)
 			TextFile indexFile = new TextFile(webRoot, "index.htm");
 			String indexContent = indexFile.getContent();
 
 			indexContent = StrUtils.replaceAll(indexContent, "[[USERNAME]]", database.getUsername());
 
-			String mariHtml = "I haven't heard anything from Mari recently, I wonder how she is doing...";
+			String mariHtml = "<div>I haven't heard anything from Mari recently, I wonder how she is doing...</div>";
 			if (mariDatabase.isAvailable()) {
 				MariTaskCtrl mariTaskCtrl = new MariTaskCtrl(mariDatabase);
 
 				List<GenericTask> tasks = mariTaskCtrl.getCurrentTaskInstances();
+				int upcomingDays = 5;
+				List<GenericTask> upcomingTasks = mariTaskCtrl.getUpcomingTaskInstances(upcomingDays);
 
-				if (tasks.size() == 0) {
-					mariHtml = "I talked to Mari, all is well on her side. :)";
+				if ((tasks.size() == 0) && (upcomingTasks.size() == 0)) {
+					mariHtml = "<div>I talked to Mari, all is well on her side. :)</div>";
 				} else {
-					mariHtml = "<div>I talked to Mari, and she mentioned these things coming up:</div>";
-					for (GenericTask task : tasks) {
-						mariHtml += "<div>" + task.getTitle() + "</div>";
+					mariHtml = "";
+					if (tasks.size() > 0) {
+						mariHtml += "<div>";
+						mariHtml += "<div>I talked to Mari, and she mentioned that these things should be done today:</div>";
+						for (GenericTask task : tasks) {
+							mariHtml += "<div>" + task.getReleasedDateStr() + " " + task.getTitle() + "</div>";
+						}
+						mariHtml += "</div>";
+					}
+					if (upcomingTasks.size() > 0) {
+						mariHtml += "<div>";
+						if (tasks.size() == 0) {
+							mariHtml += "<div>I talked to Mari, and she mentioned ";
+						} else {
+							mariHtml += "<div>She also mentioned ";
+						}
+						mariHtml += "these things coming up in the next " + upcomingDays + " days:</div>";
+						for (GenericTask task : upcomingTasks) {
+							mariHtml += "<div>" + task.getReleasedDateStr() + " " + task.getTitle() + "</div>";
+						}
+						mariHtml += "</div>";
 					}
 				}
 			}

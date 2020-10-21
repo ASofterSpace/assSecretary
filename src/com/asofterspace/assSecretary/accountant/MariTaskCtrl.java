@@ -48,4 +48,24 @@ public class MariTaskCtrl extends TaskCtrlBase {
 		return currentTaskInstances;
 	}
 
+	public List<GenericTask> getUpcomingTaskInstances(int upcomingDays) {
+
+		List<GenericTask> results = new ArrayList<>();
+
+		// generate future instances, but do not save them!
+		generateNewInstances(DateUtils.addDays(DateUtils.now(), upcomingDays));
+
+		List<GenericTask> tasks = getTaskInstances();
+
+		for (GenericTask task : tasks) {
+			if ((task.hasBeenDone() == null) || !task.hasBeenDone()) {
+				if (!currentTaskInstances.contains(task)) {
+					results.add(task);
+				}
+			}
+		}
+
+		return results;
+	}
+
 }
