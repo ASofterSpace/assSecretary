@@ -4,7 +4,10 @@
  */
 package com.asofterspace.assSecretary;
 
+import com.asofterspace.assSecretary.accountant.MariDatabase;
+import com.asofterspace.assSecretary.accountant.MariTaskCtrl;
 import com.asofterspace.assSecretary.web.Server;
+import com.asofterspace.toolbox.calendar.GenericTask;
 import com.asofterspace.toolbox.io.Directory;
 import com.asofterspace.toolbox.io.JSON;
 import com.asofterspace.toolbox.io.JsonFile;
@@ -22,6 +25,7 @@ public class AssSecretary {
 	public final static String DATA_DIR = "config";
 	public final static String SERVER_DIR = "server";
 	public final static String WEB_ROOT_DIR = "deployed";
+	public final static String MARI_DATABASE_FILE = "../assAccountant/config/database.cnf";
 
 	public final static String PROGRAM_TITLE = "assSecretary (Hugo)";
 	public final static String VERSION_NUMBER = "0.0.0.1(" + Utils.TOOLBOX_VERSION_NUMBER + ")";
@@ -59,6 +63,8 @@ public class AssSecretary {
 
 		Database database = new Database(dataDir);
 
+		MariDatabase mariDatabase = new MariDatabase(MARI_DATABASE_FILE);
+
 
 		try {
 
@@ -78,7 +84,26 @@ public class AssSecretary {
 
 			TextFile indexFile = new TextFile(webRoot, "index.htm");
 			String indexContent = indexFile.getContent();
+
 			indexContent = StrUtils.replaceAll(indexContent, "[[USERNAME]]", database.getUsername());
+
+			String mariHtml = "I haven't heard anything from Mari recently, I wonder how she is doing...";
+			if (mariDatabase.isAvailable()) {
+				MariTaskCtrl mariTaskCtrl = new MariTaskCtrl(mariDatabase);
+
+				List<GenericTask> tasks = mariTaskCtrl.getCurrentTaskInstances();
+
+				if (tasks.size() == 0) {
+					mariHtml = "I talked to Mari, all is well on her side. :)";
+				} else {
+					mariHtml = "<div>I talked to Mari, and she mentioned these things coming up:</div>";
+					for (GenericTask task : tasks) {
+						mariHtml += "<div>" + task.getTitle() + "</div>";
+					}
+				}
+			}
+			indexContent = StrUtils.replaceAll(indexContent, "[[MARI]]", mariHtml);
+
 			indexFile.saveContent(indexContent);
 
 

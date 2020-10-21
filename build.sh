@@ -12,6 +12,7 @@ rm -rf toolbox
 mkdir toolbox
 cd toolbox
 
+mkdir calendar
 mkdir coders
 mkdir io
 mkdir utils
@@ -20,6 +21,7 @@ mkdir web
 cd ../../../..
 
 cp ../Toolbox-Java/src/com/asofterspace/toolbox/*.java src/com/asofterspace/toolbox
+cp ../Toolbox-Java/src/com/asofterspace/toolbox/calendar/*.* src/com/asofterspace/toolbox/calendar
 cp ../Toolbox-Java/src/com/asofterspace/toolbox/coders/*.* src/com/asofterspace/toolbox/coders
 cp ../Toolbox-Java/src/com/asofterspace/toolbox/io/*.* src/com/asofterspace/toolbox/io
 cp ../Toolbox-Java/src/com/asofterspace/toolbox/utils/*.* src/com/asofterspace/toolbox/utils

@@ -10,6 +10,7 @@ rd /s /q toolbox
 md toolbox
 cd toolbox
 
+md calendar
 md coders
 md io
 md utils
@@ -18,6 +19,7 @@ md web
 cd ..\..\..\..
 
 copy "..\Toolbox-Java\src\com\asofterspace\toolbox\*.java" "src\com\asofterspace\toolbox"
+copy "..\Toolbox-Java\src\com\asofterspace\toolbox\calendar\*.*" "src\com\asofterspace\toolbox\calendar"
 copy "..\Toolbox-Java\src\com\asofterspace\toolbox\coders\*.*" "src\com\asofterspace\toolbox\coders"
 copy "..\Toolbox-Java\src\com\asofterspace\toolbox\io\*.*" "src\com\asofterspace\toolbox\io"
 copy "..\Toolbox-Java\src\com\asofterspace\toolbox\utils\*.*" "src\com\asofterspace\toolbox\utils"

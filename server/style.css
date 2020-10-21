@@ -2,3 +2,7 @@ body {
 	font-family: "Calibri";
 	overflow: hidden;
 }
+
+body > div {
+	padding-bottom: 10pt;
+}
