@@ -4,16 +4,11 @@
  */
 package com.asofterspace.assSecretary;
 
-import com.asofterspace.assSecretary.accountant.MariDatabase;
-import com.asofterspace.assSecretary.accountant.MariTaskCtrl;
 import com.asofterspace.assSecretary.web.Server;
-import com.asofterspace.toolbox.calendar.GenericTask;
 import com.asofterspace.toolbox.io.Directory;
 import com.asofterspace.toolbox.io.JSON;
 import com.asofterspace.toolbox.io.JsonFile;
 import com.asofterspace.toolbox.io.JsonParseException;
-import com.asofterspace.toolbox.io.TextFile;
-import com.asofterspace.toolbox.utils.StrUtils;
 import com.asofterspace.toolbox.Utils;
 import com.asofterspace.toolbox.web.WebTemplateEngine;
 
@@ -25,11 +20,12 @@ public class AssSecretary {
 	public final static String DATA_DIR = "config";
 	public final static String SERVER_DIR = "server";
 	public final static String WEB_ROOT_DIR = "deployed";
-	public final static String MARI_DATABASE_FILE = "../assAccountant/config/database.cnf";
 
 	public final static String PROGRAM_TITLE = "assSecretary (Hugo)";
-	public final static String VERSION_NUMBER = "0.0.0.1(" + Utils.TOOLBOX_VERSION_NUMBER + ")";
-	public final static String VERSION_DATE = "21. Oct 2020 - 21. Oct 2020";
+	public final static String VERSION_NUMBER = "0.0.0.2(" + Utils.TOOLBOX_VERSION_NUMBER + ")";
+	public final static String VERSION_DATE = "21. Oct 2020 - 27. Oct 2020";
+
+	private static Database database;
 
 
 	public static void main(String[] args) {
@@ -61,9 +57,7 @@ public class AssSecretary {
 
 		System.out.println("Loading database...");
 
-		Database database = new Database(dataDir);
-
-		MariDatabase mariDatabase = new MariDatabase(MARI_DATABASE_FILE);
+		database = new Database(dataDir);
 
 
 		try {
@@ -80,53 +74,6 @@ public class AssSecretary {
 			WebTemplateEngine engine = new WebTemplateEngine(serverDir, jsonConfig);
 
 			engine.compileTo(webRoot);
-
-
-			// TODO :: do this whenever index.htm is opened, rather than just once, so that we can always
-			// get the latest info (even re-loading Mari database and so on)
-			TextFile indexFile = new TextFile(webRoot, "index.htm");
-			String indexContent = indexFile.getContent();
-
-			indexContent = StrUtils.replaceAll(indexContent, "[[USERNAME]]", database.getUsername());
-
-			String mariHtml = "<div>I haven't heard anything from Mari recently, I wonder how she is doing...</div>";
-			if (mariDatabase.isAvailable()) {
-				MariTaskCtrl mariTaskCtrl = new MariTaskCtrl(mariDatabase);
-
-				List<GenericTask> tasks = mariTaskCtrl.getCurrentTaskInstances();
-				int upcomingDays = 5;
-				List<GenericTask> upcomingTasks = mariTaskCtrl.getUpcomingTaskInstances(upcomingDays);
-
-				if ((tasks.size() == 0) && (upcomingTasks.size() == 0)) {
-					mariHtml = "<div>I talked to Mari, all is well on her side. :)</div>";
-				} else {
-					mariHtml = "";
-					if (tasks.size() > 0) {
-						mariHtml += "<div>";
-						mariHtml += "<div>I talked to Mari, and she mentioned that these things should be done today:</div>";
-						for (GenericTask task : tasks) {
-							mariHtml += "<div>" + task.getReleasedDateStr() + " " + task.getTitle() + "</div>";
-						}
-						mariHtml += "</div>";
-					}
-					if (upcomingTasks.size() > 0) {
-						mariHtml += "<div>";
-						if (tasks.size() == 0) {
-							mariHtml += "<div>I talked to Mari, and she mentioned ";
-						} else {
-							mariHtml += "<div>She also mentioned ";
-						}
-						mariHtml += "these things coming up in the next " + upcomingDays + " days:</div>";
-						for (GenericTask task : upcomingTasks) {
-							mariHtml += "<div>" + task.getReleasedDateStr() + " " + task.getTitle() + "</div>";
-						}
-						mariHtml += "</div>";
-					}
-				}
-			}
-			indexContent = StrUtils.replaceAll(indexContent, "[[MARI]]", mariHtml);
-
-			indexFile.saveContent(indexContent);
 
 
 			System.out.println("Starting the server on port " + database.getPort() + "...");
@@ -146,6 +93,10 @@ public class AssSecretary {
 
 			System.out.println("Oh no! The input could not be parsed: " + e);
 		}
+	}
+
+	public static Database getDatabase() {
+		return database;
 	}
 
 }

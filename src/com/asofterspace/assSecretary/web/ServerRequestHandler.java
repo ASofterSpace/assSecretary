@@ -4,11 +4,17 @@
  */
 package com.asofterspace.assSecretary.web;
 
+import com.asofterspace.assSecretary.accountant.MariDatabase;
+import com.asofterspace.assSecretary.accountant.MariTaskCtrl;
+import com.asofterspace.assSecretary.AssSecretary;
 import com.asofterspace.assSecretary.Database;
+import com.asofterspace.toolbox.calendar.GenericTask;
 import com.asofterspace.toolbox.io.Directory;
 import com.asofterspace.toolbox.io.File;
 import com.asofterspace.toolbox.io.JSON;
 import com.asofterspace.toolbox.io.JsonParseException;
+import com.asofterspace.toolbox.io.TextFile;
+import com.asofterspace.toolbox.utils.StrUtils;
 import com.asofterspace.toolbox.web.WebServer;
 import com.asofterspace.toolbox.web.WebServerAnswer;
 import com.asofterspace.toolbox.web.WebServerAnswerInJson;
@@ -16,9 +22,12 @@ import com.asofterspace.toolbox.web.WebServerRequestHandler;
 
 import java.io.IOException;
 import java.net.Socket;
+import java.util.List;
 
 
 public class ServerRequestHandler extends WebServerRequestHandler {
+
+	public final static String MARI_DATABASE_FILE = "../assAccountant/config/database.cnf";
 
 	private Database db;
 
@@ -104,6 +113,62 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 				if (result.exists()) {
 					return result;
 				}
+			}
+
+			// answering a request for general information
+			if (locEquiv.equals("index.htm")) {
+
+				System.out.println("Answering index request...");
+
+				Database database = AssSecretary.getDatabase();
+
+				TextFile indexBaseFile = new TextFile(serverDir, locEquiv);
+				String indexContent = indexBaseFile.getContent();
+
+				indexContent = StrUtils.replaceAll(indexContent, "[[USERNAME]]", database.getUsername());
+
+				String mariHtml = "<div>I haven't heard anything from Mari recently, I wonder how she is doing...</div>";
+
+				MariDatabase mariDatabase = new MariDatabase(MARI_DATABASE_FILE);
+
+				if (mariDatabase.isAvailable()) {
+					MariTaskCtrl mariTaskCtrl = new MariTaskCtrl(mariDatabase);
+
+					List<GenericTask> tasks = mariTaskCtrl.getCurrentTaskInstances();
+					int upcomingDays = 5;
+					List<GenericTask> upcomingTasks = mariTaskCtrl.getUpcomingTaskInstances(upcomingDays);
+
+					if ((tasks.size() == 0) && (upcomingTasks.size() == 0)) {
+						mariHtml = "<div>I talked to Mari, all is well on her side. :)</div>";
+					} else {
+						mariHtml = "";
+						if (tasks.size() > 0) {
+							mariHtml += "<div>";
+							mariHtml += "<div>I talked to Mari, and she mentioned that these things should be done today:</div>";
+							for (GenericTask task : tasks) {
+								mariHtml += "<div>" + task.getReleasedDateStr() + " " + task.getTitle() + "</div>";
+							}
+							mariHtml += "</div>";
+						}
+						if (upcomingTasks.size() > 0) {
+							mariHtml += "<div>";
+							if (tasks.size() == 0) {
+								mariHtml += "<div>I talked to Mari, and she mentioned ";
+							} else {
+								mariHtml += "<div>She also mentioned ";
+							}
+							mariHtml += "these things coming up in the next " + upcomingDays + " days:</div>";
+							for (GenericTask task : upcomingTasks) {
+								mariHtml += "<div>" + task.getReleasedDateStr() + " " + task.getTitle() + "</div>";
+							}
+							mariHtml += "</div>";
+						}
+					}
+				}
+				indexContent = StrUtils.replaceAll(indexContent, "[[MARI]]", mariHtml);
+
+				TextFile indexFile = new TextFile(webRoot, locEquiv);
+				indexFile.saveContent(indexContent);
 			}
 
 			// actually get the file
