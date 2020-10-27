@@ -1,8 +1,19 @@
 body {
 	font-family: "Calibri";
 	overflow: hidden;
+	background: linear-gradient(179deg, #102, #201, #102);
+	padding-left: 212pt;
 }
 
 body > div {
 	padding-bottom: 10pt;
+	color: #88AAFF;
+}
+
+img.avatar {
+	position: absolute;
+	left: 10pt;
+	top: 10pt;
+	width: 200pt;
+	border-radius: 20pt;
 }
