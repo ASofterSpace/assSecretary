@@ -8,6 +8,7 @@ import com.asofterspace.assSecretary.accountant.MariDatabase;
 import com.asofterspace.assSecretary.accountant.MariTaskCtrl;
 import com.asofterspace.assSecretary.AssSecretary;
 import com.asofterspace.assSecretary.Database;
+import com.asofterspace.assSecretary.skyhook.VmInfo;
 import com.asofterspace.toolbox.calendar.GenericTask;
 import com.asofterspace.toolbox.io.Directory;
 import com.asofterspace.toolbox.io.File;
@@ -166,6 +167,14 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 					}
 				}
 				indexContent = StrUtils.replaceAll(indexContent, "[[MARI]]", mariHtml);
+
+				VmInfo vmInfo = AssSecretary.getSkyhookVmInfo();
+				String skyhookHtml = "<div>I have checked the skyhook VMs; the disk status is:<br>";
+				skyhookHtml += "DB: " + vmInfo.getDfDb() + "</br>";
+				skyhookHtml += "F1: " + vmInfo.getDfF1() + "</br>";
+				skyhookHtml += "F2: " + vmInfo.getDfF2();
+				skyhookHtml += "</div>";
+				indexContent = StrUtils.replaceAll(indexContent, "[[SKYHOOK]]", skyhookHtml);
 
 				TextFile indexFile = new TextFile(webRoot, locEquiv);
 				indexFile.saveContent(indexContent);

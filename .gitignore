@@ -30,8 +30,9 @@ src/sourcefiles.list
 # external dependencies (with their own repositories and life cycles)
 src/com/asofterspace/toolbox
 
-# config files
+# config files and scripts which can contain sensitive information
 /config
+/scripts
 
 # input / output files
 *.txt

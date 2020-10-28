@@ -4,11 +4,15 @@
  */
 package com.asofterspace.assSecretary;
 
+import com.asofterspace.assSecretary.skyhook.VmInfo;
 import com.asofterspace.assSecretary.web.Server;
 import com.asofterspace.toolbox.io.Directory;
+import com.asofterspace.toolbox.io.IoUtils;
 import com.asofterspace.toolbox.io.JSON;
 import com.asofterspace.toolbox.io.JsonFile;
 import com.asofterspace.toolbox.io.JsonParseException;
+import com.asofterspace.toolbox.io.SimpleFile;
+import com.asofterspace.toolbox.utils.StrUtils;
 import com.asofterspace.toolbox.Utils;
 import com.asofterspace.toolbox.web.WebTemplateEngine;
 
@@ -19,6 +23,7 @@ public class AssSecretary {
 
 	public final static String DATA_DIR = "config";
 	public final static String SERVER_DIR = "server";
+	public final static String SCRIPTS_DIR = "scripts";
 	public final static String WEB_ROOT_DIR = "deployed";
 
 	public final static String PROGRAM_TITLE = "assSecretary (Hugo)";
@@ -26,6 +31,8 @@ public class AssSecretary {
 	public final static String VERSION_DATE = "21. Oct 2020 - 27. Oct 2020";
 
 	private static Database database;
+
+	private static VmInfo skyhookVmInfo;
 
 
 	public static void main(String[] args) {
@@ -76,6 +83,15 @@ public class AssSecretary {
 			engine.compileTo(webRoot);
 
 
+			System.out.println("Performing startup tasks...");
+
+			skyhookVmInfo = new VmInfo();
+
+			addVmInfo(skyhookVmInfo, "db");
+			addVmInfo(skyhookVmInfo, "f1");
+			addVmInfo(skyhookVmInfo, "f2");
+
+
 			System.out.println("Starting the server on port " + database.getPort() + "...");
 
 			Server server = new Server(webRoot, serverDir, database);
@@ -97,6 +113,67 @@ public class AssSecretary {
 
 	public static Database getDatabase() {
 		return database;
+	}
+
+	public static VmInfo getSkyhookVmInfo() {
+		return skyhookVmInfo;
+	}
+
+	private static void addVmInfo(VmInfo skyhookVmInfo, String which) {
+
+		Directory thisDir = new Directory(".");
+		IoUtils.execute(thisDir.getAbsoluteDirname() + "\\" + SCRIPTS_DIR + "\\skyhook_df_" + which + ".bat");
+
+		SimpleFile skyhookDfDb = new SimpleFile(thisDir, "skyhook_out_" + which + ".txt");
+		List<String> lines = skyhookDfDb.getContents();
+
+		boolean nonsense = false;
+		int highestPerc = 0;
+		String highestFs = "";
+
+		for (String line : lines) {
+			if ("".equals(line.trim())) {
+				continue;
+			}
+			if (line.startsWith("Filesystem ")) {
+				continue;
+			}
+
+			// transform "/dev/sda1 ... 50% /" into just "50%"
+			String fs = line.substring(0, line.indexOf(" "));
+			line = line.trim();
+			line = line.substring(0, line.lastIndexOf(" "));
+			line = line.trim();
+			line = line.substring(line.lastIndexOf(" ") + 1);
+			if (line.endsWith("%")) {
+				line = line.substring(0, line.length() - 1);
+				int curPerc = StrUtils.strToInt(line);
+				if (curPerc > highestPerc) {
+					highestPerc = curPerc;
+					highestFs = fs;
+				}
+			} else {
+				nonsense = true;
+			}
+		}
+
+		String result;
+		if (nonsense) {
+			result = "Responded with nonsense!";
+		} else {
+			result = highestFs + " is to " + highestPerc + "% full";
+		}
+		switch (which) {
+			case "db":
+				skyhookVmInfo.setDfDb(result);
+				break;
+			case "f1":
+				skyhookVmInfo.setDfF1(result);
+				break;
+			case "f2":
+				skyhookVmInfo.setDfF2(result);
+				break;
+		}
 	}
 
 }
