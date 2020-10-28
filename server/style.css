@@ -3,6 +3,7 @@ body {
 	overflow: hidden;
 	background: linear-gradient(179deg, #102, #201, #102);
 	padding-left: 212pt;
+	padding-right: 60pt;
 }
 
 body > div {
@@ -16,4 +17,19 @@ img.avatar {
 	top: 10pt;
 	width: 200pt;
 	border-radius: 20pt;
+}
+
+a.sidebar {
+	position: absolute;
+	right: 10pt;
+	top: 10pt;
+	width: 50pt;
+}
+
+a.sidebar > img.avatar {
+	position: relative;
+	width: 100%;
+	border-radius: 5pt;
+	left: 0;
+	top: 0;
 }
