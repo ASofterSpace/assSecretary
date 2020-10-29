@@ -14,7 +14,9 @@ cd toolbox
 
 mkdir calendar
 mkdir coders
+mkdir images
 mkdir io
+mkdir projects
 mkdir utils
 mkdir web
 
@@ -23,7 +25,9 @@ cd ../../../..
 cp ../Toolbox-Java/src/com/asofterspace/toolbox/*.java src/com/asofterspace/toolbox
 cp ../Toolbox-Java/src/com/asofterspace/toolbox/calendar/*.* src/com/asofterspace/toolbox/calendar
 cp ../Toolbox-Java/src/com/asofterspace/toolbox/coders/*.* src/com/asofterspace/toolbox/coders
+cp ../Toolbox-Java/src/com/asofterspace/toolbox/images/*.* src/com/asofterspace/toolbox/images
 cp ../Toolbox-Java/src/com/asofterspace/toolbox/io/*.* src/com/asofterspace/toolbox/io
+cp ../Toolbox-Java/src/com/asofterspace/toolbox/projects/*.* src/com/asofterspace/toolbox/projects
 cp ../Toolbox-Java/src/com/asofterspace/toolbox/utils/*.* src/com/asofterspace/toolbox/utils
 cp ../Toolbox-Java/src/com/asofterspace/toolbox/web/*.* src/com/asofterspace/toolbox/web
 

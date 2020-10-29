@@ -19,11 +19,14 @@ img.avatar {
 	border-radius: 20pt;
 }
 
-a.sidebar {
+a.sidebar, div.projectbar {
 	position: absolute;
 	right: 10pt;
-	top: 10pt;
 	width: 50pt;
+}
+
+a.sidebar {
+	top: 10pt;
 }
 
 a.sidebar > img.avatar {
@@ -32,4 +35,42 @@ a.sidebar > img.avatar {
 	border-radius: 5pt;
 	left: 0;
 	top: 0;
+}
+
+div.projectbar {
+	bottom: 10pt;
+}
+
+div.projectbar > a {
+	border: 3pt solid black;
+	border-radius: 5pt;
+	text-align: center;
+	height: 30pt;
+	display: inline-block;
+	text-decoration: none;
+}
+
+span.vertAligner {
+	display: inline-block;
+	height: 100%;
+	vertical-align: middle;
+}
+
+div.projectbar > a, div.projectbar > a > img {
+	width: 100%;
+}
+
+div.projectbar > a {
+	margin-top: 5pt;
+	background: radial-gradient(rgba(255, 255, 255, 1), rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.0));;
+}
+
+div.projectbar > a:hover {
+	background: rgba(255, 255, 255, 1);
+}
+
+div.projectbar > a > img {
+	max-height: 80%;
+	max-width: 80%;
+	vertical-align: middle;
 }

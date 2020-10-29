@@ -98,6 +98,16 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 	@Override
 	protected File getFileFromLocation(String location, String[] arguments) {
 
+		// get project logo files from assWorkbench
+		if (location.startsWith("/projectlogos/") && location.endsWith(".png") && !location.contains("..")) {
+			location = location.substring("/projectlogos/".length());
+			location = System.getProperty("java.class.path") + "/../../assWorkbench/server/projects/" + location;
+			File result = new File(location);
+			if (result.exists()) {
+				return result;
+			}
+		}
+
 		String locEquiv = getWhitelistedLocationEquivalent(location);
 
 		// if no root is specified, then we are just not serving any files at all
@@ -123,7 +133,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 				Database database = AssSecretary.getDatabase();
 
-				TextFile indexBaseFile = new TextFile(serverDir, locEquiv);
+				TextFile indexBaseFile = new TextFile(webRoot, locEquiv);
 				String indexContent = indexBaseFile.getContent();
 
 				indexContent = StrUtils.replaceAll(indexContent, "[[USERNAME]]", database.getUsername());
@@ -176,6 +186,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 				skyhookHtml += "</div>";
 				indexContent = StrUtils.replaceAll(indexContent, "[[SKYHOOK]]", skyhookHtml);
 
+				locEquiv = "_" + locEquiv;
 				TextFile indexFile = new TextFile(webRoot, locEquiv);
 				indexFile.saveContent(indexContent);
 			}

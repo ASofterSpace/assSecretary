@@ -12,6 +12,9 @@ import com.asofterspace.toolbox.io.JSON;
 import com.asofterspace.toolbox.io.JsonFile;
 import com.asofterspace.toolbox.io.JsonParseException;
 import com.asofterspace.toolbox.io.SimpleFile;
+import com.asofterspace.toolbox.io.TextFile;
+import com.asofterspace.toolbox.projects.GenericProject;
+import com.asofterspace.toolbox.projects.GenericProjectCtrl;
 import com.asofterspace.toolbox.utils.StrUtils;
 import com.asofterspace.toolbox.Utils;
 import com.asofterspace.toolbox.web.WebTemplateEngine;
@@ -90,6 +93,26 @@ public class AssSecretary {
 			addVmInfo(skyhookVmInfo, "db");
 			addVmInfo(skyhookVmInfo, "f1");
 			addVmInfo(skyhookVmInfo, "f2");
+
+
+			GenericProjectCtrl projectCtrl = new GenericProjectCtrl(
+				System.getProperty("java.class.path") + "/../../assWorkbench/server/projects");
+			List<GenericProject> projects = projectCtrl.getGenericProjects();
+			StringBuilder projHtml = new StringBuilder();
+
+			for (GenericProject proj : projects) {
+				projHtml.append("\n");
+				projHtml.append("  <a href=\"localhost:3010/projects/" + proj.getShortName() + "/?open=logbook\" target=\"_blank\" class=\"project\" style=\"border-color: " + proj.getColor().toHexString() + "\">");
+				projHtml.append("    <span class=\"vertAligner\"></span><img src=\"projectlogos/" + proj.getShortName() + "/logo.png\" />");
+				projHtml.append("  </a>");
+			}
+
+			String projHtmlStr = projHtml.toString();
+
+			TextFile indexBaseFile = new TextFile(webRoot, "index.htm");
+			String indexContent = indexBaseFile.getContent();
+			indexContent = StrUtils.replaceAll(indexContent, "[[PROJECTS]]", projHtmlStr);
+			indexBaseFile.saveContent(indexContent);
 
 
 			System.out.println("Starting the server on port " + database.getPort() + "...");
