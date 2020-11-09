@@ -182,8 +182,11 @@ public class AssSecretary {
 
 		String result = "";
 		if (nonsense) {
-			result += "<span class='warning'>Responded with nonsense!</span>";
+			result += "<span class='error'>Responded with nonsense!</span>";
 		} else {
+			if (highestPerc < 30) {
+				result += "<span class='awesome'>";
+			}
 			if (highestPerc >= 80) {
 				if (highestPerc >= 90) {
 					result += "<span class='error'>";
@@ -192,7 +195,7 @@ public class AssSecretary {
 				}
 			}
 			result += highestFs + " is to " + highestPerc + "% full";
-			if (highestPerc >= 80) {
+			if ((highestPerc < 30) || (highestPerc >= 80)) {
 				result += "</span>";
 			}
 		}

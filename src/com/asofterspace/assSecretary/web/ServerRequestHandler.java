@@ -157,7 +157,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 							mariHtml += "<div>";
 							mariHtml += "<div>I talked to Mari, and she mentioned that these things should be done today:</div>";
 							for (GenericTask task : tasks) {
-								mariHtml += "<div>" + task.getReleasedDateStr() + " " + task.getTitle() + "</div>";
+								mariHtml += "<div><span class='warning'>" + task.getReleasedDateStr() + " " + task.getTitle() + "</span></div>";
 							}
 							mariHtml += "</div>";
 						}

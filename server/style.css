@@ -56,6 +56,10 @@ span.vertAligner {
 	vertical-align: middle;
 }
 
+span.awesome {
+	color: #20CC00;
+}
+
 span.warning {
 	color: #D4B430;
 }
