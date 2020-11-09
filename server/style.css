@@ -1,14 +1,20 @@
 body {
 	font-family: "Calibri";
 	overflow: hidden;
-	background: linear-gradient(179deg, #102, #201, #102);
+	background: linear-gradient(179deg, #102, #201, #102, #201, #102, #201, #102, #201, #102);
 	padding-left: 212pt;
 	padding-right: 60pt;
 }
 
-body > div {
+body > div, div#mainContent > div {
 	padding-bottom: 10pt;
 	color: #88AAFF;
+}
+
+div#mainContent {
+	overflow-y: scroll;
+	overflow-x: hidden;
+	scrollbar-color: #402 #102;
 }
 
 img.avatar {
@@ -35,6 +41,10 @@ a.sidebar > img.avatar {
 	border-radius: 5pt;
 	left: 0;
 	top: 0;
+}
+
+div.footer {
+	height: 200pt;
 }
 
 div.projectbar {
