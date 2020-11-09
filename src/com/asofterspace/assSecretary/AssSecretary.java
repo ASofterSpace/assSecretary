@@ -30,8 +30,8 @@ public class AssSecretary {
 	public final static String WEB_ROOT_DIR = "deployed";
 
 	public final static String PROGRAM_TITLE = "assSecretary (Hugo)";
-	public final static String VERSION_NUMBER = "0.0.0.2(" + Utils.TOOLBOX_VERSION_NUMBER + ")";
-	public final static String VERSION_DATE = "21. Oct 2020 - 27. Oct 2020";
+	public final static String VERSION_NUMBER = "0.0.0.3(" + Utils.TOOLBOX_VERSION_NUMBER + ")";
+	public final static String VERSION_DATE = "21. October 2020 - 9. November 2020";
 
 	private static Database database;
 
@@ -180,11 +180,21 @@ public class AssSecretary {
 			}
 		}
 
-		String result;
+		String result = "";
 		if (nonsense) {
-			result = "Responded with nonsense!";
+			result += "<span class='warning'>Responded with nonsense!</span>";
 		} else {
-			result = highestFs + " is to " + highestPerc + "% full";
+			if (highestPerc >= 80) {
+				if (highestPerc >= 90) {
+					result += "<span class='error'>";
+				} else {
+					result += "<span class='warning'>";
+				}
+			}
+			result += highestFs + " is to " + highestPerc + "% full";
+			if (highestPerc >= 80) {
+				result += "</span>";
+			}
 		}
 		switch (which) {
 			case "db":

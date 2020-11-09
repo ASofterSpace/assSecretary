@@ -56,6 +56,14 @@ span.vertAligner {
 	vertical-align: middle;
 }
 
+span.warning {
+	color: #D4B430;
+}
+
+span.error {
+	color: #FF4020;
+}
+
 div.projectbar > a, div.projectbar > a > img {
 	width: 100%;
 }
