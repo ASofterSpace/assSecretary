@@ -15,6 +15,13 @@ public class VmInfo {
 	private String dfF2;
 
 
+	public VmInfo() {
+		String defaultVal = "<span class='warning'>Has not yet responded</span>";
+		dfDb = defaultVal;
+		dfF1 = defaultVal;
+		dfF2 = defaultVal;
+	}
+
 	public String getDfDb() {
 		return dfDb;
 	}

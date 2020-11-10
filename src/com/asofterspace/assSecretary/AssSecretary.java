@@ -5,6 +5,7 @@
 package com.asofterspace.assSecretary;
 
 import com.asofterspace.assSecretary.skyhook.VmInfo;
+import com.asofterspace.assSecretary.skyhook.VmInfoDatabase;
 import com.asofterspace.assSecretary.web.Server;
 import com.asofterspace.toolbox.io.Directory;
 import com.asofterspace.toolbox.io.IoUtils;
@@ -19,6 +20,7 @@ import com.asofterspace.toolbox.utils.StrUtils;
 import com.asofterspace.toolbox.Utils;
 import com.asofterspace.toolbox.web.WebTemplateEngine;
 
+import java.util.Date;
 import java.util.List;
 
 
@@ -30,8 +32,8 @@ public class AssSecretary {
 	public final static String WEB_ROOT_DIR = "deployed";
 
 	public final static String PROGRAM_TITLE = "assSecretary (Hugo)";
-	public final static String VERSION_NUMBER = "0.0.0.3(" + Utils.TOOLBOX_VERSION_NUMBER + ")";
-	public final static String VERSION_DATE = "21. October 2020 - 9. November 2020";
+	public final static String VERSION_NUMBER = "0.0.0.4(" + Utils.TOOLBOX_VERSION_NUMBER + ")";
+	public final static String VERSION_DATE = "21. October 2020 - 10. November 2020";
 
 	private static Database database;
 
@@ -68,6 +70,7 @@ public class AssSecretary {
 		System.out.println("Loading database...");
 
 		database = new Database(dataDir);
+		VmInfoDatabase vmInfoDatabase = new VmInfoDatabase(dataDir, "skyhook");
 
 
 		try {
@@ -90,9 +93,9 @@ public class AssSecretary {
 
 			skyhookVmInfo = new VmInfo();
 
-			addVmInfo(skyhookVmInfo, "db");
-			addVmInfo(skyhookVmInfo, "f1");
-			addVmInfo(skyhookVmInfo, "f2");
+			addVmInfo(skyhookVmInfo, "db", vmInfoDatabase);
+			addVmInfo(skyhookVmInfo, "f1", vmInfoDatabase);
+			addVmInfo(skyhookVmInfo, "f2", vmInfoDatabase);
 
 
 			GenericProjectCtrl projectCtrl = new GenericProjectCtrl(
@@ -142,7 +145,7 @@ public class AssSecretary {
 		return skyhookVmInfo;
 	}
 
-	private static void addVmInfo(VmInfo skyhookVmInfo, String which) {
+	private static void addVmInfo(VmInfo skyhookVmInfo, String which, VmInfoDatabase vmInfoDatabase) {
 
 		Directory thisDir = new Directory(".");
 		IoUtils.execute(thisDir.getAbsoluteDirname() + "\\" + SCRIPTS_DIR + "\\skyhook_df_" + which + ".bat");
@@ -183,6 +186,7 @@ public class AssSecretary {
 		String result = "";
 		if (nonsense) {
 			result += "<span class='error'>Responded with nonsense!</span>";
+			vmInfoDatabase.addDatapoint(new Date(), which, null);
 		} else {
 			if (highestPerc < 30) {
 				result += "<span class='awesome'>";
@@ -198,6 +202,7 @@ public class AssSecretary {
 			if ((highestPerc < 30) || (highestPerc >= 80)) {
 				result += "</span>";
 			}
+			vmInfoDatabase.addDatapoint(new Date(), which, highestPerc);
 		}
 		switch (which) {
 			case "db":
