@@ -16,6 +16,7 @@ import com.asofterspace.toolbox.io.JSON;
 import com.asofterspace.toolbox.io.JsonParseException;
 import com.asofterspace.toolbox.io.TextFile;
 import com.asofterspace.toolbox.utils.StrUtils;
+import com.asofterspace.toolbox.web.WebAccessor;
 import com.asofterspace.toolbox.web.WebServer;
 import com.asofterspace.toolbox.web.WebServerAnswer;
 import com.asofterspace.toolbox.web.WebServerAnswerInJson;
@@ -138,42 +139,72 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 				indexContent = StrUtils.replaceAll(indexContent, "[[USERNAME]]", database.getUsername());
 
-				String mariHtml = "<div>I haven't heard anything from Mari recently, I wonder how she is doing...</div>";
+				String mariHtml = "";
+
+				String problems = WebAccessor.get("http://localhost:3011/unacknowledged-problems");
 
 				MariDatabase mariDatabase = new MariDatabase(MARI_DATABASE_FILE);
 
-				if (mariDatabase.isAvailable()) {
+				if ((problems == null) || "".equals(problems) || !mariDatabase.isAvailable()) {
+
+					mariHtml += "<div>";
+					mariHtml += "<div><span class='warning'>I haven't heard anything from Mari recently,</span> I wonder how she is doing...</div>";
+
+					if ((problems == null) || "".equals(problems)) {
+						mariHtml += "<div>(She did not react to me sending a web request to her.)</div>";
+					}
+
+					if (!mariDatabase.isAvailable()) {
+						mariHtml += "<div>(She did not let me access her database.)</div>";
+					}
+					mariHtml += "</div>";
+
+				} else {
+
+					boolean talkedToMari = false;
+
 					MariTaskCtrl mariTaskCtrl = new MariTaskCtrl(mariDatabase);
 
 					List<GenericTask> tasks = mariTaskCtrl.getCurrentTaskInstances();
 					int upcomingDays = 5;
 					List<GenericTask> upcomingTasks = mariTaskCtrl.getUpcomingTaskInstances(upcomingDays);
 
-					if ((tasks.size() == 0) && (upcomingTasks.size() == 0)) {
-						mariHtml = "<div>I talked to Mari, all is well on her side. :)</div>";
-					} else {
-						mariHtml = "";
-						if (tasks.size() > 0) {
-							mariHtml += "<div>";
-							mariHtml += "<div>I talked to Mari, and she mentioned that these things should be done today:</div>";
-							for (GenericTask task : tasks) {
-								mariHtml += "<div><span class='warning'>" + task.getReleasedDateStr() + " " + task.getTitle() + "</span></div>";
-							}
-							mariHtml += "</div>";
+					if (!"no problems".equals(problems)) {
+						mariHtml += "<div>";
+						mariHtml += "<div>I talked to Mari and she mentioned these problems:</div>";
+						mariHtml += problems;
+						mariHtml += "</div>";
+						talkedToMari = true;
+					}
+
+					if (tasks.size() > 0) {
+						mariHtml += "<div>";
+						if (!talkedToMari) {
+							mariHtml += "<div>I talked to Mari, and she ";
+						} else {
+							mariHtml += "<div>She also ";
 						}
-						if (upcomingTasks.size() > 0) {
-							mariHtml += "<div>";
-							if (tasks.size() == 0) {
-								mariHtml += "<div>I talked to Mari, and she mentioned ";
-							} else {
-								mariHtml += "<div>She also mentioned ";
-							}
-							mariHtml += "these things coming up in the next " + upcomingDays + " days:</div>";
-							for (GenericTask task : upcomingTasks) {
-								mariHtml += "<div>" + task.getReleasedDateStr() + " " + task.getTitle() + "</div>";
-							}
-							mariHtml += "</div>";
+						mariHtml += "mentioned that these things should be done today:</div>";
+						for (GenericTask task : tasks) {
+							mariHtml += "<div><span class='warning'>" + task.getReleasedDateStr() + " " + task.getTitle() + "</span></div>";
 						}
+						mariHtml += "</div>";
+						talkedToMari = true;
+					}
+
+					if (upcomingTasks.size() > 0) {
+						mariHtml += "<div>";
+						if (!talkedToMari) {
+							mariHtml += "<div>I talked to Mari, and she ";
+						} else {
+							mariHtml += "<div>She also ";
+						}
+						mariHtml += "mentioned these things coming up in the next " + upcomingDays + " days:</div>";
+						for (GenericTask task : upcomingTasks) {
+							mariHtml += "<div>" + task.getReleasedDateStr() + " " + task.getTitle() + "</div>";
+						}
+						mariHtml += "</div>";
+						talkedToMari = true;
 					}
 				}
 				indexContent = StrUtils.replaceAll(indexContent, "[[MARI]]", mariHtml);
