@@ -66,6 +66,11 @@ span.vertAligner {
 	vertical-align: middle;
 }
 
+span.sup {
+	font-size: 80%;
+	vertical-align: top;
+}
+
 span.awesome {
 	color: #20CC00;
 }

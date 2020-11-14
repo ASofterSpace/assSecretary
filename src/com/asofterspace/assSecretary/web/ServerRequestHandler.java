@@ -142,7 +142,10 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 				indexContent = StrUtils.replaceAll(indexContent, "[[USERNAME]]", database.getUsername());
 
 				Date now = new Date();
-				String generalInfo = "Today is " + StrUtils.replaceAll(DateUtils.serializeDateTimeLong(now), ", ", " and it is ") + " right now. You are on planet Earth.";
+				// Today is Monday the 23rd of April 2027 and it is 08:37 right now. You are on planet Earth.
+				String generalInfo = "Today is " + DateUtils.getDayOfWeekNameEN(now) + " the " +
+					StrUtils.replaceAll(DateUtils.serializeDateTimeLong(now, "<span class='sup'>", "</span>"), ", ", " and it is ") +
+					" right now. You are on planet Earth.";
 				indexContent = StrUtils.replaceAll(indexContent, "[[GENERAL_INFO]]", generalInfo);
 
 				String mariHtml = "";
