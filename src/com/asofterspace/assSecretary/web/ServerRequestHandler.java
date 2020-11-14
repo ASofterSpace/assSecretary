@@ -15,6 +15,7 @@ import com.asofterspace.toolbox.io.File;
 import com.asofterspace.toolbox.io.JSON;
 import com.asofterspace.toolbox.io.JsonParseException;
 import com.asofterspace.toolbox.io.TextFile;
+import com.asofterspace.toolbox.utils.DateUtils;
 import com.asofterspace.toolbox.utils.StrUtils;
 import com.asofterspace.toolbox.web.WebAccessor;
 import com.asofterspace.toolbox.web.WebServer;
@@ -24,6 +25,7 @@ import com.asofterspace.toolbox.web.WebServerRequestHandler;
 
 import java.io.IOException;
 import java.net.Socket;
+import java.util.Date;
 import java.util.List;
 
 
@@ -138,6 +140,10 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 				String indexContent = indexBaseFile.getContent();
 
 				indexContent = StrUtils.replaceAll(indexContent, "[[USERNAME]]", database.getUsername());
+
+				Date now = new Date();
+				String generalInfo = "Today is " + StrUtils.replaceAll(DateUtils.serializeDateTimeLong(now), ", ", " and it is ") + " right now. You are on planet Earth.";
+				indexContent = StrUtils.replaceAll(indexContent, "[[GENERAL_INFO]]", generalInfo);
 
 				String mariHtml = "";
 
