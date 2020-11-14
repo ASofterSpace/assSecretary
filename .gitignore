@@ -44,3 +44,6 @@ src/com/asofterspace/toolbox
 
 # pictures
 /server/pics
+
+# toolbox-js
+/server/toolbox

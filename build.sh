@@ -31,6 +31,22 @@ cp ../Toolbox-Java/src/com/asofterspace/toolbox/projects/*.* src/com/asofterspac
 cp ../Toolbox-Java/src/com/asofterspace/toolbox/utils/*.* src/com/asofterspace/toolbox/utils
 cp ../Toolbox-Java/src/com/asofterspace/toolbox/web/*.* src/com/asofterspace/toolbox/web
 
+
+cd server
+
+rm -rf toolbox
+
+mkdir toolbox
+cd toolbox
+
+mkdir utils
+
+cd ../..
+
+cp ../Toolbox-JavaScript/toolbox/*.js server/toolbox
+cp ../Toolbox-JavaScript/toolbox/utils/*.* server/toolbox/utils
+
+
 rm -rf bin
 
 mkdir bin

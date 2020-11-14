@@ -29,6 +29,22 @@ copy "..\Toolbox-Java\src\com\asofterspace\toolbox\projects\*.*" "src\com\asofte
 copy "..\Toolbox-Java\src\com\asofterspace\toolbox\utils\*.*" "src\com\asofterspace\toolbox\utils"
 copy "..\Toolbox-Java\src\com\asofterspace\toolbox\web\*.*" "src\com\asofterspace\toolbox\web"
 
+
+cd server
+
+rd /s /q toolbox
+
+md toolbox
+cd toolbox
+
+md utils
+
+cd ..\..
+
+copy "..\Toolbox-JavaScript\toolbox\*.js" "server\toolbox"
+copy "..\Toolbox-JavaScript\toolbox\utils\*.*" "server\toolbox\utils"
+
+
 rd /s /q bin
 
 md bin

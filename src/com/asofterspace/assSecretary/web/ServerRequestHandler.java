@@ -143,9 +143,9 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 				Date now = new Date();
 				// Today is Monday the 23rd of April 2027 and it is 08:37 right now. You are on planet Earth.
-				String generalInfo = "Today is " + DateUtils.getDayOfWeekNameEN(now) + " the " +
+				String generalInfo = "Today is <span id='curdatetime'>" + DateUtils.getDayOfWeekNameEN(now) + " the " +
 					StrUtils.replaceAll(DateUtils.serializeDateTimeLong(now, "<span class='sup'>", "</span>"), ", ", " and it is ") +
-					" right now. You are on planet Earth.";
+					"</span> right now. You are on planet Earth.";
 				indexContent = StrUtils.replaceAll(indexContent, "[[GENERAL_INFO]]", generalInfo);
 
 				String mariHtml = "";

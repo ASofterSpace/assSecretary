@@ -21,7 +21,7 @@ window.secretary = {
 		if (retry) {
 			// if we could not fully resize now, then let's do it later...
 			window.setTimeout(function() {
-				window.accountant.onResize();
+				window.secretary.onResize();
 			}, 100);
 		}
 	},
@@ -33,3 +33,16 @@ window.addEventListener("resize", window.secretary.onResize);
 
 
 window.secretary.onResize();
+
+
+// every 30 seconds, update the clock time (including the date, as it might have changed!)
+window.setInterval(function() {
+	var dateTimeEl = document.getElementById("curdatetime");
+	var DateUtils = toolbox.utils.DateUtils;
+	var StrUtils = toolbox.utils.StrUtils;
+	if (dateTimeEl && DateUtils && StrUtils) {
+		var now = DateUtils.now();
+		dateTimeEl.innerHTML = DateUtils.getDayOfWeekNameEN(now) + " the " +
+			StrUtils.replaceAll(DateUtils.serializeDateTimeLong(now, "<span class='sup'>", "</span>"), ", ", " and it is ");
+	}
+}, 30000);
