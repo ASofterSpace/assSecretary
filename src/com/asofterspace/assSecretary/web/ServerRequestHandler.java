@@ -145,7 +145,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 				// Today is Monday the 23rd of April 2027 and it is 08:37 right now. You are on planet Earth.
 				String generalInfo = "Today is <span id='curdatetime'>" + DateUtils.getDayOfWeekNameEN(now) + " the " +
 					StrUtils.replaceAll(DateUtils.serializeDateTimeLong(now, "<span class='sup'>", "</span>"), ", ", " and it is ") +
-					"</span> right now. You are on planet Earth.";
+					"</span> right now. You are currently on planet Earth.";
 				indexContent = StrUtils.replaceAll(indexContent, "[[GENERAL_INFO]]", generalInfo);
 
 				String mariHtml = "";
@@ -219,12 +219,13 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 				indexContent = StrUtils.replaceAll(indexContent, "[[MARI]]", mariHtml);
 
 				VmInfo vmInfo = AssSecretary.getSkyhookVmInfo();
-				String skyhookHtml = "<div>I have checked the skyhook VMs; the disk status is:<br>";
-				skyhookHtml += "DB: " + vmInfo.getDfDb() + "</br>";
-				skyhookHtml += "F1: " + vmInfo.getDfF1() + "</br>";
-				skyhookHtml += "F2: " + vmInfo.getDfF2();
-				skyhookHtml += "</div>";
-				indexContent = StrUtils.replaceAll(indexContent, "[[SKYHOOK]]", skyhookHtml);
+				String vmStatsHtml = "<div>I have checked the skyhook and supervision earth VMs; the disk status is:<br>";
+				vmStatsHtml += "Skyhook DB: " + vmInfo.getDfDb() + "</br>";
+				vmStatsHtml += "Skyhook F1: " + vmInfo.getDfF1() + "</br>";
+				vmStatsHtml += "Skyhook F2: " + vmInfo.getDfF2() + "</br>";
+				vmStatsHtml += "SVE svs-backend: " + vmInfo.getSvsBackend();
+				vmStatsHtml += "</div>";
+				indexContent = StrUtils.replaceAll(indexContent, "[[VM_STATS]]", vmStatsHtml);
 
 				locEquiv = "_" + locEquiv;
 				TextFile indexFile = new TextFile(webRoot, locEquiv);

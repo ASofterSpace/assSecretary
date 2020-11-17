@@ -32,12 +32,12 @@ public class AssSecretary {
 	public final static String WEB_ROOT_DIR = "deployed";
 
 	public final static String PROGRAM_TITLE = "assSecretary (Hugo)";
-	public final static String VERSION_NUMBER = "0.0.0.4(" + Utils.TOOLBOX_VERSION_NUMBER + ")";
-	public final static String VERSION_DATE = "21. October 2020 - 10. November 2020";
+	public final static String VERSION_NUMBER = "0.0.0.5(" + Utils.TOOLBOX_VERSION_NUMBER + ")";
+	public final static String VERSION_DATE = "21. October 2020 - 17. November 2020";
 
 	private static Database database;
 
-	private static VmInfo skyhookVmInfo;
+	private static VmInfo vmInfo;
 
 
 	public static void main(String[] args) {
@@ -91,11 +91,13 @@ public class AssSecretary {
 
 			System.out.println("Performing startup tasks...");
 
-			skyhookVmInfo = new VmInfo();
+			vmInfo = new VmInfo();
 
-			addVmInfo(skyhookVmInfo, "db", vmInfoDatabase);
-			addVmInfo(skyhookVmInfo, "f1", vmInfoDatabase);
-			addVmInfo(skyhookVmInfo, "f2", vmInfoDatabase);
+			addVmInfo(vmInfo, "skyhook", "db", vmInfoDatabase);
+			addVmInfo(vmInfo, "skyhook", "f1", vmInfoDatabase);
+			addVmInfo(vmInfo, "skyhook", "f2", vmInfoDatabase);
+
+			addVmInfo(vmInfo, "supervision-earth", "svs-backend", vmInfoDatabase);
 
 
 			GenericProjectCtrl projectCtrl = new GenericProjectCtrl(
@@ -142,16 +144,16 @@ public class AssSecretary {
 	}
 
 	public static VmInfo getSkyhookVmInfo() {
-		return skyhookVmInfo;
+		return vmInfo;
 	}
 
-	private static void addVmInfo(VmInfo skyhookVmInfo, String which, VmInfoDatabase vmInfoDatabase) {
+	private static void addVmInfo(VmInfo vmInfo, String origin, String which, VmInfoDatabase vmInfoDatabase) {
 
 		Directory thisDir = new Directory(".");
-		IoUtils.execute(thisDir.getAbsoluteDirname() + "\\" + SCRIPTS_DIR + "\\skyhook_df_" + which + ".bat");
+		IoUtils.execute(thisDir.getAbsoluteDirname() + "\\" + SCRIPTS_DIR + "\\" + origin + "_df_" + which + ".bat");
 
-		SimpleFile skyhookDfDb = new SimpleFile(thisDir, "skyhook_out_" + which + ".txt");
-		List<String> lines = skyhookDfDb.getContents();
+		SimpleFile dfDbFile = new SimpleFile(thisDir, origin + "_out_" + which + ".txt");
+		List<String> lines = dfDbFile.getContents();
 
 		boolean nonsense = false;
 		int highestPerc = 0;
@@ -162,6 +164,12 @@ public class AssSecretary {
 				continue;
 			}
 			if (line.startsWith("Filesystem ")) {
+				continue;
+			}
+			if (line.startsWith("load pubkey ")) {
+				continue;
+			}
+			if (line.startsWith("/dev/loop") && line.contains("100% /snap/")) {
 				continue;
 			}
 
@@ -206,13 +214,16 @@ public class AssSecretary {
 		}
 		switch (which) {
 			case "db":
-				skyhookVmInfo.setDfDb(result);
+				vmInfo.setDfDb(result);
 				break;
 			case "f1":
-				skyhookVmInfo.setDfF1(result);
+				vmInfo.setDfF1(result);
 				break;
 			case "f2":
-				skyhookVmInfo.setDfF2(result);
+				vmInfo.setDfF2(result);
+				break;
+			case "svs-backend":
+				vmInfo.setSvsBackend(result);
 				break;
 		}
 	}

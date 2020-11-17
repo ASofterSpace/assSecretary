@@ -13,6 +13,7 @@ public class VmInfo {
 	private String dfDb;
 	private String dfF1;
 	private String dfF2;
+	private String svsBackend;
 
 
 	public VmInfo() {
@@ -20,6 +21,7 @@ public class VmInfo {
 		dfDb = defaultVal;
 		dfF1 = defaultVal;
 		dfF2 = defaultVal;
+		svsBackend = defaultVal;
 	}
 
 	public String getDfDb() {
@@ -44,6 +46,14 @@ public class VmInfo {
 
 	public void setDfF2(String dfF2) {
 		this.dfF2 = dfF2;
+	}
+
+	public String getSvsBackend() {
+		return svsBackend;
+	}
+
+	public void setSvsBackend(String svsBackend) {
+		this.svsBackend = svsBackend;
 	}
 
 }
