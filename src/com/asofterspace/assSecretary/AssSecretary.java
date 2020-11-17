@@ -4,8 +4,10 @@
  */
 package com.asofterspace.assSecretary;
 
-import com.asofterspace.assSecretary.skyhook.VmInfo;
-import com.asofterspace.assSecretary.skyhook.VmInfoDatabase;
+import com.asofterspace.assSecretary.missionControl.MissionControlDatabase;
+import com.asofterspace.assSecretary.missionControl.VmInfo;
+import com.asofterspace.assSecretary.missionControl.WebInfo;
+import com.asofterspace.assSecretary.missionControl.WebInfoCallback;
 import com.asofterspace.assSecretary.web.Server;
 import com.asofterspace.toolbox.io.Directory;
 import com.asofterspace.toolbox.io.IoUtils;
@@ -18,6 +20,8 @@ import com.asofterspace.toolbox.projects.GenericProject;
 import com.asofterspace.toolbox.projects.GenericProjectCtrl;
 import com.asofterspace.toolbox.utils.StrUtils;
 import com.asofterspace.toolbox.Utils;
+import com.asofterspace.toolbox.web.WebAccessedCallback;
+import com.asofterspace.toolbox.web.WebAccessor;
 import com.asofterspace.toolbox.web.WebTemplateEngine;
 
 import java.util.Date;
@@ -38,6 +42,7 @@ public class AssSecretary {
 	private static Database database;
 
 	private static VmInfo vmInfo;
+	private static WebInfo webInfo;
 
 
 	public static void main(String[] args) {
@@ -70,7 +75,7 @@ public class AssSecretary {
 		System.out.println("Loading database...");
 
 		database = new Database(dataDir);
-		VmInfoDatabase vmInfoDatabase = new VmInfoDatabase(dataDir, "skyhook");
+		MissionControlDatabase missionControlDatabase = new MissionControlDatabase(dataDir, "mission_control");
 
 
 		try {
@@ -91,13 +96,23 @@ public class AssSecretary {
 
 			System.out.println("Performing startup tasks...");
 
+			webInfo = new WebInfo();
 			vmInfo = new VmInfo();
 
-			addVmInfo(vmInfo, "skyhook", "db", vmInfoDatabase);
-			addVmInfo(vmInfo, "skyhook", "f1", vmInfoDatabase);
-			addVmInfo(vmInfo, "skyhook", "f2", vmInfoDatabase);
+			addWebInfo(webInfo, "asofterspace", "assEn", "https://www.asofterspace.com/", missionControlDatabase);
+			addWebInfo(webInfo, "asofterspace", "assDe", "https://www.asofterspace.de/", missionControlDatabase);
 
-			addVmInfo(vmInfo, "supervision-earth", "svs-backend", vmInfoDatabase);
+			addVmInfo(vmInfo, "skyhook", "db", missionControlDatabase);
+			addVmInfo(vmInfo, "skyhook", "f1", missionControlDatabase);
+			addVmInfo(vmInfo, "skyhook", "f2", missionControlDatabase);
+			addWebInfo(webInfo, "skyhook", "skyWeb", "https://skyhook.is/", missionControlDatabase);
+			addWebInfo(webInfo, "skyhook", "skyApp", "https://app.skyhook.is/", missionControlDatabase);
+			addWebInfo(webInfo, "skyhook", "skyDb", "http://skyhookdb.skyhook.is/phpmyadmin/", missionControlDatabase);
+
+			addVmInfo(vmInfo, "supervision-earth", "svs-backend", missionControlDatabase);
+			addWebInfo(webInfo, "supervision-earth", "sveWeb", "https://supervision.earth/", missionControlDatabase);
+			addWebInfo(webInfo, "supervision-earth", "sveApp", "https://supervisionspace.app/", missionControlDatabase);
+			addWebInfo(webInfo, "supervision-earth", "sveLB", "http://svs-backend-loadbalancer-1910963306.eu-central-1.elb.amazonaws.com/", missionControlDatabase);
 
 
 			GenericProjectCtrl projectCtrl = new GenericProjectCtrl(
@@ -143,11 +158,16 @@ public class AssSecretary {
 		return database;
 	}
 
-	public static VmInfo getSkyhookVmInfo() {
+	public static VmInfo getVmInfo() {
 		return vmInfo;
 	}
 
-	private static void addVmInfo(VmInfo vmInfo, String origin, String which, VmInfoDatabase vmInfoDatabase) {
+	public static WebInfo getWebInfo() {
+		return webInfo;
+	}
+
+	private static void addVmInfo(VmInfo vmInfo, String origin, String which,
+		MissionControlDatabase missionControlDatabase) {
 
 		Directory thisDir = new Directory(".");
 		IoUtils.execute(thisDir.getAbsoluteDirname() + "\\" + SCRIPTS_DIR + "\\" + origin + "_df_" + which + ".bat");
@@ -194,7 +214,7 @@ public class AssSecretary {
 		String result = "";
 		if (nonsense) {
 			result += "<span class='error'>Responded with nonsense!</span>";
-			vmInfoDatabase.addDatapoint(new Date(), which, null);
+			missionControlDatabase.addDfDatapoint(new Date(), origin, which, null);
 		} else {
 			if (highestPerc < 30) {
 				result += "<span class='awesome'>";
@@ -210,22 +230,17 @@ public class AssSecretary {
 			if ((highestPerc < 30) || (highestPerc >= 80)) {
 				result += "</span>";
 			}
-			vmInfoDatabase.addDatapoint(new Date(), which, highestPerc);
+			missionControlDatabase.addDfDatapoint(new Date(), origin, which, highestPerc);
 		}
-		switch (which) {
-			case "db":
-				vmInfo.setDfDb(result);
-				break;
-			case "f1":
-				vmInfo.setDfF1(result);
-				break;
-			case "f2":
-				vmInfo.setDfF2(result);
-				break;
-			case "svs-backend":
-				vmInfo.setSvsBackend(result);
-				break;
-		}
+
+		vmInfo.set(which, result);
 	}
 
+	private static void addWebInfo(WebInfo webInfo, String origin, String which, String url,
+		MissionControlDatabase missionControlDatabase) {
+
+		WebAccessedCallback callback = new WebInfoCallback(webInfo, origin, which, missionControlDatabase);
+
+		WebAccessor.getAsynch(url, callback);
+	}
 }

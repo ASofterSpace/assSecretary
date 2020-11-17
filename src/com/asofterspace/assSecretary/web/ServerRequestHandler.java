@@ -8,7 +8,9 @@ import com.asofterspace.assSecretary.accountant.MariDatabase;
 import com.asofterspace.assSecretary.accountant.MariTaskCtrl;
 import com.asofterspace.assSecretary.AssSecretary;
 import com.asofterspace.assSecretary.Database;
-import com.asofterspace.assSecretary.skyhook.VmInfo;
+import com.asofterspace.assSecretary.missionControl.McInfo;
+import com.asofterspace.assSecretary.missionControl.VmInfo;
+import com.asofterspace.assSecretary.missionControl.WebInfo;
 import com.asofterspace.toolbox.calendar.GenericTask;
 import com.asofterspace.toolbox.io.Directory;
 import com.asofterspace.toolbox.io.File;
@@ -218,14 +220,33 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 				}
 				indexContent = StrUtils.replaceAll(indexContent, "[[MARI]]", mariHtml);
 
-				VmInfo vmInfo = AssSecretary.getSkyhookVmInfo();
-				String vmStatsHtml = "<div>I have checked the skyhook and supervision earth VMs; the disk status is:<br>";
-				vmStatsHtml += "Skyhook DB: " + vmInfo.getDfDb() + "</br>";
-				vmStatsHtml += "Skyhook F1: " + vmInfo.getDfF1() + "</br>";
-				vmStatsHtml += "Skyhook F2: " + vmInfo.getDfF2() + "</br>";
-				vmStatsHtml += "SVE svs-backend: " + vmInfo.getSvsBackend();
-				vmStatsHtml += "</div>";
-				indexContent = StrUtils.replaceAll(indexContent, "[[VM_STATS]]", vmStatsHtml);
+				VmInfo vmInfo = AssSecretary.getVmInfo();
+				WebInfo webInfo = AssSecretary.getWebInfo();
+				StringBuilder vmStatsHtml = new StringBuilder();
+
+				addLine(vmStatsHtml, "asofterspace.com", webInfo, "assEn");
+				addLine(vmStatsHtml, "asofterspace.de", webInfo, "assDe");
+
+				addLine(vmStatsHtml, "Skyhook DB", vmInfo, "db");
+				addLine(vmStatsHtml, "Skyhook DB", webInfo, "skyDb");
+				addLine(vmStatsHtml, "Skyhook F1", vmInfo, "f1");
+				addLine(vmStatsHtml, "Skyhook F2", vmInfo, "f2");
+				addLine(vmStatsHtml, "Skyhook App", webInfo, "skyApp");
+				addLine(vmStatsHtml, "Skyhook Webpage", webInfo, "skyWeb");
+
+				addLine(vmStatsHtml, "Supervision Earth svs-backend", vmInfo, "svs-backend");
+				addLine(vmStatsHtml, "Supervision Earth App", webInfo, "sveApp");
+				addLine(vmStatsHtml, "Supervision Earth Load Balancer", webInfo, "sveLB");
+				addLine(vmStatsHtml, "Supervision Earth Webpage", webInfo, "sveWeb");
+
+				if (vmStatsHtml.length() < 1) {
+					vmStatsHtml.insert(0, "<div>I have checked the VM disk statusses and web accessibility - and all is fine.");
+				} else {
+					vmStatsHtml.insert(0, "<div>I have checked the VM disk statusses and web accessibility - the status is:");
+				}
+
+				vmStatsHtml.append("</div>");
+				indexContent = StrUtils.replaceAll(indexContent, "[[VM_STATS]]", vmStatsHtml.toString());
 
 				locEquiv = "_" + locEquiv;
 				TextFile indexFile = new TextFile(webRoot, locEquiv);
@@ -240,4 +261,11 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 		// - even if it exists on the server!
 		return null;
 	}
+
+	private void addLine(StringBuilder vmStatsHtml, String name, McInfo mcInfo, String key) {
+		if (mcInfo.isImportant(key)) {
+			vmStatsHtml.append("<br>" + name + ": " + mcInfo.get(key));
+		}
+	}
+
 }

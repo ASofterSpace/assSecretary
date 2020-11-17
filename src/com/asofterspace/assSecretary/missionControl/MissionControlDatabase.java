@@ -2,7 +2,7 @@
  * Unlicensed code created by A Softer Space, 2020
  * www.asofterspace.com/licenses/unlicense.txt
  */
-package com.asofterspace.assSecretary.skyhook;
+package com.asofterspace.assSecretary.missionControl;
 
 import com.asofterspace.assSecretary.Database;
 import com.asofterspace.toolbox.io.Directory;
@@ -18,7 +18,7 @@ import java.util.List;
 /**
  * Some information about the VMs which we are monitoring for skyhook
  */
-public class VmInfoDatabase {
+public class MissionControlDatabase {
 
 	private Directory dataDir;
 
@@ -28,10 +28,14 @@ public class VmInfoDatabase {
 
 	private JSON root;
 
+	// entries with information about df results
 	private List<Record> entries;
 
+	// webpage GET access results
+	private List<Record> webpages;
 
-	public VmInfoDatabase(Directory dataDir, String dbFileNameArg) {
+
+	public MissionControlDatabase(Directory dataDir, String dbFileNameArg) {
 
 		this.dataDir = dataDir;
 
@@ -50,18 +54,33 @@ public class VmInfoDatabase {
 		}
 
 		this.entries = root.getArray("entries");
+
+		this.webpages = root.getArray("webpages");
 	}
 
 	public Record getRoot() {
 		return root;
 	}
 
-	public void addDatapoint(Date timestamp, String whichServer, Integer highestPerc) {
+	public void addDfDatapoint(Date timestamp, String origin, String whichServer, Integer highestPerc) {
 
 		Record cur = Record.emptyObject();
 		cur.set("timestamp", timestamp);
+		cur.set("origin", origin);
 		cur.set("server", whichServer);
 		cur.set("highestPerc", highestPerc);
+		entries.add(cur);
+
+		save();
+	}
+
+	public void addWebpageDatapoint(Date timestamp, String origin, String whichWebpage, Integer httpCode) {
+
+		Record cur = Record.emptyObject();
+		cur.set("timestamp", timestamp);
+		cur.set("origin", origin);
+		cur.set("webpage", whichWebpage);
+		cur.set("httpCode", httpCode);
 		entries.add(cur);
 
 		save();
@@ -72,6 +91,8 @@ public class VmInfoDatabase {
 		root.makeObject();
 
 		root.set("entries", entries);
+
+		root.set("webpages", webpages);
 
 		dbFile.setAllContents(root);
 		dbFile.save();
