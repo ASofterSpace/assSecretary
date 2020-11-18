@@ -20,7 +20,7 @@ public abstract class McInfo {
 			return true;
 		}
 
-		return true; // until mission control page exists
+		return false;
 	}
 
 }

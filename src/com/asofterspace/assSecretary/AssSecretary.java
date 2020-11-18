@@ -43,6 +43,7 @@ public class AssSecretary {
 
 	private static VmInfo vmInfo;
 	private static WebInfo webInfo;
+	private static String projHtmlStr;
 
 
 	public static void main(String[] args) {
@@ -94,6 +95,37 @@ public class AssSecretary {
 			engine.compileTo(webRoot);
 
 
+			GenericProjectCtrl projectCtrl = new GenericProjectCtrl(
+				System.getProperty("java.class.path") + "/../../assWorkbench/server/projects");
+			List<GenericProject> projects = projectCtrl.getGenericProjects();
+			StringBuilder projHtml = new StringBuilder();
+
+			for (GenericProject proj : projects) {
+				projHtml.append("\n");
+				projHtml.append("  <a href=\"localhost:3010/projects/" + proj.getShortName() + "/?open=logbook\" target=\"_blank\" class=\"project\" style=\"border-color: " + proj.getColor().toHexString() + "\">");
+				projHtml.append("    <span class=\"vertAligner\"></span><img src=\"projectlogos/" + proj.getShortName() + "/logo.png\" />");
+				projHtml.append("  </a>");
+			}
+
+			projHtmlStr = projHtml.toString();
+
+			TextFile indexBaseFile = new TextFile(webRoot, "index.htm");
+			String indexContent = indexBaseFile.getContent();
+			indexContent = StrUtils.replaceAll(indexContent, "[[PROJECTS]]", projHtmlStr);
+			indexBaseFile.saveContent(indexContent);
+
+
+			System.out.println("Starting the server on port " + database.getPort() + "...");
+
+			Server server = new Server(webRoot, serverDir, database);
+
+			server.setWhitelist(whitelist);
+
+			boolean async = true;
+
+			server.serve(async);
+
+
 			System.out.println("Performing startup tasks...");
 
 			webInfo = new WebInfo();
@@ -113,40 +145,6 @@ public class AssSecretary {
 			addWebInfo(webInfo, "supervision-earth", "sveWeb", "https://supervision.earth/", missionControlDatabase);
 			addWebInfo(webInfo, "supervision-earth", "sveApp", "https://supervisionspace.app/", missionControlDatabase);
 			addWebInfo(webInfo, "supervision-earth", "sveLB", "http://svs-backend-loadbalancer-1910963306.eu-central-1.elb.amazonaws.com/", missionControlDatabase);
-
-
-			GenericProjectCtrl projectCtrl = new GenericProjectCtrl(
-				System.getProperty("java.class.path") + "/../../assWorkbench/server/projects");
-			List<GenericProject> projects = projectCtrl.getGenericProjects();
-			StringBuilder projHtml = new StringBuilder();
-
-			for (GenericProject proj : projects) {
-				projHtml.append("\n");
-				projHtml.append("  <a href=\"localhost:3010/projects/" + proj.getShortName() + "/?open=logbook\" target=\"_blank\" class=\"project\" style=\"border-color: " + proj.getColor().toHexString() + "\">");
-				projHtml.append("    <span class=\"vertAligner\"></span><img src=\"projectlogos/" + proj.getShortName() + "/logo.png\" />");
-				projHtml.append("  </a>");
-			}
-
-			String projHtmlStr = projHtml.toString();
-
-			TextFile indexBaseFile = new TextFile(webRoot, "index.htm");
-			String indexContent = indexBaseFile.getContent();
-			indexContent = StrUtils.replaceAll(indexContent, "[[PROJECTS]]", projHtmlStr);
-			indexBaseFile.saveContent(indexContent);
-
-
-			System.out.println("Starting the server on port " + database.getPort() + "...");
-
-			Server server = new Server(webRoot, serverDir, database);
-
-			server.setWhitelist(whitelist);
-
-			boolean async = false;
-
-			server.serve(async);
-
-
-			System.out.println("Server done, all shut down and cleaned up! Have a nice day! :)");
 
 		} catch (JsonParseException e) {
 
@@ -243,4 +241,9 @@ public class AssSecretary {
 
 		WebAccessor.getAsynch(url, callback);
 	}
+
+	public static String getProjHtmlStr() {
+		return projHtmlStr;
+	}
+
 }

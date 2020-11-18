@@ -131,6 +131,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 				}
 			}
 
+
 			// answering a request for general information
 			if (locEquiv.equals("index.htm")) {
 
@@ -248,10 +249,31 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 				vmStatsHtml.append("</div>");
 				indexContent = StrUtils.replaceAll(indexContent, "[[VM_STATS]]", vmStatsHtml.toString());
 
+				indexContent = StrUtils.replaceAll(indexContent, "[[MISSION_CONTROL_PREVIEW]]", getMissionControlHtml(false));
+
 				locEquiv = "_" + locEquiv;
 				TextFile indexFile = new TextFile(webRoot, locEquiv);
 				indexFile.saveContent(indexContent);
 			}
+
+
+			// answering a request for the a softer space mission control center
+			if (locEquiv.equals("missioncontrol.htm")) {
+
+				System.out.println("Answering mission control request...");
+
+				TextFile indexBaseFile = new TextFile(webRoot, locEquiv);
+				String indexContent = indexBaseFile.getContent();
+
+				indexContent = StrUtils.replaceAll(indexContent, "[[MISSION_CONTROL]]", getMissionControlHtml(true));
+
+				indexContent = StrUtils.replaceAll(indexContent, "[[PROJECTS]]", AssSecretary.getProjHtmlStr());
+
+				locEquiv = "_" + locEquiv;
+				TextFile indexFile = new TextFile(webRoot, locEquiv);
+				indexFile.saveContent(indexContent);
+			}
+
 
 			// actually get the file
 			return webRoot.getFile(locEquiv);
@@ -260,6 +282,44 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 		// if the file was not found on the whitelist, do not return it
 		// - even if it exists on the server!
 		return null;
+	}
+
+	private String getMissionControlHtml(boolean createLinks) {
+
+		String mcHtml = "";
+
+		VmInfo vmInfo = AssSecretary.getVmInfo();
+		WebInfo webInfo = AssSecretary.getWebInfo();
+
+		String companyStart = "<div class='company_outer'>";
+		String companyEnd = "</div>";
+		String machineStart = "<div class='machine_outer'><div class='machine_inner'>";
+		String machineEnd = "</div></div>";
+
+		mcHtml += companyStart;
+		mcHtml += machineStart + "ASS Odyssey MM-01" + machineEnd;
+		mcHtml += machineStart + "asofterspace.com<br>" + webInfo.get("assEn") + machineEnd;
+		mcHtml += machineStart + "asofterspace.de<br>" + webInfo.get("assDe") + machineEnd;
+		mcHtml += "<img class='logo' src='projectlogos/asofterspace/logo.png' />";
+		mcHtml += companyEnd;
+
+		mcHtml += companyStart;
+		mcHtml += machineStart + "Webpage<br>" + webInfo.get("skyWeb") + machineEnd;
+		mcHtml += machineStart + "App<br>" + webInfo.get("skyApp") + machineEnd;
+		mcHtml += machineStart + "F1<br>" + vmInfo.get("f1") + machineEnd;
+		mcHtml += machineStart + "F2<br>" + vmInfo.get("f2") + machineEnd;
+		mcHtml += machineStart + "DB<br>" + webInfo.get("skyDb") + "<br>" + vmInfo.get("db") + machineEnd;
+		mcHtml += "<img class='logo' src='projectlogos/skyhook/logo.png' />";
+		mcHtml += companyEnd;
+
+		mcHtml += companyStart;
+		mcHtml += machineStart + "Webpage<br>" + webInfo.get("sveWeb") + machineEnd;
+		mcHtml += machineStart + "App Frontend<br>" + webInfo.get("sveApp") + machineEnd;
+		mcHtml += machineStart + "App Backend<br>" + webInfo.get("sveLB") + "<br>" + vmInfo.get("svs-backend") + machineEnd;
+		mcHtml += "<img class='logo' src='projectlogos/supervisionearth/logo.png' />";
+		mcHtml += companyEnd;
+
+		return mcHtml;
 	}
 
 	private void addLine(StringBuilder vmStatsHtml, String name, McInfo mcInfo, String key) {
