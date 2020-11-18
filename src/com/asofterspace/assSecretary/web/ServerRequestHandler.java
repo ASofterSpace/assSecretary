@@ -235,8 +235,8 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 				addLine(vmStatsHtml, "Skyhook Webpage", webInfo, "skyWeb");
 
 				addLine(vmStatsHtml, "Supervision Earth svs-backend", vmInfo, "svs-backend");
-				addLine(vmStatsHtml, "Supervision Earth App", webInfo, "sveApp");
-				addLine(vmStatsHtml, "Supervision Earth Load Balancer", webInfo, "sveLB");
+				addLine(vmStatsHtml, "Supervision Earth App Frontend", webInfo, "sveApp");
+				addLine(vmStatsHtml, "Supervision Earth App Backend", webInfo, "sveLB");
 				addLine(vmStatsHtml, "Supervision Earth Webpage", webInfo, "sveWeb");
 
 				if (vmStatsHtml.length() < 1) {

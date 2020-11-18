@@ -57,10 +57,10 @@ public class WebInfoCallback implements WebAccessedCallback {
 			if ((code == 200) || (code == 204)) {
 				result += "<span class='awesome'>";
 			} else {
-				if ((code >= 200) || (code < 300)) {
+				if ((code >= 200) && (code < 300)) {
 					result += "<span>";
 				} else {
-					if ((code >= 300) || (code < 400)) {
+					if ((code >= 300) && (code < 400)) {
 						result += "<span class='warning'>";
 					} else {
 						result += "<span class='error'>";

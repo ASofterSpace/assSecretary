@@ -4,7 +4,7 @@
  */
 package com.asofterspace.assSecretary.missionControl;
 
-import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.Map;
 
 
@@ -19,7 +19,7 @@ public class VmInfo extends McInfo {
 
 
 	public VmInfo() {
-		entries = new HashMap<>();
+		entries = new ConcurrentHashMap<>();
 	}
 
 	@Override
