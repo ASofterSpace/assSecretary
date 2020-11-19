@@ -5,7 +5,10 @@
 package com.asofterspace.assSecretary.tasks;
 
 import com.asofterspace.toolbox.calendar.GenericTask;
+import com.asofterspace.toolbox.io.HTML;
+import com.asofterspace.toolbox.utils.StrUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -121,17 +124,60 @@ public class Task extends GenericTask {
 	}
 
 	public String toHtmlStr() {
+
+		String id = getId();
+
 		String html = "";
-		html += "<div class='line'>";
+
+		html += "<div class='line' id='task-" + id + "'>";
 		html += "<span style='width: 10%;'>";
 		html += getReleasedDateStr();
 		html += "</span>";
 		html += "<span style='width: 60%;'>";
-		html += title;
+		html += HTML.escapeHTMLstr(title);
 		html += "</span>";
-		html += "<span style='width: 10%;' class='button' onclick='secretary.taskDone(\"" + getId() + "\")'>";
+
+		List<String> details = getDetails();
+		boolean hasDetails = (details != null) && (details.size() > 0);
+		if (hasDetails) {
+			if (details.size() == 1) {
+				if ((details.get(0) == null) || (details.get(0).length() == 0)) {
+					hasDetails = false;
+				}
+			}
+		}
+
+		String btnStyle = "width: 5.5%; margin-left: 0.5%;";
+		if (hasDetails) {
+			html += "<span style='" + btnStyle + "' class='button' onclick='secretary.taskDetails(\"" + id + "\")'>";
+			html += "Details";
+			html += "</span>";
+		} else {
+			html += "<span style='" + btnStyle + " visibility: hidden;' class='button'>";
+			html += "&nbsp;";
+			html += "</span>";
+		}
+
+		html += "<span style='" + btnStyle + "' class='button' onclick='secretary.taskDone(\"" + id + "\")'>";
 		html += "Done";
 		html += "</span>";
+		html += "<span style='" + btnStyle + "' class='button' onclick='secretary.taskEdit(\"" + id + "\")'>";
+		html += "Edit";
+		html += "</span>";
+		html += "<span style='" + btnStyle + "' class='button' onclick='secretary.taskDelete(\"" + id + "\")'>";
+		html += "Delete";
+		html += "</span>";
+		if (hasDetails) {
+			html += "<div style='display: none' id='task-details-" + id + "'>";
+			List<String> safeDetails = new ArrayList<>();
+			if (details != null) {
+				for (String detail : details) {
+					safeDetails.add(HTML.escapeHTMLstr(detail));
+				}
+			}
+			html += StrUtils.join("<br>", safeDetails);
+			html += "</div>";
+		}
 		html += "</div>";
 		return html;
 	}

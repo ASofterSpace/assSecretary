@@ -89,6 +89,17 @@ window.secretary = {
 		window.location.reload(false);
 	},
 
+	taskDetails: function(id) {
+		var taskDetailsDiv = document.getElementById("task-details-" + id);
+		if (taskDetailsDiv) {
+			if (taskDetailsDiv.style.display == "none") {
+				taskDetailsDiv.style.display = "block";
+			} else {
+				taskDetailsDiv.style.display = "none";
+			}
+		}
+	},
+
 	taskDone: function(id) {
 
 		var request = new XMLHttpRequest();
@@ -109,6 +120,14 @@ window.secretary = {
 		};
 
 		request.send(JSON.stringify(data));
+	},
+
+	taskEdit: function(id) {
+		alert("Sorry, not implemented yet.");
+	},
+
+	taskDelete: function(id) {
+		alert("Sorry, not implemented yet.");
 	},
 
 }
