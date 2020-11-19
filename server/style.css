@@ -15,6 +15,73 @@ div#mainContent {
 	overflow-y: scroll;
 	overflow-x: hidden;
 	scrollbar-color: #402 #102;
+	position: relative;
+}
+
+div#buttonBar {
+	position: fixed;
+	bottom: 0;
+	left: 0;
+	right: 0;
+}
+
+div.buttonBar {
+	text-align: center;
+}
+
+div.buttonBar > span.button {
+	padding: 2pt 10pt;
+	border-radius: 5pt;
+	margin: 0pt 10pt;
+}
+
+div.line > span.button {
+	padding: 0pt 4pt;
+	border-radius: 5pt;
+}
+
+div.buttonBar > span.button, div.line > span.button {
+	background: rgba(150, 200, 250, 0.2);
+	cursor: pointer;
+	text-align: center;
+}
+
+div.buttonBar > span.button:hover, div.line > span.button:hover {
+	background: rgba(150, 200, 250, 0.5);
+}
+
+div.modal {
+	display: none;
+	position: absolute;
+	top: 100pt;
+	left: 100pt;
+	right: 100pt;
+	border-radius: 16pt;
+	background: rgba(40, 0, 80, 0.9);
+	padding: 15pt;
+	opacity: 0.9;
+}
+
+div.modal textarea {
+	width: 100%;
+	box-sizing: border-box;
+}
+
+div.modal > div.column {
+	width: 19%;
+	display: inline-block;
+}
+
+div.line:hover {
+	background: rgba(255, 0, 255, 0.19);
+}
+
+div.line > span {
+	display: inline-block;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	vertical-align: top;
 }
 
 img.avatar {

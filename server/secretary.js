@@ -26,6 +26,91 @@ window.secretary = {
 		}
 	},
 
+	showAddSingleTaskModal: function() {
+		var modal = document.getElementById("addSingleTaskModal");
+		if (modal) {
+			modal.style.display = "block";
+		}
+	},
+
+	showAddRepeatingTaskModal: function() {
+		alert("Sorry, this is not yet implemented!");
+	},
+
+	submitAndCloseSingleTaskModal: function() {
+		this.submitSingleTaskModal(true);
+	},
+
+	submitSingleTaskModal: function(closeOnSubmit) {
+
+		var request = new XMLHttpRequest();
+		request.open("POST", "addSingleTask", true);
+		request.setRequestHeader("Content-Type", "application/json");
+
+		request.onreadystatechange = function() {
+			if (request.readyState == 4 && request.status == 200) {
+				var result = JSON.parse(request.response);
+				// show some sort of confirmation
+				if (result.success) {
+					var singleTaskSavedLabel = document.getElementById("singleTaskSavedLabel");
+					if (singleTaskSavedLabel) {
+						singleTaskSavedLabel.style.display = "block";
+						window.setTimeout(function () {
+							singleTaskSavedLabel.style.display = "none";
+						}, 3000);
+					}
+					if (closeOnSubmit) {
+						window.secretary.closeSingleTaskModal();
+					}
+				}
+			}
+		}
+
+		var data = {
+			title: document.getElementById("singleTaskTitle").value,
+			details: document.getElementById("singleTaskDetails").value,
+			releaseDate: document.getElementById("singleTaskReleaseDate").value,
+			origin: document.getElementById("singleTaskOrigin").value,
+			priority: document.getElementById("singleTaskPriority").value,
+			priorityEscalationAfterDays: document.getElementById("singleTaskPriorityEscalationAfterDays").value,
+			duration: document.getElementById("singleTaskDuration").value,
+		};
+
+		request.send(JSON.stringify(data));
+	},
+
+	closeSingleTaskModal: function() {
+		var modal = document.getElementById("addSingleTaskModal");
+		if (modal) {
+			modal.style.display = "none";
+		}
+
+		// reload, as data might have changed while the modal was open...
+		window.location.reload(false);
+	},
+
+	taskDone: function(id) {
+
+		var request = new XMLHttpRequest();
+		request.open("POST", "taskDone", true);
+		request.setRequestHeader("Content-Type", "application/json");
+
+		request.onreadystatechange = function() {
+			if (request.readyState == 4 && request.status == 200) {
+				var result = JSON.parse(request.response);
+				if (result.success) {
+					window.location.reload(false);
+				}
+			}
+		}
+
+		var data = {
+			id: id,
+		};
+
+		request.send(JSON.stringify(data));
+	},
+
 }
 
 
@@ -38,11 +123,13 @@ window.secretary.onResize();
 // every 30 seconds, update the clock time (including the date, as it might have changed!)
 window.setInterval(function() {
 	var dateTimeEl = document.getElementById("curdatetime");
-	var DateUtils = toolbox.utils.DateUtils;
-	var StrUtils = toolbox.utils.StrUtils;
-	if (dateTimeEl && DateUtils && StrUtils) {
-		var now = DateUtils.now();
-		dateTimeEl.innerHTML = DateUtils.getDayOfWeekNameEN(now) + " the " +
-			StrUtils.replaceAll(DateUtils.serializeDateTimeLong(now, "<span class='sup'>", "</span>"), ", ", " and it is ");
+	if (toolbox) {
+		var DateUtils = toolbox.utils.DateUtils;
+		var StrUtils = toolbox.utils.StrUtils;
+		if (dateTimeEl && DateUtils && StrUtils) {
+			var now = DateUtils.now();
+			dateTimeEl.innerHTML = DateUtils.getDayOfWeekNameEN(now) + " the " +
+				StrUtils.replaceAll(DateUtils.serializeDateTimeLong(now, "<span class='sup'>", "</span>"), ", ", " and it is ");
+		}
 	}
 }, 30000);

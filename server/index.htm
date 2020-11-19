@@ -28,7 +28,13 @@
 
 			[[VM_STATS]]
 
+			[[TASKS]]
+
 			<div class="footer">&nbsp;</div>
+
+			<div id="buttonBar" class="buttonBar">
+				[[BUTTON_BAR]]
+			</div>
 		</div>
 
 		<img class="avatar" src="/pics/hugo.jpg" />
@@ -36,6 +42,63 @@
 		<a href="missioncontrol.htm" style="transform: scale(0.2);position: absolute;bottom: 10pt;left: 10pt;transform-origin: left bottom;width: 1025pt;">
 			[[MISSION_CONTROL_PREVIEW]]
 		</a>
+
+		<div class="modal" id="addSingleTaskModal">
+			<div id="singleTaskSavedLabel" style="display: none;text-align: center;font-weight: bold;font-style: italic;color: #F00;padding-bottom: 10pt;">
+				Saved!
+			</div>
+			<div style="position: relative; padding-bottom: 10pt;">
+				<span>Title:</span>
+				<input id="singleTaskTitle" type="text" style="width: 90%;position: absolute;right: 0;top: 0;" />
+			</div>
+			<div style="padding-bottom: 10pt;">
+				<div>Details:</div>
+				<textarea id="singleTaskDetails" style="height: 200pt;"></textarea>
+			</div>
+			<div class="column">
+				<div>Schedule on:</div>
+				<input id="singleTaskReleaseDate" type="text" value="[[CURDATE]]" />
+			</div>
+			<div class="column">
+				<div>Origin:</div>
+				<select id="singleTaskOrigin">
+					<option value="private" selected="selected">private</option>
+					<option value="asofterspace">a softer space</option>
+					<option value="skyhook">skyhook</option>
+					<option value="egscc">EGS-CC</option>
+					<option value="recoded">Recoded</option>
+					<option value="supervisionearth">Supervision Earth</option>
+					<option value="gsmccc">GSMC-CC</option>
+					<option value="behemoth">Behemoth House Hunting</option>
+					<option value="sports">Sports</option>
+				</select>
+			</div>
+			<div class="column">
+				<div>Priority:</div>
+				<div>
+					<span>MAX</span>
+					<input id="singleTaskPriority" type="range" min="0" max="100" value="50" />
+					<span>none</span>
+				</div>
+			</div>
+			<div class="column">
+				<div>Priority Escalation after X days:</div>
+				<div>
+					<input id="singleTaskPriorityEscalationAfterDays" type="text" value="never" />
+				</div>
+			</div>
+			<div class="column">
+				<div>Duration in HH:MM:</div>
+				<div>
+					<input id="singleTaskDuration" type="text" value="0:00" />
+				</div>
+			</div>
+			<div class="buttonBar" style="padding-top: 10pt;">
+				<span class="button" onclick="secretary.submitSingleTaskModal(false)">Save</span>
+				<span class="button" onclick="secretary.submitAndCloseSingleTaskModal()">Save and Exit</span>
+				<span class="button" onclick="secretary.closeSingleTaskModal()">Exit</span>
+			</div>
+		</div>
 
 		<a class="sidebar" href="http://localhost:3011/">
 			<img class="avatar" src="/pics/mari.jpg" />

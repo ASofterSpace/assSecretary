@@ -11,6 +11,8 @@ import com.asofterspace.assSecretary.Database;
 import com.asofterspace.assSecretary.missionControl.McInfo;
 import com.asofterspace.assSecretary.missionControl.VmInfo;
 import com.asofterspace.assSecretary.missionControl.WebInfo;
+import com.asofterspace.assSecretary.tasks.Task;
+import com.asofterspace.assSecretary.tasks.TaskCtrl;
 import com.asofterspace.toolbox.calendar.GenericTask;
 import com.asofterspace.toolbox.io.Directory;
 import com.asofterspace.toolbox.io.File;
@@ -27,6 +29,8 @@ import com.asofterspace.toolbox.web.WebServerRequestHandler;
 
 import java.io.IOException;
 import java.net.Socket;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
@@ -37,15 +41,19 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 	private Database db;
 
+	private TaskCtrl taskCtrl;
+
 	private Directory serverDir;
 
 
 	public ServerRequestHandler(WebServer server, Socket request, Directory webRoot, Directory serverDir,
-		Database db) {
+		Database db, TaskCtrl taskCtrl) {
 
 		super(server, request, webRoot);
 
 		this.db = db;
+
+		this.taskCtrl = taskCtrl;
 
 		this.serverDir = serverDir;
 	}
@@ -77,8 +85,24 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 			switch (fileLocation) {
 
-				case "/example":
-					answer = new WebServerAnswerInJson(new JSON("{\"foo\": \"bar\"}"));
+				case "/addSingleTask":
+					boolean didAdd = taskCtrl.addAdHocTask(
+						json.getString("title"),
+						json.getString("details"),
+						json.getString("releaseDate"),
+						json.getString("origin"),
+						json.getInteger("priority"),
+						json.getInteger("priorityEscalationAfterDays"),
+						json.getString("duration")
+					);
+					answer = new WebServerAnswerInJson(new JSON("{\"success\": " + didAdd + "}"));
+					break;
+
+				case "/taskDone":
+					boolean didSetToDone = taskCtrl.setTaskToDone(
+						json.getString("id")
+					);
+					answer = new WebServerAnswerInJson(new JSON("{\"success\": " + didSetToDone + "}"));
 					break;
 
 				default:
@@ -198,7 +222,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 						}
 						mariHtml += "mentioned that these things should be done today:</div>";
 						for (GenericTask task : tasks) {
-							mariHtml += "<div><span class='warning'>" + task.getReleasedDateStr() + " " + task.getTitle() + "</span></div>";
+							mariHtml += "<div class='line'><span class='warning'>" + task.getReleasedDateStr() + " " + task.getTitle() + "</span></div>";
 						}
 						mariHtml += "</div>";
 						talkedToMari = true;
@@ -213,7 +237,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 						}
 						mariHtml += "mentioned these things coming up in the next " + upcomingDays + " days:</div>";
 						for (GenericTask task : upcomingTasks) {
-							mariHtml += "<div>" + task.getReleasedDateStr() + " " + task.getTitle() + "</div>";
+							mariHtml += "<div class='line'>" + task.getReleasedDateStr() + " " + task.getTitle() + "</div>";
 						}
 						mariHtml += "</div>";
 						talkedToMari = true;
@@ -249,7 +273,35 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 				vmStatsHtml.append("</div>");
 				indexContent = StrUtils.replaceAll(indexContent, "[[VM_STATS]]", vmStatsHtml.toString());
 
+
+				String taskHtml = "<div>There are no tasks at all that need to be done - whoa!</div>";
+				List<Task> tasks = taskCtrl.getCurrentTaskInstancesAsTasks();
+
+				Collections.sort(tasks, new Comparator<Task>() {
+					public int compare(Task a, Task b) {
+						return a.getCurrentPriority() - b.getCurrentPriority();
+					}
+				});
+
+				if (tasks.size() > 0) {
+					taskHtml = "<div><div>These tasks would like to be done:</div>";
+					for (Task task : tasks) {
+						taskHtml += task.toHtmlStr();
+					}
+					taskHtml += "</div>";
+				}
+
+				indexContent = StrUtils.replaceAll(indexContent, "[[TASKS]]", taskHtml);
+
+
 				indexContent = StrUtils.replaceAll(indexContent, "[[MISSION_CONTROL_PREVIEW]]", getMissionControlHtml(false));
+
+				String buttonBarHtml = "";
+				buttonBarHtml += "<span class='button' onclick='secretary.showAddSingleTaskModal();'>Add Single Task</span>";
+				buttonBarHtml += "<span class='button' onclick='secretary.showAddRepeatingTaskModal();'>Add Repeating Task</span>";
+				indexContent = StrUtils.replaceAll(indexContent, "[[BUTTON_BAR]]", buttonBarHtml);
+
+				indexContent = StrUtils.replaceAll(indexContent, "[[CURDATE]]", DateUtils.serializeDate(DateUtils.now()));
 
 				locEquiv = "_" + locEquiv;
 				TextFile indexFile = new TextFile(webRoot, locEquiv);
@@ -324,7 +376,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 	private void addLine(StringBuilder vmStatsHtml, String name, McInfo mcInfo, String key) {
 		if (mcInfo.isImportant(key)) {
-			vmStatsHtml.append("<br>" + name + ": " + mcInfo.get(key));
+			vmStatsHtml.append("<div class='line'>" + name + ": " + mcInfo.get(key) + "</div>");
 		}
 	}
 

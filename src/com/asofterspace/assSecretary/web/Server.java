@@ -5,6 +5,7 @@
 package com.asofterspace.assSecretary.web;
 
 import com.asofterspace.assSecretary.Database;
+import com.asofterspace.assSecretary.tasks.TaskCtrl;
 import com.asofterspace.toolbox.io.Directory;
 import com.asofterspace.toolbox.web.WebServer;
 import com.asofterspace.toolbox.web.WebServerRequestHandler;
@@ -16,20 +17,24 @@ public class Server extends WebServer {
 
 	private Database db;
 
+	private TaskCtrl taskCtrl;
+
 	private Directory serverDir;
 
 
-	public Server(Directory webRoot, Directory serverDir, Database db) {
+	public Server(Directory webRoot, Directory serverDir, Database db, TaskCtrl taskCtrl) {
 
 		super(webRoot, db.getPort());
 
 		this.db = db;
 
+		this.taskCtrl = taskCtrl;
+
 		this.serverDir = serverDir;
 	}
 
 	protected WebServerRequestHandler getHandler(Socket request) {
-		return new ServerRequestHandler(this, request, webRoot, serverDir, db);
+		return new ServerRequestHandler(this, request, webRoot, serverDir, db, taskCtrl);
 	}
 
 }

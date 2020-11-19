@@ -4,18 +4,12 @@
  */
 package com.asofterspace.assSecretary.accountant;
 
-import com.asofterspace.toolbox.calendar.GenericTask;
 import com.asofterspace.toolbox.calendar.TaskCtrlBase;
 import com.asofterspace.toolbox.utils.DateUtils;
 import com.asofterspace.toolbox.utils.Record;
 
-import java.util.ArrayList;
-import java.util.List;
-
 
 public class MariTaskCtrl extends TaskCtrlBase {
-
-	private List<GenericTask> currentTaskInstances;
 
 
 	public MariTaskCtrl(MariDatabase database) {
@@ -31,41 +25,6 @@ public class MariTaskCtrl extends TaskCtrlBase {
 		Record root = database.getLoadedRoot();
 
 		loadFromRoot(root);
-	}
-
-	public List<GenericTask> getCurrentTaskInstances() {
-
-		currentTaskInstances = new ArrayList<>();
-
-		List<GenericTask> tasks = getTaskInstances();
-
-		for (GenericTask task : tasks) {
-			if ((task.hasBeenDone() == null) || !task.hasBeenDone()) {
-				currentTaskInstances.add(task);
-			}
-		}
-
-		return currentTaskInstances;
-	}
-
-	public List<GenericTask> getUpcomingTaskInstances(int upcomingDays) {
-
-		List<GenericTask> results = new ArrayList<>();
-
-		// generate future instances, but do not save them!
-		generateNewInstances(DateUtils.addDays(DateUtils.now(), upcomingDays));
-
-		List<GenericTask> tasks = getTaskInstances();
-
-		for (GenericTask task : tasks) {
-			if ((task.hasBeenDone() == null) || !task.hasBeenDone()) {
-				if (!currentTaskInstances.contains(task)) {
-					results.add(task);
-				}
-			}
-		}
-
-		return results;
 	}
 
 }

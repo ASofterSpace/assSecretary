@@ -8,6 +8,8 @@ import com.asofterspace.assSecretary.missionControl.MissionControlDatabase;
 import com.asofterspace.assSecretary.missionControl.VmInfo;
 import com.asofterspace.assSecretary.missionControl.WebInfo;
 import com.asofterspace.assSecretary.missionControl.WebInfoCallback;
+import com.asofterspace.assSecretary.tasks.TaskCtrl;
+import com.asofterspace.assSecretary.tasks.TaskDatabase;
 import com.asofterspace.assSecretary.web.Server;
 import com.asofterspace.toolbox.io.Directory;
 import com.asofterspace.toolbox.io.IoUtils;
@@ -78,6 +80,9 @@ public class AssSecretary {
 		database = new Database(dataDir);
 		MissionControlDatabase missionControlDatabase = new MissionControlDatabase(dataDir, "mission_control");
 
+		TaskDatabase taskDatabase = new TaskDatabase(dataDir);
+		TaskCtrl taskCtrl = new TaskCtrl(taskDatabase);
+
 
 		try {
 
@@ -117,7 +122,7 @@ public class AssSecretary {
 
 			System.out.println("Starting the server on port " + database.getPort() + "...");
 
-			Server server = new Server(webRoot, serverDir, database);
+			Server server = new Server(webRoot, serverDir, database, taskCtrl);
 
 			server.setWhitelist(whitelist);
 
