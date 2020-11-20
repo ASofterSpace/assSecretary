@@ -198,6 +198,8 @@ window.addEventListener("resize", window.secretary.onResize);
 
 window.secretary.onResize();
 
+window.secretary.filterTasks();
+
 
 // every 30 seconds, update the clock time (including the date, as it might have changed!)
 window.setInterval(function() {
