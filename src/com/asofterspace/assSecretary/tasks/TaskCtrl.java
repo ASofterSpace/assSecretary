@@ -8,7 +8,6 @@ import com.asofterspace.toolbox.calendar.GenericTask;
 import com.asofterspace.toolbox.calendar.TaskCtrlBase;
 import com.asofterspace.toolbox.utils.DateUtils;
 import com.asofterspace.toolbox.utils.Record;
-import com.asofterspace.toolbox.utils.StrUtils;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -107,6 +106,15 @@ public class TaskCtrl extends TaskCtrlBase {
 		return result;
 	}
 
+	public Task getTaskById(String id) {
+		for (Task task : getCurrentTaskInstancesAsTasks()) {
+			if (task.hasId(id)) {
+				return task;
+			}
+		}
+		return null;
+	}
+
 	/**
 	 * Returns true if it worked and an ad hoc task was created, and false otherwise
 	 */
@@ -126,7 +134,7 @@ public class TaskCtrl extends TaskCtrlBase {
 			ourTask.setOrigin(origin);
 			ourTask.setPriority(priority);
 			ourTask.setPriorityEscalationAfterDays(priorityEscalationAfterDays);
-			ourTask.setDuration(durationStrToInt(duration));
+			ourTask.setDurationStr(duration);
 		} else {
 			System.out.println("Something very weird happened, we encountered a task which is not a Task!");
 		}
@@ -134,29 +142,6 @@ public class TaskCtrl extends TaskCtrlBase {
 		save();
 
 		return true;
-	}
-
-	private Integer durationStrToInt(String str) {
-		if (str == null) {
-			return null;
-		}
-		if (str.contains(":")) {
-			String[] strs = str.split(":");
-			String hours = strs[0];
-			String minutes = strs[1];
-			Integer houri = StrUtils.strToInt(hours);
-			Integer minuti = StrUtils.strToInt(minutes);
-			if ((houri == null) || (minuti == null)) {
-				return null;
-			}
-			return (houri * 60) + minuti;
-		}
-		String hours = str;
-		Integer result = StrUtils.strToInt(hours);
-		if (result == null) {
-			return null;
-		}
-		return result * 60;
 	}
 
 	public boolean setTaskToDone(String id) {

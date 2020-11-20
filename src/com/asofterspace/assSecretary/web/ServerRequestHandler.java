@@ -20,6 +20,7 @@ import com.asofterspace.toolbox.io.JSON;
 import com.asofterspace.toolbox.io.JsonParseException;
 import com.asofterspace.toolbox.io.TextFile;
 import com.asofterspace.toolbox.utils.DateUtils;
+import com.asofterspace.toolbox.utils.Record;
 import com.asofterspace.toolbox.utils.StrUtils;
 import com.asofterspace.toolbox.web.WebAccessor;
 import com.asofterspace.toolbox.web.WebServer;
@@ -86,16 +87,40 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 			switch (fileLocation) {
 
 				case "/addSingleTask":
-					boolean didAdd = taskCtrl.addAdHocTask(
-						json.getString("title"),
-						json.getString("details"),
-						json.getString("releaseDate"),
-						json.getString("origin"),
-						json.getInteger("priority"),
-						json.getInteger("priorityEscalationAfterDays"),
-						json.getString("duration")
-					);
-					answer = new WebServerAnswerInJson(new JSON("{\"success\": " + didAdd + "}"));
+
+					String editingId = json.getString("editingId");
+
+					if (editingId == null) {
+						// add new task
+						boolean didAdd = taskCtrl.addAdHocTask(
+							json.getString("title"),
+							json.getString("details"),
+							json.getString("releaseDate"),
+							json.getString("origin"),
+							json.getInteger("priority"),
+							json.getInteger("priorityEscalationAfterDays"),
+							json.getString("duration")
+						);
+						answer = new WebServerAnswerInJson(new JSON("{\"success\": " + didAdd + "}"));
+
+					} else {
+						// edit existing task
+						Task task = taskCtrl.getTaskById(editingId);
+						if (task != null) {
+							task.setTitle(json.getString("title"));
+							task.setDetailsStr(json.getString("details"));
+							task.setReleasedDate(DateUtils.parseDate(json.getString("releaseDate")));
+							task.setOrigin(json.getString("origin"));
+							task.setPriority(json.getInteger("priority"));
+							task.setPriorityEscalationAfterDays(json.getInteger("priorityEscalationAfterDays"));
+							task.setDurationStr(json.getString("duration"));
+							taskCtrl.save();
+							answer = new WebServerAnswerInJson(new JSON("{\"success\": true}"));
+						} else {
+							respond(404);
+							return;
+						}
+					}
 					break;
 
 				case "/taskDone":
@@ -120,6 +145,35 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 	@Override
 	protected WebServerAnswer answerGet(String location, String[] arguments) {
+
+		if ("/task".equals(location)) {
+			String id = null;
+			for (String arg : arguments) {
+				if (!arg.contains("=")) {
+					continue;
+				}
+				String key = arg.substring(0, arg.indexOf("="));
+				String value = arg.substring(arg.indexOf("=") + 1);
+				if (key.equals("id")) {
+					id = value;
+				}
+			}
+			if (id != null) {
+				Task task = taskCtrl.getTaskById(id);
+				if (task != null) {
+					JSON response = new JSON(Record.emptyObject());
+					response.set("success", true);
+					response.set("title", task.getTitle());
+					response.set("details", StrUtils.join("\n", task.getDetails()));
+					response.set("releaseDate", task.getReleasedDateStr());
+					response.set("origin", task.getOrigin());
+					response.set("priority", task.getPriority());
+					response.set("priorityEscalationAfterDays", task.getPriorityEscalationAfterDays());
+					response.set("duration", task.getDurationStr());
+					return new WebServerAnswerInJson(response);
+				}
+			}
+		}
 
 		return null;
 	}

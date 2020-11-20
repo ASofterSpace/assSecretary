@@ -8,6 +8,9 @@ import com.asofterspace.toolbox.io.Directory;
 import com.asofterspace.toolbox.io.JsonFile;
 import com.asofterspace.toolbox.io.JsonParseException;
 import com.asofterspace.toolbox.utils.Record;
+import com.asofterspace.toolbox.utils.StrUtils;
+
+import java.util.Random;
 
 
 /**
@@ -15,14 +18,22 @@ import com.asofterspace.toolbox.utils.Record;
  */
 public class TaskDatabase {
 
+	private Directory dataDir;
+
 	private JsonFile dbFile;
 
 	private Record loadedRoot;
 
 	private boolean available = false;
 
+	private Random rand;
+
 
 	public TaskDatabase(Directory dataDir) {
+
+		this.dataDir = dataDir;
+
+		rand = new Random();
 
 		dbFile = new JsonFile(dataDir, "tasks.json");
 
@@ -52,6 +63,11 @@ public class TaskDatabase {
 
 		dbFile.setAllContents(loadedRoot);
 		dbFile.save();
+
+		String backupName = "tasks-backup-" + StrUtils.leftPad0(rand.nextInt(10000), 4) + ".json";
+		JsonFile backupFile = new JsonFile(dataDir, backupName);
+		backupFile.setAllContents(loadedRoot);
+		backupFile.save();
 	}
 
 }

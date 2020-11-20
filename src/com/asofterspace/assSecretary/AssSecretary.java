@@ -126,6 +126,7 @@ public class AssSecretary {
 			otherOriginsStr += "<option value='gsmccc'>GSMC-CC</option>";
 			otherOriginsStr += "<option value='behemoth'>Behemoth House Hunting</option>";
 			otherOriginsStr += "<option value='sports'>Sports</option>";
+			otherOriginsStr += "<option value='firefighting'>Fire Fighting</option>";
 			indexContent = StrUtils.replaceAll(indexContent, "[[OTHER_ORIGINS]]", otherOriginsStr);
 			indexBaseFile.saveContent(indexContent);
 

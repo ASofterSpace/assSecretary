@@ -1,5 +1,8 @@
 window.secretary = {
 
+	currentlyEditing: null,
+
+
 	onResize: function() {
 
 		var retry = false;
@@ -30,6 +33,7 @@ window.secretary = {
 		var modal = document.getElementById("addSingleTaskModal");
 		if (modal) {
 			modal.style.display = "block";
+			this.currentlyEditing = null;
 		}
 	},
 
@@ -67,6 +71,7 @@ window.secretary = {
 		}
 
 		var data = {
+			editingId: window.secretary.currentlyEditing,
 			title: document.getElementById("singleTaskTitle").value,
 			details: document.getElementById("singleTaskDetails").value,
 			releaseDate: document.getElementById("singleTaskReleaseDate").value,
@@ -123,7 +128,34 @@ window.secretary = {
 	},
 
 	taskEdit: function(id) {
-		alert("Sorry, not implemented yet.");
+
+		var request = new XMLHttpRequest();
+		request.open("GET", "task?id=" + id, true);
+		request.setRequestHeader("Content-Type", "application/json");
+
+		request.onreadystatechange = function() {
+			if (request.readyState == 4 && request.status == 200) {
+				var result = JSON.parse(request.response);
+				if (result.success) {
+					var modal = document.getElementById("addSingleTaskModal");
+					if (modal) {
+						modal.style.display = "block";
+
+						document.getElementById("singleTaskTitle").value = result.title;
+						document.getElementById("singleTaskDetails").value = result.details;
+						document.getElementById("singleTaskReleaseDate").value = result.releaseDate;
+						document.getElementById("singleTaskOrigin").value = result.origin;
+						document.getElementById("singleTaskPriority").value = result.priority;
+						document.getElementById("singleTaskPriorityEscalationAfterDays").value = result.priorityEscalationAfterDays;
+						document.getElementById("singleTaskDuration").value = result.duration;
+
+						window.secretary.currentlyEditing = id;
+					}
+				}
+			}
+		}
+
+		request.send();
 	},
 
 	taskDelete: function(id) {
@@ -162,7 +194,7 @@ window.secretary = {
 		// hide future tasks if future is not selected
 		var filterTaskFuture = document.getElementById("filterTaskFuture");
 		if (filterTaskFuture) {
-			if (filterTaskFuture.className == "button") {
+			if (filterTaskFuture.className == "button unchecked") {
 				var filteredTasks = document.getElementsByClassName("future-task");
 				for (var i = 0; i < filteredTasks.length; i++) {
 					filteredTasks[i].style.display = "none";
@@ -181,10 +213,10 @@ window.secretary = {
 	toggleTaskFutureView: function() {
 		var filterTaskFuture = document.getElementById("filterTaskFuture");
 		if (filterTaskFuture) {
-			if (filterTaskFuture.className == "button") {
+			if (filterTaskFuture.className == "button unchecked") {
 				filterTaskFuture.className = "button checked";
 			} else {
-				filterTaskFuture.className = "button";
+				filterTaskFuture.className = "button unchecked";
 			}
 		}
 		this.filterTasks();

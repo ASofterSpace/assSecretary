@@ -33,6 +33,7 @@ public class Server extends WebServer {
 		this.serverDir = serverDir;
 	}
 
+	@Override
 	protected WebServerRequestHandler getHandler(Socket request) {
 		return new ServerRequestHandler(this, request, webRoot, serverDir, db, taskCtrl);
 	}

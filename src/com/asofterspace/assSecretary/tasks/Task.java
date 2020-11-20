@@ -97,8 +97,44 @@ public class Task extends GenericTask {
 		return duration;
 	}
 
+	public String getDurationStr() {
+		if (duration == null) {
+			return "00:00";
+		}
+		int minutes = duration % 60;
+		int hours = duration / 60;
+		return StrUtils.leftPad0(hours, 2) + ":" + StrUtils.leftPad0(minutes, 2);
+	}
+
+	public void setDurationStr(String durationStr) {
+		duration = durationStrToInt(durationStr);
+	}
+
 	public void setDuration(Integer duration) {
 		this.duration = duration;
+	}
+
+	private Integer durationStrToInt(String str) {
+		if (str == null) {
+			return null;
+		}
+		if (str.contains(":")) {
+			String[] strs = str.split(":");
+			String hours = strs[0];
+			String minutes = strs[1];
+			Integer houri = StrUtils.strToInt(hours);
+			Integer minuti = StrUtils.strToInt(minutes);
+			if ((houri == null) || (minuti == null)) {
+				return null;
+			}
+			return (houri * 60) + minuti;
+		}
+		String hours = str;
+		Integer result = StrUtils.strToInt(hours);
+		if (result == null) {
+			return null;
+		}
+		return result * 60;
 	}
 
 	public boolean hasAnId() {

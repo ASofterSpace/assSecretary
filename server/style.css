@@ -47,6 +47,11 @@ span.button:hover {
 	background: rgba(150, 200, 250, 0.5);
 }
 
+span.button.unchecked {
+	background: none;
+	border: 1px solid rgba(150, 200, 250, 0.5);
+}
+
 span.button.checked {
 	background: rgba(150, 200, 250, 0.6);
 }
