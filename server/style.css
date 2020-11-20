@@ -29,25 +29,26 @@ div.buttonBar {
 	text-align: center;
 }
 
+span.button {
+	padding: 0pt 4pt;
+	border-radius: 5pt;
+	background: rgba(150, 200, 250, 0.2);
+	cursor: pointer;
+	text-align: center;
+}
+
 div.buttonBar > span.button {
 	padding: 2pt 10pt;
 	border-radius: 5pt;
 	margin: 0pt 10pt;
 }
 
-div.line > span.button {
-	padding: 0pt 4pt;
-	border-radius: 5pt;
-}
-
-div.buttonBar > span.button, div.line > span.button {
-	background: rgba(150, 200, 250, 0.2);
-	cursor: pointer;
-	text-align: center;
-}
-
-div.buttonBar > span.button:hover, div.line > span.button:hover {
+span.button:hover {
 	background: rgba(150, 200, 250, 0.5);
+}
+
+span.button.checked {
+	background: rgba(150, 200, 250, 0.6);
 }
 
 div.modal {

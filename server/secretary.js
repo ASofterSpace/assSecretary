@@ -130,6 +130,66 @@ window.secretary = {
 		alert("Sorry, not implemented yet.");
 	},
 
+	filterTasks: function() {
+
+		// hide all tasks
+		var tasks = document.getElementsByClassName("task");
+		for (var i = 0; i < tasks.length; i++) {
+			tasks[i].style.display = "none";
+		}
+
+		// show tasks that are filtered for by origin
+		var filterTaskOrigin = document.getElementById("filterTaskOrigin");
+		if (filterTaskOrigin) {
+			var originFilter = filterTaskOrigin.value;
+			if (originFilter == "every") {
+				for (var i = 0; i < tasks.length; i++) {
+					tasks[i].style.display = "block";
+				}
+			} else {
+				if (originFilter == "work") {
+					this.showTasksWithOrigin("skyhook");
+					this.showTasksWithOrigin("egscc");
+					this.showTasksWithOrigin("recoded");
+					this.showTasksWithOrigin("supervisionearth");
+					this.showTasksWithOrigin("gsmccc");
+				} else {
+					this.showTasksWithOrigin(originFilter);
+				}
+			}
+		}
+
+		// hide future tasks if future is not selected
+		var filterTaskFuture = document.getElementById("filterTaskFuture");
+		if (filterTaskFuture) {
+			if (filterTaskFuture.className == "button") {
+				var filteredTasks = document.getElementsByClassName("future-task");
+				for (var i = 0; i < filteredTasks.length; i++) {
+					filteredTasks[i].style.display = "none";
+				}
+			}
+		}
+	},
+
+	showTasksWithOrigin: function(origin) {
+		var filteredTasks = document.getElementsByClassName("task-with-origin-" + origin);
+		for (var i = 0; i < filteredTasks.length; i++) {
+			filteredTasks[i].style.display = "block";
+		}
+	},
+
+	toggleTaskFutureView: function() {
+		var filterTaskFuture = document.getElementById("filterTaskFuture");
+		if (filterTaskFuture) {
+			if (filterTaskFuture.className == "button") {
+				filterTaskFuture.className = "button checked";
+			} else {
+				filterTaskFuture.className = "button";
+			}
+		}
+		this.filterTasks();
+	},
+
 }
 
 

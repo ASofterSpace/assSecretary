@@ -129,7 +129,12 @@ public class Task extends GenericTask {
 
 		String html = "";
 
-		html += "<div class='line' id='task-" + id + "'>";
+		String futureTaskStr = "";
+		if (releasedInTheFuture()) {
+			futureTaskStr = " future-task";
+		}
+
+		html += "<div class='line task task-with-origin-" + getOrigin() + futureTaskStr + "' id='task-" + id + "'>";
 		html += "<span style='width: 10%;'>";
 		html += getReleasedDateStr();
 		html += "</span>";

@@ -274,7 +274,6 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 				indexContent = StrUtils.replaceAll(indexContent, "[[VM_STATS]]", vmStatsHtml.toString());
 
 
-				String taskHtml = "<div>There are no tasks at all that need to be done - whoa!</div>";
 				List<Task> tasks = taskCtrl.getCurrentTaskInstancesAsTasks();
 
 				Collections.sort(tasks, new Comparator<Task>() {
@@ -283,12 +282,11 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 					}
 				});
 
+				String taskHtml = "";
 				if (tasks.size() > 0) {
-					taskHtml = "<div><div>These tasks would like to be done:</div>";
 					for (Task task : tasks) {
 						taskHtml += task.toHtmlStr();
 					}
-					taskHtml += "</div>";
 				}
 
 				indexContent = StrUtils.replaceAll(indexContent, "[[TASKS]]", taskHtml);

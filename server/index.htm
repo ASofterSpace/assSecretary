@@ -28,7 +28,23 @@
 
 			[[VM_STATS]]
 
-			[[TASKS]]
+			<div style="position: relative">
+				<span id="filterTaskFuture" class="button" onclick="secretary.toggleTaskFutureView();" style="position: absolute; top: 0; right: 130pt;">
+					Future
+				</span>
+
+				<select id="filterTaskOrigin" onchange="secretary.filterTasks();" style="position: absolute; top: 0; right: 0;">
+					<option value="every" selected="selected">every task</option>
+					<option value="private">private</option>
+					<option value="work" selected="selected">work for customers</option>
+					[[OTHER_ORIGINS]]
+				</select>
+
+				<div>These tasks would like to be done:</div>
+				<div id="taskContainer">
+					[[TASKS]]
+				</div>
+			</div>
 
 			<div class="footer">&nbsp;</div>
 
@@ -63,14 +79,7 @@
 				<div>Origin:</div>
 				<select id="singleTaskOrigin">
 					<option value="private" selected="selected">private</option>
-					<option value="asofterspace">a softer space</option>
-					<option value="skyhook">skyhook</option>
-					<option value="egscc">EGS-CC</option>
-					<option value="recoded">Recoded</option>
-					<option value="supervisionearth">Supervision Earth</option>
-					<option value="gsmccc">GSMC-CC</option>
-					<option value="behemoth">Behemoth House Hunting</option>
-					<option value="sports">Sports</option>
+					[[OTHER_ORIGINS]]
 				</select>
 			</div>
 			<div class="column" style="width: 25%">
