@@ -146,7 +146,11 @@ window.secretary = {
 						document.getElementById("singleTaskReleaseDate").value = result.releaseDate;
 						document.getElementById("singleTaskOrigin").value = result.origin;
 						document.getElementById("singleTaskPriority").value = result.priority;
-						document.getElementById("singleTaskPriorityEscalationAfterDays").value = result.priorityEscalationAfterDays;
+						if (result.priorityEscalationAfterDays == null) {
+							document.getElementById("singleTaskPriorityEscalationAfterDays").value = "never";
+						} else {
+							document.getElementById("singleTaskPriorityEscalationAfterDays").value = result.priorityEscalationAfterDays;
+						}
 						document.getElementById("singleTaskDuration").value = result.duration;
 
 						window.secretary.currentlyEditing = id;
