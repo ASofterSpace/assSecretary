@@ -83,10 +83,10 @@ public class TaskCtrl extends TaskCtrlBase {
 		Record taskRecord = super.taskToRecord(task);
 		if (task instanceof Task) {
 			Task ourTask = (Task) task;
-			taskRecord.set(ORIGIN, ourTask.getOrigin());
-			taskRecord.set(PRIORITY, ourTask.getPriority());
-			taskRecord.set(PRIORITY_ESCALATION_AFTER_DAYS, ourTask.getPriorityEscalationAfterDays());
-			taskRecord.set(DURATION, ourTask.getDuration());
+			taskRecord.setOrRemove(ORIGIN, ourTask.getOrigin());
+			taskRecord.setOrRemove(PRIORITY, ourTask.getPriority());
+			taskRecord.setOrRemove(PRIORITY_ESCALATION_AFTER_DAYS, ourTask.getPriorityEscalationAfterDays());
+			taskRecord.setOrRemove(DURATION, ourTask.getDuration());
 			if (ourTask.hasAnId()) {
 				taskRecord.set(ID, ourTask.getId());
 			}
