@@ -20,7 +20,7 @@ public class Task extends GenericTask {
 
 	// the priority of the task (independent of when it is scheduled and released), as
 	// integer between 0 (the universe is going to end immediately if we don't do this RIGHT NOW!)
-	// and 100 (meh, seriously whatever)
+	// and 1000000 (meh, seriously whatever)
 	private Integer priority;
 
 	// if we do not manage to perform this task on the release date, how will the priority
@@ -76,9 +76,13 @@ public class Task extends GenericTask {
 		return priority;
 	}
 
-	public Integer getCurrentPriority() {
+	public int getCurrentPriority() {
+		int result = 500000;
+		if (priority != null) {
+			result = priority;
+		}
 		// TODO :: adjust based on priority escalation value
-		return priority;
+		return result;
 	}
 
 	public void setPriority(Integer priority) {
@@ -174,7 +178,14 @@ public class Task extends GenericTask {
 		html += "<span style='width: 10%;'>";
 		html += getReleasedDateStr();
 		html += "</span>";
-		html += "<span style='width: 60%;'>";
+		html += "<span style='width: 60%;'";
+		int prio = getCurrentPriority();
+		if (prio < 100000) {
+			html += " class='error'";
+		} else if (prio < 360000) {
+			html += " class='warning'";
+		}
+		html += ">";
 		html += HTML.escapeHTMLstr(title);
 		html += "</span>";
 
