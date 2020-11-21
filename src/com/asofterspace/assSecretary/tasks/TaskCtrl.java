@@ -94,6 +94,17 @@ public class TaskCtrl extends TaskCtrlBase {
 		return taskRecord;
 	}
 
+	public List<Task> getAllTaskInstancesAsTasks() {
+		List<GenericTask> genericTasks = taskInstances;
+		List<Task> result = new ArrayList<>();
+		for (GenericTask genericTask : genericTasks) {
+			if (genericTask instanceof Task) {
+				result.add((Task) genericTask);
+			}
+		}
+		return result;
+	}
+
 	public List<Task> getCurrentTaskInstancesAsTasks() {
 		boolean ordered = false;
 		List<GenericTask> genericTasks = getCurrentTaskInstances(ordered);

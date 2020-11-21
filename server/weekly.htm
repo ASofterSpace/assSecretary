@@ -15,6 +15,19 @@
 
 	<body style="padding-left: 0px;">
 		<div id="mainContent">
+			<div style="padding-bottom: 10pt;">
+				<div style="display: inline-block; width: 30%;">
+					<a href="/weekly.htm?date=[[PREV_DATE]]"><span class="button">Previous Week</span></a>
+				</div>
+				<div style="display: inline-block; width: 30%; position: relative;">
+					&nbsp;
+					@include(inc_taskfilter.htm)
+				</div>
+				<div style="display: inline-block; width: 30%; text-align: right; float: right;">
+					<a href="/weekly.htm?date=[[NEXT_DATE]]"><span class="button">Next Week</span></a>
+				</div>
+			</div>
+
 			[[WEEKLY_PLAN]]
 
 			<div class="footer">&nbsp;</div>

@@ -10,6 +10,7 @@ import com.asofterspace.toolbox.utils.DateUtils;
 import com.asofterspace.toolbox.utils.StrUtils;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -198,30 +199,34 @@ public class Task extends GenericTask {
 		html += ">";
 		html += HTML.escapeHTMLstr(title);
 		html += "</span>";
-		if (reducedView) {
-			html += "</div>";
-			html += "<div>";
-		}
 
-		List<String> details = getDetails();
-		boolean hasDetails = (details != null) && (details.size() > 0);
-		if (hasDetails) {
-			if (details.size() == 1) {
-				if ((details.get(0) == null) || (details.get(0).length() == 0)) {
-					hasDetails = false;
-				}
-			}
-		}
+		boolean hasDetails = false;
 
 		String btnStyle = "width: 5.5%; margin-left: 0.5%;";
-		if (hasDetails) {
-			html += "<span style='" + btnStyle + "' class='button' onclick='secretary.taskDetails(\"" + id + "\")'>";
-			html += "Details";
-			html += "</span>";
+
+		if (reducedView) {
+			html += "</div>";
+			html += "<div style='text-align: center;'>";
 		} else {
-			html += "<span style='" + btnStyle + " visibility: hidden;' class='button'>";
-			html += "&nbsp;";
-			html += "</span>";
+			List<String> details = getDetails();
+			hasDetails = (details != null) && (details.size() > 0);
+			if (hasDetails) {
+				if (details.size() == 1) {
+					if ((details.get(0) == null) || (details.get(0).length() == 0)) {
+						hasDetails = false;
+					}
+				}
+			}
+
+			if (hasDetails) {
+				html += "<span style='" + btnStyle + "' class='button' onclick='secretary.taskDetails(\"" + id + "\")'>";
+				html += "Details";
+				html += "</span>";
+			} else {
+				html += "<span style='" + btnStyle + " visibility: hidden;' class='button'>";
+				html += "&nbsp;";
+				html += "</span>";
+			}
 		}
 
 		if (hasBeenDone()) {
@@ -305,6 +310,25 @@ public class Task extends GenericTask {
 		}
 
 		return contentStr;
+	}
+
+	public boolean appliesTo(Date day) {
+
+		// entries which are done apply to the date on which they were done
+		if (hasBeenDone()) {
+			return DateUtils.isSameDay(day, getDoneDate());
+		}
+
+		// entries which are not yet done apply to their release date...
+		Date displayDate = getReleaseDate();
+		Date today = DateUtils.now();
+
+		// ... or, if they were released before today, they apply to today
+		if (displayDate.before(today)) {
+			displayDate = today;
+		}
+
+		return DateUtils.isSameDay(day, displayDate);
 	}
 
 }

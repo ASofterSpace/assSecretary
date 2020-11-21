@@ -30,6 +30,7 @@ import com.asofterspace.toolbox.web.WebServerRequestHandler;
 
 import java.io.IOException;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -429,23 +430,60 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 				String indexContent = indexBaseFile.getContent();
 
 				String weeklyHtmlStr = "";
-				Date today = DateUtils.now();
+				// the actual today that it really is... today
+				Date actualToday = DateUtils.now();
+				// the "today" for which the chart is generated, by default the actual today
+				Date today = actualToday;
+				for (String arg : arguments) {
+					if (arg.contains("=")) {
+						String key = arg.substring(0, arg.indexOf("="));
+						if ("date".equals(key)) {
+							today = DateUtils.parseDate(arg.substring(arg.indexOf("=") + 1));
+						}
+					}
+				}
 				List<Date> weekDays = DateUtils.getWeekForDate(today);
 
+				List<Task> tasks = taskCtrl.getAllTaskInstancesAsTasks();
+
 				for (Date day : weekDays) {
-					boolean isToday = DateUtils.isSameDay(today, day);
+					boolean isToday = DateUtils.isSameDay(actualToday, day);
 					weeklyHtmlStr += "<div class='weekly_day";
+					String boldness = "";
 					if (isToday) {
 						weeklyHtmlStr += " today";
+						boldness = "font-weight: bold";
 					}
 					weeklyHtmlStr += "'>";
-					weeklyHtmlStr += "<div style='text-align: center'>" + DateUtils.serializeDate(day) + "</div>";
-					weeklyHtmlStr += "<div style='text-align: center'>" + DateUtils.getDayOfWeekNameEN(day) + "</div>";
-					// weeklyHtmlStr += TODO tasks on that day;
+					weeklyHtmlStr += "<div style='text-align: center; " + boldness + "'>" + DateUtils.serializeDate(day) + "</div>";
+					weeklyHtmlStr += "<div style='text-align: center; " + boldness + "'>" + DateUtils.getDayOfWeekNameEN(day) + "</div>";
+
+					List<Task> tasksToday = new ArrayList<>();
+					for (Task task : tasks) {
+						if (task.appliesTo(day)) {
+							tasksToday.add(task);
+						}
+					}
+
+					Collections.sort(tasksToday, new Comparator<Task>() {
+						public int compare(Task a, Task b) {
+							return a.getCurrentPriority() - b.getCurrentPriority();
+						}
+					});
+
+					for (Task task : tasksToday) {
+						boolean historicalView = false;
+						boolean reducedView = true;
+						weeklyHtmlStr += task.toHtmlStr(historicalView, reducedView);
+					}
+
 					weeklyHtmlStr += "</div>";
 				}
 
 				indexContent = StrUtils.replaceAll(indexContent, "[[WEEKLY_PLAN]]", weeklyHtmlStr);
+
+				indexContent = StrUtils.replaceAll(indexContent, "[[PREV_DATE]]", DateUtils.serializeDate(DateUtils.addDays(today, -7)));
+				indexContent = StrUtils.replaceAll(indexContent, "[[NEXT_DATE]]", DateUtils.serializeDate(DateUtils.addDays(today, 7)));
 
 				indexContent = StrUtils.replaceAll(indexContent, "[[PROJECTS]]", AssSecretary.getProjHtmlStr());
 

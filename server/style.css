@@ -6,6 +6,11 @@ body {
 	padding-right: 60pt;
 }
 
+a {
+	color: #88AAFF;
+	text-decoration: none;
+}
+
 body > div, div#mainContent > div {
 	padding-bottom: 10pt;
 	color: #88AAFF;
@@ -80,10 +85,13 @@ div.weekly_day {
 	display: inline-block;
 	border-left: 1px solid rgb(150, 200, 250);
 	border-right: 1px solid rgb(150, 200, 250);
+	vertical-align: top;
+	padding: 3pt;
+	box-sizing: border-box;
 }
 
 div.weekly_day.today {
-	background: rgba(150, 200, 255, 0.2);
+	background: repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.6), rgba(0, 0, 0, 0), rgba(0, 0, 0, 0), rgba(255, 255, 255, 0.15), rgba(0, 0, 0, 0), rgba(0, 0, 0, 0), rgba(255, 255, 255, 0.2), rgba(0, 0, 0, 0), rgba(0, 0, 0, 0), rgba(255, 255, 255, 0.25), rgba(0, 0, 0, 0), rgba(0, 0, 0, 0), rgba(255, 255, 255, 0.3), rgba(0, 0, 0, 0), rgba(0, 0, 0, 0), rgba(255, 255, 255, 0.3), rgba(0, 0, 0, 0), rgba(0, 0, 0, 0), rgba(255, 255, 255, 0.3), rgba(0, 0, 0, 0), rgba(0, 0, 0, 0), rgba(255, 255, 255, 0.3), rgba(0, 0, 0, 0), rgba(0, 0, 0, 0), rgba(255, 255, 255, 0.3), rgba(0, 0, 0, 0), rgba(0, 0, 0, 0), rgba(255, 255, 255, 0.3), rgba(0, 0, 0, 0), rgba(0, 0, 0, 0), rgba(255, 255, 255, 0.3), rgba(0, 0, 0, 0), rgba(0, 0, 0, 0), rgba(255, 255, 255, 0.3), rgba(0, 0, 0, 0), rgba(0, 0, 0, 0));
 }
 
 div.modal {
@@ -110,6 +118,7 @@ div.modal > div.column {
 
 div.line:hover {
 	background: rgba(255, 0, 255, 0.19);
+	border-radius: 4pt;
 }
 
 div.line > span {
@@ -155,6 +164,7 @@ div.footer {
 
 div.details > a {
 	color: #AACCFF;
+	text-decoration: underline;
 }
 
 div.details > a:hover {
@@ -203,7 +213,7 @@ div.projectbar > a, div.projectbar > a > img {
 
 div.projectbar > a {
 	margin-top: 5pt;
-	background: radial-gradient(rgba(255, 255, 255, 1), rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.0));;
+	background: radial-gradient(rgba(255, 255, 255, 1), rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.0));
 }
 
 div.projectbar > a:hover {
