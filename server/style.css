@@ -81,7 +81,7 @@ span.button.checked {
 }
 
 div.weekly_day {
-	width: 14%;
+	width: 14.2%;
 	display: inline-block;
 	border-left: 1px solid rgb(150, 200, 250);
 	border-right: 1px solid rgb(150, 200, 250);
@@ -92,6 +92,15 @@ div.weekly_day {
 
 div.weekly_day.today {
 	background: repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.6), rgba(0, 0, 0, 0), rgba(0, 0, 0, 0), rgba(255, 255, 255, 0.15), rgba(0, 0, 0, 0), rgba(0, 0, 0, 0), rgba(255, 255, 255, 0.2), rgba(0, 0, 0, 0), rgba(0, 0, 0, 0), rgba(255, 255, 255, 0.25), rgba(0, 0, 0, 0), rgba(0, 0, 0, 0), rgba(255, 255, 255, 0.3), rgba(0, 0, 0, 0), rgba(0, 0, 0, 0), rgba(255, 255, 255, 0.3), rgba(0, 0, 0, 0), rgba(0, 0, 0, 0), rgba(255, 255, 255, 0.3), rgba(0, 0, 0, 0), rgba(0, 0, 0, 0), rgba(255, 255, 255, 0.3), rgba(0, 0, 0, 0), rgba(0, 0, 0, 0), rgba(255, 255, 255, 0.3), rgba(0, 0, 0, 0), rgba(0, 0, 0, 0), rgba(255, 255, 255, 0.3), rgba(0, 0, 0, 0), rgba(0, 0, 0, 0), rgba(255, 255, 255, 0.3), rgba(0, 0, 0, 0), rgba(0, 0, 0, 0), rgba(255, 255, 255, 0.3), rgba(0, 0, 0, 0), rgba(0, 0, 0, 0));
+}
+
+div.separator_top {
+	border-bottom: 1px solid rgb(150, 200, 255);
+	height: 5pt;
+}
+
+div.separator_bottom {
+	height: 3pt;
 }
 
 div.modal {

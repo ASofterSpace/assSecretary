@@ -406,7 +406,13 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 				boolean historicalView = true;
 				boolean reducedView = false;
 				if (tasks.size() > 0) {
+					Date prevDate = tasks.get(0).getDoneDate();
 					for (Task task : tasks) {
+						if (!DateUtils.isSameDay(task.getDoneDate(), prevDate)) {
+							prevDate = task.getDoneDate();
+							taskHtml += "<div class='separator_top'>&nbsp;</div>";
+							taskHtml += "<div class='separator_bottom'>&nbsp;</div>";
+						}
 						taskHtml += task.toHtmlStr(historicalView, reducedView);
 					}
 				}
