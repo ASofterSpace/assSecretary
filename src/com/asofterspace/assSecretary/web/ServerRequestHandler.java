@@ -130,6 +130,13 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 					answer = new WebServerAnswerInJson(new JSON("{\"success\": " + didSetToDone + "}"));
 					break;
 
+				case "/taskUnDone":
+					boolean didSetToNotDone = taskCtrl.setTaskToNotDone(
+						json.getString("id")
+					);
+					answer = new WebServerAnswerInJson(new JSON("{\"success\": " + didSetToNotDone + "}"));
+					break;
+
 				default:
 					respond(404);
 					return;
@@ -228,6 +235,15 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 					StrUtils.replaceAll(DateUtils.serializeDateTimeLong(now, "<span class='sup'>", "</span>"), ", ", " and it is ") +
 					"</span> right now. You are currently on planet Earth.";
 				indexContent = StrUtils.replaceAll(indexContent, "[[GENERAL_INFO]]", generalInfo);
+
+
+				String tabsHtml = "<div id='tabList'>";
+				tabsHtml += "<a href='/tasklog.htm'>Task Log</a>";
+				tabsHtml += "<a href='/weekly.htm'>Weekly Plan</a>";
+				tabsHtml += "</div>";
+
+				indexContent = StrUtils.replaceAll(indexContent, "[[TABS]]", tabsHtml);
+
 
 				String mariHtml = "";
 
@@ -337,9 +353,10 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 				});
 
 				String taskHtml = "";
+				boolean historicalView = false;
 				if (tasks.size() > 0) {
 					for (Task task : tasks) {
-						taskHtml += task.toHtmlStr();
+						taskHtml += task.toHtmlStr(historicalView);
 					}
 				}
 
@@ -354,6 +371,62 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 				indexContent = StrUtils.replaceAll(indexContent, "[[BUTTON_BAR]]", buttonBarHtml);
 
 				indexContent = StrUtils.replaceAll(indexContent, "[[CURDATE]]", DateUtils.serializeDate(DateUtils.now()));
+
+				locEquiv = "_" + locEquiv;
+				TextFile indexFile = new TextFile(webRoot, locEquiv);
+				indexFile.saveContent(indexContent);
+			}
+
+
+			// answering a request for the task log tab
+			if (locEquiv.equals("tasklog.htm")) {
+
+				System.out.println("Answering task log request...");
+
+				TextFile indexBaseFile = new TextFile(webRoot, locEquiv);
+				String indexContent = indexBaseFile.getContent();
+
+				List<Task> tasks = taskCtrl.getDoneTaskInstancesAsTasks();
+
+				Collections.sort(tasks, new Comparator<Task>() {
+					public int compare(Task a, Task b) {
+						if (a.getDoneDate().equals(b.getDoneDate())) {
+							return a.getCurrentPriority() - b.getCurrentPriority();
+						}
+						if (a.getDoneDate().before(b.getDoneDate())) {
+							return 1;
+						}
+						return -1;
+					}
+				});
+
+				String taskHtml = "";
+				boolean historicalView = true;
+				if (tasks.size() > 0) {
+					for (Task task : tasks) {
+						taskHtml += task.toHtmlStr(historicalView);
+					}
+				}
+
+				indexContent = StrUtils.replaceAll(indexContent, "[[TASKS]]", taskHtml);
+
+				indexContent = StrUtils.replaceAll(indexContent, "[[PROJECTS]]", AssSecretary.getProjHtmlStr());
+
+				locEquiv = "_" + locEquiv;
+				TextFile indexFile = new TextFile(webRoot, locEquiv);
+				indexFile.saveContent(indexContent);
+			}
+
+
+			// answering a request for the weekly view
+			if (locEquiv.equals("weekly.htm")) {
+
+				System.out.println("Answering weekly view request...");
+
+				TextFile indexBaseFile = new TextFile(webRoot, locEquiv);
+				String indexContent = indexBaseFile.getContent();
+
+				indexContent = StrUtils.replaceAll(indexContent, "[[PROJECTS]]", AssSecretary.getProjHtmlStr());
 
 				locEquiv = "_" + locEquiv;
 				TextFile indexFile = new TextFile(webRoot, locEquiv);

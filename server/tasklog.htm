@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+
+	<head>
+		<meta charset="utf-8">
+
+		<title>Hugo, A Softer Space Secretary</title>
+
+		<meta name="keywords" content="secretary">
+
+		<meta name="description" content="Our secretary, who helps us organize things.">
+
+		@include(inc_dependencies.htm)
+	</head>
+
+	<body style="padding-left: 0px;">
+		<div id="mainContent">
+			<div style="position: relative">
+				@include(inc_taskfilter.htm)
+
+				<div>These tasks have been done:</div>
+				<div id="taskContainer">
+					[[TASKS]]
+				</div>
+			</div>
+
+			<div class="footer">&nbsp;</div>
+
+		</div>
+
+		@include(inc_task_modals.htm)
+
+		@include(inc_subpage_end.htm)

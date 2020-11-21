@@ -117,17 +117,6 @@ public class AssSecretary {
 			TextFile indexBaseFile = new TextFile(webRoot, "index.htm");
 			String indexContent = indexBaseFile.getContent();
 			indexContent = StrUtils.replaceAll(indexContent, "[[PROJECTS]]", projHtmlStr);
-			String otherOriginsStr = "";
-			otherOriginsStr += "<option value='asofterspace'>a softer space</option>";
-			otherOriginsStr += "<option value='skyhook'>skyhook</option>";
-			otherOriginsStr += "<option value='egscc'>EGS-CC</option>";
-			otherOriginsStr += "<option value='recoded'>Recoded</option>";
-			otherOriginsStr += "<option value='supervisionearth'>Supervision Earth</option>";
-			otherOriginsStr += "<option value='gsmccc'>GSMC-CC</option>";
-			otherOriginsStr += "<option value='behemoth'>Behemoth House Hunting</option>";
-			otherOriginsStr += "<option value='sports'>Sports</option>";
-			otherOriginsStr += "<option value='firefighting'>Fire Fighting</option>";
-			indexContent = StrUtils.replaceAll(indexContent, "[[OTHER_ORIGINS]]", otherOriginsStr);
 			indexBaseFile.saveContent(indexContent);
 
 

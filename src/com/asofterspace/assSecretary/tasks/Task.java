@@ -6,6 +6,7 @@ package com.asofterspace.assSecretary.tasks;
 
 import com.asofterspace.toolbox.calendar.GenericTask;
 import com.asofterspace.toolbox.io.HTML;
+import com.asofterspace.toolbox.utils.DateUtils;
 import com.asofterspace.toolbox.utils.StrUtils;
 
 import java.util.ArrayList;
@@ -163,7 +164,7 @@ public class Task extends GenericTask {
 		return id;
 	}
 
-	public String toHtmlStr() {
+	public String toHtmlStr(boolean historicalView) {
 
 		String id = getId();
 
@@ -176,7 +177,11 @@ public class Task extends GenericTask {
 
 		html += "<div class='line task task-with-origin-" + getOrigin() + futureTaskStr + "' id='task-" + id + "'>";
 		html += "<span style='width: 10%;'>";
-		html += getReleasedDateStr();
+		if (historicalView) {
+			html += DateUtils.serializeDate(getDoneDate());
+		} else {
+			html += getReleasedDateStr();
+		}
 		html += "</span>";
 		html += "<span style='width: 60%;'";
 		int prio = getCurrentPriority();
@@ -210,9 +215,15 @@ public class Task extends GenericTask {
 			html += "</span>";
 		}
 
-		html += "<span style='" + btnStyle + "' class='button' onclick='secretary.taskDone(\"" + id + "\")'>";
-		html += "Done";
-		html += "</span>";
+		if (historicalView) {
+			html += "<span style='" + btnStyle + "' class='button' onclick='secretary.taskUnDone(\"" + id + "\")'>";
+			html += "Un-done";
+			html += "</span>";
+		} else {
+			html += "<span style='" + btnStyle + "' class='button' onclick='secretary.taskDone(\"" + id + "\")'>";
+			html += "Done";
+			html += "</span>";
+		}
 		html += "<span style='" + btnStyle + "' class='button' onclick='secretary.taskEdit(\"" + id + "\")'>";
 		html += "Edit";
 		html += "</span>";
@@ -220,7 +231,7 @@ public class Task extends GenericTask {
 		html += "Delete";
 		html += "</span>";
 		if (hasDetails) {
-			html += "<div style='display: none' id='task-details-" + id + "'>";
+			html += "<div style='display: none' class='details' id='task-details-" + id + "'>";
 			List<String> safeDetails = new ArrayList<>();
 			if (details != null) {
 				for (String detail : details) {
@@ -238,7 +249,7 @@ public class Task extends GenericTask {
 		return html;
 	}
 
-	public static String addHtmlLinkToStringContent(String contentStr String prefix) {
+	public static String addHtmlLinkToStringContent(String contentStr, String prefix) {
 
 		// replace http:// with actual links
 		int start = contentStr.indexOf(prefix);

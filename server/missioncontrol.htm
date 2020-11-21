@@ -10,7 +10,7 @@
 
 		<meta name="description" content="Our mission control.">
 
-		<link href="style.css?v=@version" media="all" rel="stylesheet" type="text/css">
+		@include(inc_dependencies.htm)
 	</head>
 
 	<body style="padding-left: 0px;">
@@ -18,18 +18,4 @@
 			[[MISSION_CONTROL]]
 		</div>
 
-		<a class="sidebar" href="/">
-			<img class="avatar" src="/pics/hugo.jpg" />
-		</a>
-
-		<a class="sidebar" href="http://localhost:3011/" style="top: 92pt;">
-			<img class="avatar" src="/pics/mari.jpg" />
-		</a>
-
-		<div class="projectbar">
-			[[PROJECTS]]
-		</div>
-
-		<script src="secretary.js?v=@version"></script>
-	</body>
-</html>
+		@include(inc_subpage_end.htm)

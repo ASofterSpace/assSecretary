@@ -106,10 +106,27 @@ public class TaskCtrl extends TaskCtrlBase {
 		return result;
 	}
 
+	public List<Task> getDoneTaskInstancesAsTasks() {
+		List<GenericTask> genericTasks = taskInstances;
+		List<Task> result = new ArrayList<>();
+		for (GenericTask genericTask : genericTasks) {
+			if (genericTask instanceof Task) {
+				if (genericTask.hasBeenDone()) {
+					result.add((Task) genericTask);
+				}
+			}
+		}
+		return result;
+	}
+
 	public Task getTaskById(String id) {
-		for (Task task : getCurrentTaskInstancesAsTasks()) {
-			if (task.hasId(id)) {
-				return task;
+		List<GenericTask> genericTasks = taskInstances;
+		for (GenericTask genericTask : genericTasks) {
+			if (genericTask instanceof Task) {
+				Task task = (Task) genericTask;
+				if (task.hasId(id)) {
+					return task;
+				}
 			}
 		}
 		return null;
@@ -145,14 +162,34 @@ public class TaskCtrl extends TaskCtrlBase {
 	}
 
 	public boolean setTaskToDone(String id) {
-		List<Task> tasks = getCurrentTaskInstancesAsTasks();
-		for (Task task : tasks) {
-			if (task.hasId(id)) {
-				task.setDone(true);
-				task.setDoneDate(DateUtils.now());
-				task.setDoneLog("");
-				save();
-				return true;
+		List<GenericTask> genericTasks = taskInstances;
+		for (GenericTask genericTask : genericTasks) {
+			if (genericTask instanceof Task) {
+				Task task = (Task) genericTask;
+				if (task.hasId(id)) {
+					task.setDone(true);
+					task.setDoneDate(DateUtils.now());
+					task.setDoneLog("");
+					save();
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	public boolean setTaskToNotDone(String id) {
+		List<GenericTask> genericTasks = taskInstances;
+		for (GenericTask genericTask : genericTasks) {
+			if (genericTask instanceof Task) {
+				Task task = (Task) genericTask;
+				if (task.hasId(id)) {
+					task.setDone(false);
+					task.setDoneDate(null);
+					task.setDoneLog(null);
+					save();
+					return true;
+				}
 			}
 		}
 		return false;

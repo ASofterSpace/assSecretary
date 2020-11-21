@@ -14,8 +14,27 @@ body > div, div#mainContent > div {
 div#mainContent {
 	overflow-y: scroll;
 	overflow-x: hidden;
+}
+
+div#tabList {
+	overflow: hidden;
+}
+
+div#tabList, div#mainContent {
 	scrollbar-color: #402 #102;
 	position: relative;
+}
+
+div#tabList > div, div#tabList > a {
+	margin-right: 8pt;
+	display: block;
+	text-decoration: none;
+	color: #88AAFF;
+	border-radius: 6pt;
+}
+
+div#tabList > a:hover {
+	background: rgba(255, 0, 255, 0.1);
 }
 
 div#buttonBar {
@@ -90,11 +109,14 @@ div.line > span {
 	vertical-align: top;
 }
 
-img.avatar {
+img.avatar, div#tabList {
 	position: absolute;
 	left: 10pt;
-	top: 10pt;
 	width: 200pt;
+}
+
+img.avatar {
+	top: 10pt;
 	border-radius: 20pt;
 }
 
@@ -118,6 +140,14 @@ a.sidebar > img.avatar {
 
 div.footer {
 	height: 200pt;
+}
+
+div.details > a {
+	color: #AACCFF;
+}
+
+div.details > a:hover {
+	color: #CCEEFF;
 }
 
 div.projectbar {

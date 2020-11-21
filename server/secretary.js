@@ -21,6 +21,21 @@ window.secretary = {
 			retry = true;
 		}
 
+		if (window.expectingAvatarAndTabList) {
+			var tabList = document.getElementById("tabList");
+			var hugoAvatar = document.getElementById("hugoAvatar");
+			if (tabList && hugoAvatar) {
+				var topPx = hugoAvatar.clientHeight + 25;
+				tabList.style.top = topPx + "px";
+				tabList.style.height = (window.innerHeight - (topPx + 25)) + "px";
+				if (hugoAvatar.clientHeight < 1) {
+					retry = true;
+				}
+			} else {
+				retry = true;
+			}
+		}
+
 		if (retry) {
 			// if we could not fully resize now, then let's do it later...
 			window.setTimeout(function() {
@@ -109,6 +124,28 @@ window.secretary = {
 
 		var request = new XMLHttpRequest();
 		request.open("POST", "taskDone", true);
+		request.setRequestHeader("Content-Type", "application/json");
+
+		request.onreadystatechange = function() {
+			if (request.readyState == 4 && request.status == 200) {
+				var result = JSON.parse(request.response);
+				if (result.success) {
+					window.location.reload(false);
+				}
+			}
+		}
+
+		var data = {
+			id: id,
+		};
+
+		request.send(JSON.stringify(data));
+	},
+
+	taskUnDone: function(id) {
+
+		var request = new XMLHttpRequest();
+		request.open("POST", "taskUnDone", true);
 		request.setRequestHeader("Content-Type", "application/json");
 
 		request.onreadystatechange = function() {
