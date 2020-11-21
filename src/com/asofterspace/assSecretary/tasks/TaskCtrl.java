@@ -146,7 +146,7 @@ public class TaskCtrl extends TaskCtrlBase {
 	/**
 	 * Returns true if it worked and an ad hoc task was created, and false otherwise
 	 */
-	public boolean addAdHocTask(String title, String details, String dateStr, String origin, Integer priority,
+	public Task addAdHocTask(String title, String details, String dateStr, String origin, Integer priority,
 		Integer priorityEscalationAfterDays, String duration) {
 
 		Date scheduleDate = DateUtils.parseDate(dateStr);
@@ -154,7 +154,7 @@ public class TaskCtrl extends TaskCtrlBase {
 		GenericTask addedTask = super.addAdHocTask(title, details, scheduleDate);
 
 		if (addedTask == null) {
-			return false;
+			return null;
 		}
 
 		if (addedTask instanceof Task) {
@@ -163,13 +163,16 @@ public class TaskCtrl extends TaskCtrlBase {
 			ourTask.setPriority(priority);
 			ourTask.setPriorityEscalationAfterDays(priorityEscalationAfterDays);
 			ourTask.setDurationStr(duration);
+
+			save();
+
+			return ourTask;
+
 		} else {
 			System.out.println("Something very weird happened, we encountered a task which is not a Task!");
 		}
 
-		save();
-
-		return true;
+		return null;
 	}
 
 	public boolean setTaskToDone(String id) {

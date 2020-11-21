@@ -48,6 +48,9 @@ window.secretary = {
 		var modal = document.getElementById("addSingleTaskModal");
 		if (modal) {
 			modal.style.display = "block";
+
+			document.getElementById("doneAndCopySingleTaskModalBtn").style.display = "none";
+
 			this.currentlyEditing = null;
 		}
 	},
@@ -80,6 +83,44 @@ window.secretary = {
 					}
 					if (closeOnSubmit) {
 						window.secretary.closeSingleTaskModal();
+					}
+				}
+			}
+		}
+
+		var data = {
+			editingId: window.secretary.currentlyEditing,
+			title: document.getElementById("singleTaskTitle").value,
+			details: document.getElementById("singleTaskDetails").value,
+			releaseDate: document.getElementById("singleTaskReleaseDate").value,
+			origin: document.getElementById("singleTaskOrigin").value,
+			priority: document.getElementById("singleTaskPriority").value,
+			priorityEscalationAfterDays: document.getElementById("singleTaskPriorityEscalationAfterDays").value,
+			duration: document.getElementById("singleTaskDuration").value,
+		};
+
+		request.send(JSON.stringify(data));
+	},
+
+	doneAndCopySingleTaskModal: function() {
+
+		var request = new XMLHttpRequest();
+		request.open("POST", "doneAndCopySingleTask", true);
+		request.setRequestHeader("Content-Type", "application/json");
+
+		request.onreadystatechange = function() {
+			if (request.readyState == 4 && request.status == 200) {
+				var result = JSON.parse(request.response);
+				// show some sort of confirmation
+				if (result.success) {
+					var singleTaskSavedLabel = document.getElementById("singleTaskSavedLabel");
+					if (singleTaskSavedLabel) {
+						singleTaskSavedLabel.style.display = "block";
+						window.setTimeout(function () {
+							singleTaskSavedLabel.style.display = "none";
+						}, 3000);
+						window.secretary.currentlyEditing = result.newId;
+						document.getElementById("singleTaskReleaseDate").value = result.newReleaseDate;
 					}
 				}
 			}
@@ -189,6 +230,8 @@ window.secretary = {
 							document.getElementById("singleTaskPriorityEscalationAfterDays").value = result.priorityEscalationAfterDays;
 						}
 						document.getElementById("singleTaskDuration").value = result.duration;
+
+						document.getElementById("doneAndCopySingleTaskModalBtn").style.display = "inline";
 
 						window.secretary.currentlyEditing = id;
 					}

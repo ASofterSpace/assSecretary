@@ -167,7 +167,10 @@ public class Task extends GenericTask {
 
 	public String toHtmlStr(boolean historicalView, boolean reducedView) {
 
-		String id = getId();
+		String id = null;
+		if (isInstance()) {
+			id = getId();
+		}
 
 		String html = "";
 
@@ -203,6 +206,12 @@ public class Task extends GenericTask {
 		boolean hasDetails = false;
 
 		String btnStyle = "width: 5.5%; margin-left: 0.5%;";
+
+		// if this is not an actual instance, but just a ghost of a scheduled task, then of course it cannot
+		// be edited in any way shape or form, so no point in shoing any buttons :)
+		if (!isInstance()) {
+			btnStyle += "visibility:hidden;";
+		}
 
 		if (reducedView) {
 			html += "</div>";

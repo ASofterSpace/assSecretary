@@ -93,7 +93,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 					if (editingId == null) {
 						// add new task
-						boolean didAdd = taskCtrl.addAdHocTask(
+						Task newTask = taskCtrl.addAdHocTask(
 							json.getString("title"),
 							json.getString("details"),
 							json.getString("releaseDate"),
@@ -102,7 +102,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 							json.getInteger("priorityEscalationAfterDays"),
 							json.getString("duration")
 						);
-						answer = new WebServerAnswerInJson(new JSON("{\"success\": " + didAdd + "}"));
+						answer = new WebServerAnswerInJson(new JSON("{\"success\": " + (newTask != null) + "}"));
 
 					} else {
 						// edit existing task
@@ -122,6 +122,53 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 							return;
 						}
 					}
+					break;
+
+				case "/doneAndCopySingleTask":
+
+					editingId = json.getString("editingId");
+
+					if (editingId == null) {
+						respond(404);
+						return;
+					}
+
+					// edit existing task
+					Task task = taskCtrl.getTaskById(editingId);
+					if (task != null) {
+						task.setTitle(json.getString("title"));
+						task.setDetailsStr(json.getString("details"));
+						task.setReleasedDate(DateUtils.parseDate(json.getString("releaseDate")));
+						task.setOrigin(json.getString("origin"));
+						task.setPriority(json.getInteger("priority"));
+						task.setPriorityEscalationAfterDays(json.getInteger("priorityEscalationAfterDays"));
+						task.setDurationStr(json.getString("duration"));
+
+						taskCtrl.setTaskToDone(editingId);
+
+						taskCtrl.save();
+						answer = new WebServerAnswerInJson(new JSON("{\"success\": true}"));
+					} else {
+						respond(404);
+						return;
+					}
+
+					// add new task
+					String newReleaseDate = DateUtils.serializeDate(
+						DateUtils.addDays(DateUtils.now(), 1)
+					);
+					Task newTask = taskCtrl.addAdHocTask(
+						json.getString("title"),
+						json.getString("details"),
+						newReleaseDate,
+						json.getString("origin"),
+						json.getInteger("priority"),
+						json.getInteger("priorityEscalationAfterDays"),
+						json.getString("duration")
+					);
+					answer = new WebServerAnswerInJson(new JSON("{\"success\": " + (newTask != null) + ", " +
+						"\"newId\": \"" + newTask.getId() + "\", \"newReleaseDate\": \"" + newReleaseDate + "\"}"));
+
 					break;
 
 				case "/taskDone":
@@ -452,19 +499,30 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 				List<Task> tasks = taskCtrl.getAllTaskInstancesAsTasks();
 
+				List<GenericTask> baseTasksForSchedule = taskCtrl.getTasks();
+
 				for (Date day : weekDays) {
 					boolean isToday = DateUtils.isSameDay(actualToday, day);
 					weeklyHtmlStr += "<div class='weekly_day";
 					String boldness = "";
 					if (isToday) {
 						weeklyHtmlStr += " today";
-						boldness = "font-weight: bold";
+						boldness = "font-weight: bold;";
 					}
 					weeklyHtmlStr += "'>";
 					weeklyHtmlStr += "<div style='text-align: center; " + boldness + "'>" + DateUtils.serializeDate(day) + "</div>";
-					weeklyHtmlStr += "<div style='text-align: center; " + boldness + "'>" + DateUtils.getDayOfWeekNameEN(day) + "</div>";
+					weeklyHtmlStr += "<div style='text-align: center; " + boldness + " padding-bottom: 10pt;'>" + DateUtils.getDayOfWeekNameEN(day) + "</div>";
 
 					List<Task> tasksToday = new ArrayList<>();
+
+					for (GenericTask task : baseTasksForSchedule) {
+						if (task instanceof Task) {
+							if (task.isScheduledOn(day)) {
+								tasksToday.add((Task) task);
+							}
+						}
+					}
+
 					for (Task task : tasks) {
 						if (task.appliesTo(day)) {
 							tasksToday.add(task);
