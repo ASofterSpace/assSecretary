@@ -224,7 +224,11 @@ public class Task extends GenericTask {
 			List<String> safeDetails = new ArrayList<>();
 			if (details != null) {
 				for (String detail : details) {
-					safeDetails.add(HTML.escapeHTMLstr(detail));
+					detail = StrUtils.replaceAll(detail, "<", "&lt;");
+					detail = StrUtils.replaceAll(detail, ">", "&gt;");
+					detail = addHtmlLinkToStringContent(detail, "http://");
+					detail = addHtmlLinkToStringContent(detail, "https://");
+					safeDetails.add(detail);
 				}
 			}
 			html += StrUtils.join("<br>", safeDetails);
@@ -232,6 +236,51 @@ public class Task extends GenericTask {
 		}
 		html += "</div>";
 		return html;
+	}
+
+	public static String addHtmlLinkToStringContent(String contentStr String prefix) {
+
+		// replace http:// with actual links
+		int start = contentStr.indexOf(prefix);
+		while (start >= 0) {
+			int end = StrUtils.getLinkEndFromPosition(start, contentStr);
+			if (end < 0) {
+				end = contentStr.length();
+			}
+			String midStr = contentStr.substring(start, end);
+
+			// do we actually do anything with this midStr (so with this link that we encountered)?
+
+			// by default, nope!
+			boolean adjustMidStr = false;
+			if (start > 0) {
+				// if we do not see a closed XML tag before it (so if we are not inside of an XML tag), yea!
+				if (contentStr.charAt(start - 1) != '>') {
+					adjustMidStr = true;
+				} else {
+					// if we are "enclosed" by an XML tag (that is, there is one before us), but it is just
+					// a <br>, then also yeah!
+					if ((start > 3) && (contentStr.substring(start - 4, start).equals("<br>"))) {
+						adjustMidStr = true;
+					}
+				}
+			} else {
+				// if the link is the very first thing in the string, yea!
+				adjustMidStr = true;
+			}
+
+			if (adjustMidStr) {
+				// ... but if we are not, happily add a link!
+				midStr = "<a href='" + midStr + "' target='_blank'>" + midStr + "</a>";
+			}
+			contentStr =
+				contentStr.substring(0, start) +
+				midStr +
+				contentStr.substring(end);
+			start = contentStr.indexOf(prefix, start + midStr.length() + 1);
+		}
+
+		return contentStr;
 	}
 
 }
