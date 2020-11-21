@@ -75,6 +75,17 @@ span.button.checked {
 	background: rgba(150, 200, 250, 0.6);
 }
 
+div.weekly_day {
+	width: 14%;
+	display: inline-block;
+	border-left: 1px solid rgb(150, 200, 250);
+	border-right: 1px solid rgb(150, 200, 250);
+}
+
+div.weekly_day.today {
+	background: rgba(150, 200, 255, 0.2);
+}
+
 div.modal {
 	display: none;
 	position: absolute;

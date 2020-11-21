@@ -354,9 +354,10 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 				String taskHtml = "";
 				boolean historicalView = false;
+				boolean reducedView = false;
 				if (tasks.size() > 0) {
 					for (Task task : tasks) {
-						taskHtml += task.toHtmlStr(historicalView);
+						taskHtml += task.toHtmlStr(historicalView, reducedView);
 					}
 				}
 
@@ -402,9 +403,10 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 				String taskHtml = "";
 				boolean historicalView = true;
+				boolean reducedView = false;
 				if (tasks.size() > 0) {
 					for (Task task : tasks) {
-						taskHtml += task.toHtmlStr(historicalView);
+						taskHtml += task.toHtmlStr(historicalView, reducedView);
 					}
 				}
 
@@ -425,6 +427,25 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 				TextFile indexBaseFile = new TextFile(webRoot, locEquiv);
 				String indexContent = indexBaseFile.getContent();
+
+				String weeklyHtmlStr = "";
+				Date today = DateUtils.now();
+				List<Date> weekDays = DateUtils.getWeekForDate(today);
+
+				for (Date day : weekDays) {
+					boolean isToday = DateUtils.isSameDay(today, day);
+					weeklyHtmlStr += "<div class='weekly_day";
+					if (isToday) {
+						weeklyHtmlStr += " today";
+					}
+					weeklyHtmlStr += "'>";
+					weeklyHtmlStr += "<div style='text-align: center'>" + DateUtils.serializeDate(day) + "</div>";
+					weeklyHtmlStr += "<div style='text-align: center'>" + DateUtils.getDayOfWeekNameEN(day) + "</div>";
+					// weeklyHtmlStr += TODO tasks on that day;
+					weeklyHtmlStr += "</div>";
+				}
+
+				indexContent = StrUtils.replaceAll(indexContent, "[[WEEKLY_PLAN]]", weeklyHtmlStr);
 
 				indexContent = StrUtils.replaceAll(indexContent, "[[PROJECTS]]", AssSecretary.getProjHtmlStr());
 

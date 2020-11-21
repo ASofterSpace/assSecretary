@@ -164,7 +164,7 @@ public class Task extends GenericTask {
 		return id;
 	}
 
-	public String toHtmlStr(boolean historicalView) {
+	public String toHtmlStr(boolean historicalView, boolean reducedView) {
 
 		String id = getId();
 
@@ -176,13 +176,18 @@ public class Task extends GenericTask {
 		}
 
 		html += "<div class='line task task-with-origin-" + getOrigin() + futureTaskStr + "' id='task-" + id + "'>";
-		html += "<span style='width: 10%;'>";
-		if (historicalView) {
-			html += DateUtils.serializeDate(getDoneDate());
-		} else {
-			html += getReleasedDateStr();
+		if (reducedView) {
+			html += "<div>";
 		}
-		html += "</span>";
+		if (!reducedView) {
+			html += "<span style='width: 10%;'>";
+			if (historicalView) {
+				html += DateUtils.serializeDate(getDoneDate());
+			} else {
+				html += getReleasedDateStr();
+			}
+			html += "</span>";
+		}
 		html += "<span style='width: 60%;'";
 		int prio = getCurrentPriority();
 		if (prio < 100000) {
@@ -193,6 +198,10 @@ public class Task extends GenericTask {
 		html += ">";
 		html += HTML.escapeHTMLstr(title);
 		html += "</span>";
+		if (reducedView) {
+			html += "</div>";
+			html += "<div>";
+		}
 
 		List<String> details = getDetails();
 		boolean hasDetails = (details != null) && (details.size() > 0);
@@ -215,7 +224,7 @@ public class Task extends GenericTask {
 			html += "</span>";
 		}
 
-		if (historicalView) {
+		if (hasBeenDone()) {
 			html += "<span style='" + btnStyle + "' class='button' onclick='secretary.taskUnDone(\"" + id + "\")'>";
 			html += "Un-done";
 			html += "</span>";
@@ -230,6 +239,10 @@ public class Task extends GenericTask {
 		html += "<span style='" + btnStyle + "' class='button' onclick='secretary.taskDelete(\"" + id + "\")'>";
 		html += "Delete";
 		html += "</span>";
+		if (reducedView) {
+			html += "</div>";
+		}
+
 		if (hasDetails) {
 			html += "<div style='display: none' class='details' id='task-details-" + id + "'>";
 			List<String> safeDetails = new ArrayList<>();
