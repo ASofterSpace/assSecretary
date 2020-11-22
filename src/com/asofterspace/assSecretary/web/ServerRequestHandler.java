@@ -515,17 +515,22 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 					List<Task> tasksToday = new ArrayList<>();
 
-					for (GenericTask task : baseTasksForSchedule) {
-						if (task instanceof Task) {
-							if (task.isScheduledOn(day)) {
-								tasksToday.add((Task) task);
-							}
-						}
-					}
-
+					// check for all task instances if they apply today
 					for (Task task : tasks) {
 						if (task.appliesTo(day)) {
 							tasksToday.add(task);
+						}
+					}
+
+					// for days in the future, also add ghost tasks (non-instances) - but no in the past,
+					// as there we would expect real instances to have been created instead!
+					if (day.after(actualToday)) {
+						for (GenericTask task : baseTasksForSchedule) {
+							if (task instanceof Task) {
+								if (task.isScheduledOn(day)) {
+									tasksToday.add((Task) task);
+								}
+							}
 						}
 					}
 
