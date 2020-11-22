@@ -416,11 +416,6 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 				indexContent = StrUtils.replaceAll(indexContent, "[[MISSION_CONTROL_PREVIEW]]", getMissionControlHtml(false));
 
-				String buttonBarHtml = "";
-				buttonBarHtml += "<span class='button' onclick='secretary.showAddSingleTaskModal();'>Add Single Task</span>";
-				buttonBarHtml += "<span class='button' onclick='secretary.showAddRepeatingTaskModal();'>Add Repeating Task</span>";
-				indexContent = StrUtils.replaceAll(indexContent, "[[BUTTON_BAR]]", buttonBarHtml);
-
 				indexContent = StrUtils.replaceAll(indexContent, "[[CURDATE]]", DateUtils.serializeDate(DateUtils.now()));
 
 				locEquiv = "_" + locEquiv;
@@ -560,6 +555,8 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 				indexContent = StrUtils.replaceAll(indexContent, "[[NEXT_DATE]]", DateUtils.serializeDate(DateUtils.addDays(today, 7)));
 
 				indexContent = StrUtils.replaceAll(indexContent, "[[PROJECTS]]", AssSecretary.getProjHtmlStr());
+
+				indexContent = StrUtils.replaceAll(indexContent, "[[CURDATE]]", DateUtils.serializeDate(DateUtils.now()));
 
 				locEquiv = "_" + locEquiv;
 				TextFile indexFile = new TextFile(webRoot, locEquiv);
