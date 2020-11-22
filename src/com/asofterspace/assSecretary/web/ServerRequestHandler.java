@@ -394,9 +394,11 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 				List<Task> tasks = taskCtrl.getCurrentTaskInstancesAsTasks();
 
+				Date today = DateUtils.now();
+
 				Collections.sort(tasks, new Comparator<Task>() {
 					public int compare(Task a, Task b) {
-						return a.getCurrentPriority() - b.getCurrentPriority();
+						return a.getCurrentPriority(today) - b.getCurrentPriority(today);
 					}
 				});
 
@@ -405,7 +407,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 				boolean reducedView = false;
 				if (tasks.size() > 0) {
 					for (Task task : tasks) {
-						taskHtml += task.toHtmlStr(historicalView, reducedView);
+						taskHtml += task.toHtmlStr(historicalView, reducedView, today);
 					}
 				}
 
@@ -439,10 +441,12 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 				Collections.sort(tasks, new Comparator<Task>() {
 					public int compare(Task a, Task b) {
-						if (a.getDoneDate().equals(b.getDoneDate())) {
-							return a.getCurrentPriority() - b.getCurrentPriority();
+						Date aDone = a.getDoneDate();
+						Date bDone = b.getDoneDate();
+						if (aDone.equals(bDone)) {
+							return a.getCurrentPriority(aDone) - b.getCurrentPriority(bDone);
 						}
-						if (a.getDoneDate().before(b.getDoneDate())) {
+						if (aDone.before(bDone)) {
 							return 1;
 						}
 						return -1;
@@ -455,12 +459,13 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 				if (tasks.size() > 0) {
 					Date prevDate = tasks.get(0).getDoneDate();
 					for (Task task : tasks) {
-						if (!DateUtils.isSameDay(task.getDoneDate(), prevDate)) {
-							prevDate = task.getDoneDate();
+						Date curDate = task.getDoneDate();
+						if (!DateUtils.isSameDay(curDate, prevDate)) {
+							prevDate = curDate;
 							taskHtml += "<div class='separator_top'>&nbsp;</div>";
 							taskHtml += "<div class='separator_bottom'>&nbsp;</div>";
 						}
-						taskHtml += task.toHtmlStr(historicalView, reducedView);
+						taskHtml += task.toHtmlStr(historicalView, reducedView, curDate);
 					}
 				}
 
@@ -536,14 +541,14 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 					Collections.sort(tasksToday, new Comparator<Task>() {
 						public int compare(Task a, Task b) {
-							return a.getCurrentPriority() - b.getCurrentPriority();
+							return a.getCurrentPriority(day) - b.getCurrentPriority(day);
 						}
 					});
 
 					for (Task task : tasksToday) {
 						boolean historicalView = false;
 						boolean reducedView = true;
-						weeklyHtmlStr += task.toHtmlStr(historicalView, reducedView);
+						weeklyHtmlStr += task.toHtmlStr(historicalView, reducedView, day);
 					}
 
 					weeklyHtmlStr += "</div>";

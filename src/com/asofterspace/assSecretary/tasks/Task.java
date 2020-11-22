@@ -78,16 +78,28 @@ public class Task extends GenericTask {
 		return priority;
 	}
 
-	public int getCurrentPriority() {
+	/**
+	 * Get the current priority on a certain day
+	 */
+	public int getCurrentPriority(Date currentDay) {
+
+		// set a useful default
 		int result = 500000;
+
+		// get the baseline priority set by the user
 		if (priority != null) {
 			result = priority;
 		}
+
+		// if this task is just a ghost of a scheduled task, then it will not have its priority escalated
+		if (!isInstance()) {
+			return result;
+		}
+
 		// adjust based on priority escalation value
 		if ((priorityEscalationAfterDays != null) && (priorityEscalationAfterDays > 0)) {
 			Date releaseDate = getReleaseDate();
-			Date today = DateUtils.now();
-			Integer difference = DateUtils.getDayDifference(releaseDate, today);
+			Integer difference = DateUtils.getDayDifference(releaseDate, currentDay);
 			if (difference != null) {
 				// here:     today - releaseDate >= priorityEscalationAfterDays
 				// same as:                today >= releaseDate + priorityEscalationAfterDays
@@ -180,7 +192,7 @@ public class Task extends GenericTask {
 		return id;
 	}
 
-	public String toHtmlStr(boolean historicalView, boolean reducedView) {
+	public String toHtmlStr(boolean historicalView, boolean reducedView, Date dateForWhichHtmlGetsDisplayed) {
 
 		String id = null;
 		if (isInstance()) {
@@ -208,7 +220,7 @@ public class Task extends GenericTask {
 			html += "</span>";
 		}
 		html += "<span style='width: 60%;'";
-		int prio = getCurrentPriority();
+		int prio = getCurrentPriority(dateForWhichHtmlGetsDisplayed);
 		if (prio < 100000) {
 			html += " class='error'";
 		} else if (prio < 360000) {
