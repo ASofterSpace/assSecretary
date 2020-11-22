@@ -57,7 +57,9 @@ public class Task extends GenericTask {
 			this.priority = otherTask.priority;
 			this.priorityEscalationAfterDays = otherTask.priorityEscalationAfterDays;
 			this.duration = otherTask.duration;
-			this.id = otherTask.id;
+
+			// never copy another entry's id, but instead, generate a new one!
+			this.id = null;
 		}
 	}
 
@@ -194,10 +196,7 @@ public class Task extends GenericTask {
 
 	public String toHtmlStr(boolean historicalView, boolean reducedView, Date dateForWhichHtmlGetsDisplayed) {
 
-		String id = null;
-		if (isInstance()) {
-			id = getId();
-		}
+		String id = getId();
 
 		String html = "";
 
@@ -234,12 +233,6 @@ public class Task extends GenericTask {
 
 		String btnStyle = "width: 5.5%; margin-left: 0.5%;";
 
-		// if this is not an actual instance, but just a ghost of a scheduled task, then of course it cannot
-		// be edited in any way shape or form, so no point in shoing any buttons :)
-		if (!isInstance()) {
-			btnStyle += "visibility:hidden;";
-		}
-
 		if (reducedView) {
 			html += "</div>";
 			html += "<div style='text-align: center;'>";
@@ -253,33 +246,48 @@ public class Task extends GenericTask {
 					}
 				}
 			}
+		}
 
-			if (hasDetails) {
-				html += "<span style='" + btnStyle + "' class='button' onclick='secretary.taskDetails(\"" + id + "\")'>";
-				html += "Details";
+		// if this is not an actual instance, but just a ghost of a scheduled task, then of course it cannot
+		// be edited in any way shape or form, so no point in showing any of the regular buttons :)
+		if (!isInstance()) {
+			// on the other hand, a non-instance CAN be prematurely released to achieve an instance which CAN be edited!
+
+			html += "<span style='" + btnStyle + "' class='button' onclick='secretary.taskPreRelease(\"" + id + "\")'>";
+			html += "Pre-Release";
+			html += "</span>";
+
+		} else {
+
+			if (!reducedView) {
+				if (hasDetails) {
+					html += "<span style='" + btnStyle + "' class='button' onclick='secretary.taskDetails(\"" + id + "\")'>";
+					html += "Details";
+					html += "</span>";
+				} else {
+					html += "<span style='" + btnStyle + " visibility: hidden;' class='button'>";
+					html += "&nbsp;";
+					html += "</span>";
+				}
+			}
+
+			if (hasBeenDone()) {
+				html += "<span style='" + btnStyle + "' class='button' onclick='secretary.taskUnDone(\"" + id + "\")'>";
+				html += "Un-done";
 				html += "</span>";
 			} else {
-				html += "<span style='" + btnStyle + " visibility: hidden;' class='button'>";
-				html += "&nbsp;";
+				html += "<span style='" + btnStyle + "' class='button' onclick='secretary.taskDone(\"" + id + "\")'>";
+				html += "Done";
 				html += "</span>";
 			}
+			html += "<span style='" + btnStyle + "' class='button' onclick='secretary.taskEdit(\"" + id + "\")'>";
+			html += "Edit";
+			html += "</span>";
+			html += "<span style='" + btnStyle + "' class='button' onclick='secretary.taskDelete(\"" + id + "\", \"" + HTML.escapeHTMLstr(StrUtils.replaceAll(title, "\"", "")) + "\")'>";
+			html += "Delete";
+			html += "</span>";
 		}
 
-		if (hasBeenDone()) {
-			html += "<span style='" + btnStyle + "' class='button' onclick='secretary.taskUnDone(\"" + id + "\")'>";
-			html += "Un-done";
-			html += "</span>";
-		} else {
-			html += "<span style='" + btnStyle + "' class='button' onclick='secretary.taskDone(\"" + id + "\")'>";
-			html += "Done";
-			html += "</span>";
-		}
-		html += "<span style='" + btnStyle + "' class='button' onclick='secretary.taskEdit(\"" + id + "\")'>";
-		html += "Edit";
-		html += "</span>";
-		html += "<span style='" + btnStyle + "' class='button' onclick='secretary.taskDelete(\"" + id + "\")'>";
-		html += "Delete";
-		html += "</span>";
 		if (reducedView) {
 			html += "</div>";
 		}

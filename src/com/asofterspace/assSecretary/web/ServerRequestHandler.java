@@ -124,6 +124,48 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 					}
 					break;
 
+				case "/taskPreRelease":
+
+					editingId = json.getString("id");
+
+					if (editingId == null) {
+						respond(404);
+						return;
+					} else {
+						Task task = taskCtrl.getTaskById(editingId);
+						if (task != null) {
+							GenericTask newGenericTask = taskCtrl.releaseTaskOn(task, DateUtils.now());
+							if (newGenericTask instanceof Task) {
+								Task newTask = (Task) newGenericTask;
+								taskCtrl.save();
+								answer = new WebServerAnswerInJson(new JSON("{\"success\": true, \"newId\": \"" + newTask.getId() + "\"}"));
+							} else {
+								respond(400);
+								return;
+							}
+						} else {
+							respond(404);
+							return;
+						}
+					}
+					break;
+
+				case "/taskDelete":
+
+					editingId = json.getString("id");
+
+					if (editingId == null) {
+						respond(404);
+						return;
+					} else {
+						boolean done = taskCtrl.deleteTaskById(editingId);
+						if (done) {
+							taskCtrl.save();
+						}
+						answer = new WebServerAnswerInJson(new JSON("{\"success\": " + done + "}"));
+					}
+					break;
+
 				case "/doneAndCopySingleTask":
 
 					editingId = json.getString("editingId");

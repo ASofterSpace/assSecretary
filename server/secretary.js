@@ -2,6 +2,8 @@ window.secretary = {
 
 	currentlyEditing: null,
 
+	currentlyDeleting: null,
+
 
 	onResize: function() {
 
@@ -242,8 +244,69 @@ window.secretary = {
 		request.send();
 	},
 
-	taskDelete: function(id) {
-		alert("Sorry, not implemented yet.");
+	taskPreRelease: function(id) {
+
+		var request = new XMLHttpRequest();
+		request.open("POST", "taskPreRelease", true);
+		request.setRequestHeader("Content-Type", "application/json");
+
+		request.onreadystatechange = function() {
+			if (request.readyState == 4 && request.status == 200) {
+				var result = JSON.parse(request.response);
+				if (result.success) {
+					window.secretary.taskEdit(result.newId);
+				}
+			}
+		}
+
+		var data = {
+			id: id,
+		};
+
+		request.send(JSON.stringify(data));
+	},
+
+	taskDelete: function(id, title) {
+		var modal = document.getElementById("deleteTaskModal");
+		if (modal) {
+			modal.style.display = "block";
+
+			this.currentlyDeleting = id;
+
+			document.getElementById("deleteTaskModalContent").innerHTML = "Do you really want to delete this task?" +
+				"<br><br>Title: " + title;
+		}
+	},
+
+	closeDeleteTaskModal: function() {
+		var modal = document.getElementById("deleteTaskModal");
+		if (modal) {
+			modal.style.display = "none";
+		}
+	},
+
+	doDeleteTask: function(id) {
+
+		this.closeDeleteTaskModal();
+
+		var request = new XMLHttpRequest();
+		request.open("POST", "taskDelete", true);
+		request.setRequestHeader("Content-Type", "application/json");
+
+		request.onreadystatechange = function() {
+			if (request.readyState == 4 && request.status == 200) {
+				var result = JSON.parse(request.response);
+				if (result.success) {
+					window.location.reload(false);
+				}
+			}
+		}
+
+		var data = {
+			id: window.secretary.currentlyDeleting,
+		};
+
+		request.send(JSON.stringify(data));
 	},
 
 	filterTasks: function() {

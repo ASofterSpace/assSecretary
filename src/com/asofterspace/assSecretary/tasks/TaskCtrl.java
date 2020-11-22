@@ -131,6 +131,7 @@ public class TaskCtrl extends TaskCtrlBase {
 	}
 
 	public Task getTaskById(String id) {
+		// look through task instances...
 		List<GenericTask> genericTasks = taskInstances;
 		for (GenericTask genericTask : genericTasks) {
 			if (genericTask instanceof Task) {
@@ -140,7 +141,54 @@ public class TaskCtrl extends TaskCtrlBase {
 				}
 			}
 		}
+		// ... and through scheduled base tasks as well!
+		genericTasks = tasks;
+		for (GenericTask genericTask : genericTasks) {
+			if (genericTask instanceof Task) {
+				Task task = (Task) genericTask;
+				if (task.hasId(id)) {
+					return task;
+				}
+			}
+		}
 		return null;
+	}
+
+	public boolean deleteTaskById(String id) {
+
+		boolean result = false;
+
+		// look through task instances...
+		List<GenericTask> genericTasks = taskInstances;
+		List<GenericTask> newTaskList = new ArrayList<>();
+		for (GenericTask genericTask : genericTasks) {
+			if (genericTask instanceof Task) {
+				Task task = (Task) genericTask;
+				if (task.hasId(id)) {
+					result = true;
+				} else {
+					newTaskList.add(task);
+				}
+			}
+		}
+		taskInstances = newTaskList;
+
+		// ... and through scheduled base tasks as well!
+		genericTasks = tasks;
+		newTaskList = new ArrayList<>();
+		for (GenericTask genericTask : genericTasks) {
+			if (genericTask instanceof Task) {
+				Task task = (Task) genericTask;
+				if (task.hasId(id)) {
+					result = true;
+				} else {
+					newTaskList.add(task);
+				}
+			}
+		}
+		tasks = newTaskList;
+
+		return result;
 	}
 
 	/**
