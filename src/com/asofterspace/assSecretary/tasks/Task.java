@@ -83,7 +83,22 @@ public class Task extends GenericTask {
 		if (priority != null) {
 			result = priority;
 		}
-		// TODO :: adjust based on priority escalation value
+		// adjust based on priority escalation value
+		if ((priorityEscalationAfterDays != null) && (priorityEscalationAfterDays > 0)) {
+			Date releaseDate = getReleaseDate();
+			Date today = DateUtils.now();
+			Integer difference = DateUtils.getDayDifference(releaseDate, today);
+			if (difference != null) {
+				// here:     today - releaseDate >= priorityEscalationAfterDays
+				// same as:                today >= releaseDate + priorityEscalationAfterDays
+				if (difference >= priorityEscalationAfterDays) {
+					// if priorityEscalationAfterDays have passed, then reduce priority by 10%,
+					// and keep reducing a bit more each day
+					result -= (100000 * difference) / priorityEscalationAfterDays;
+				}
+			}
+
+		}
 		return result;
 	}
 
