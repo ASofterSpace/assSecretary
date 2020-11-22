@@ -5,17 +5,35 @@
 			</div>
 			<div style="position: relative; padding-bottom: 10pt;">
 				<span>Title:</span>
-				<input id="singleTaskTitle" type="text" style="width: 90%;position: absolute;right: 0;top: 0;" />
+				<input id="singleTaskTitle" type="text" style="width: 90%;position: absolute;right: 20pt;top: 0;" />
+				<span class="button" onclick="secretary.closeSingleTaskModal()" style="position: absolute;right: 0;top: 0;">X</span>
 			</div>
-			<div style="padding-bottom: 10pt;">
+			<div style="padding-bottom: 10pt; width: 84%; display: inline-block;">
 				<div>Details:</div>
 				<textarea id="singleTaskDetails" style="height: 200pt;"></textarea>
+			</div>
+			<div style="display: inline-block; width: 15%; float: right; text-align: center;">
+				<div>Duration in HH:MM:</div>
+				<div style="padding-bottom: 10pt;">
+					<input id="singleTaskDuration" type="text" value="0:00" />
+				</div>
+				<div class="buttonBar verticalButtonBar">
+					<span class="button" onclick="document.getElementById('singleTaskDuration').value = '0:15';">15 min</span>
+					<span class="button" onclick="document.getElementById('singleTaskDuration').value = '0:30';">30 min</span>
+					<span class="button" onclick="document.getElementById('singleTaskDuration').value = '0:45';">45 min</span>
+					<span class="button" onclick="document.getElementById('singleTaskDuration').value = '1:00';">1 hour</span>
+					<span class="button" onclick="document.getElementById('singleTaskDuration').value = '2:00';">2 hours</span>
+					<span class="button" onclick="document.getElementById('singleTaskDuration').value = '3:00';">3 hours</span>
+					<span class="button" onclick="document.getElementById('singleTaskDuration').value = '4:00';">4 hours</span>
+					<span class="button" onclick="document.getElementById('singleTaskDuration').value = '6:00';">6 hours</span>
+					<span class="button" onclick="document.getElementById('singleTaskDuration').value = '8:00';">8 hours</span>
+				</div>
 			</div>
 			<div class="column">
 				<div>Schedule on:</div>
 				<input id="singleTaskReleaseDate" type="text" value="[[CURDATE]]" />
 			</div>
-			<div class="column">
+			<div class="column" style="width: 25%;">
 				<div>Origin:</div>
 				<select id="singleTaskOrigin">
 					<option value="private" selected="selected">private</option>
@@ -34,12 +52,6 @@
 				<div>Priority Escalation after X days:</div>
 				<div>
 					<input id="singleTaskPriorityEscalationAfterDays" type="text" value="never" />
-				</div>
-			</div>
-			<div class="column">
-				<div>Duration in HH:MM:</div>
-				<div>
-					<input id="singleTaskDuration" type="text" value="0:00" />
 				</div>
 			</div>
 			<div class="buttonBar" style="padding-top: 10pt;">

@@ -80,6 +80,10 @@ span.button.checked {
 	background: rgba(150, 200, 250, 0.6);
 }
 
+div.verticalButtonBar > span.button {
+	display: block;
+}
+
 div.weekly_day {
 	width: 14.2%;
 	display: inline-block;
