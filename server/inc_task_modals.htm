@@ -43,9 +43,9 @@
 			<div class="column" style="width: 25%">
 				<div>Priority:</div>
 				<div>
-					<span>MAX</span>
-					<input id="singleTaskPriority" type="range" min="0" max="1000000" value="500000" style="width:120pt;" />
-					<span>none</span>
+					<span id="singleTaskPriorityMaxLabel">MAX</span>
+					<input id="singleTaskPriority" type="range" min="0" max="1000000" value="500000" style="width:120pt;" onchange="secretary.singleTaskPriorityChange()" oninput="secretary.singleTaskPriorityChange()" />
+					<span id="singleTaskPriorityNoneLabel">none</span>
 				</div>
 			</div>
 			<div class="column">

@@ -226,6 +226,7 @@ window.secretary = {
 						document.getElementById("singleTaskReleaseDate").value = result.releaseDate;
 						document.getElementById("singleTaskOrigin").value = result.origin;
 						document.getElementById("singleTaskPriority").value = result.priority;
+						window.secretary.singleTaskPriorityChange();
 						if (result.priorityEscalationAfterDays == null) {
 							document.getElementById("singleTaskPriorityEscalationAfterDays").value = "never";
 						} else {
@@ -412,6 +413,21 @@ window.secretary = {
 			}
 		}
 		this.filterTasks();
+	},
+
+	singleTaskPriorityChange: function() {
+		var prio = document.getElementById("singleTaskPriority").value;
+
+		if (prio < 100000) {
+			document.getElementById("singleTaskPriorityMaxLabel").className = "error";
+			document.getElementById("singleTaskPriorityNoneLabel").className = "error";
+		} else if (prio < 360000) {
+			document.getElementById("singleTaskPriorityMaxLabel").className = "warning";
+			document.getElementById("singleTaskPriorityNoneLabel").className = "warning";
+		} else {
+			document.getElementById("singleTaskPriorityMaxLabel").className = "";
+			document.getElementById("singleTaskPriorityNoneLabel").className = "";
+		}
 	},
 
 }
