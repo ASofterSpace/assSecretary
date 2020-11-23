@@ -3,20 +3,20 @@
 		</div>
 
 
-		<div class="modal" id="addSingleTaskModal" style="z-index: 1000;">
+		<div class="modal" id="addSingleTaskModal" style="z-index: 1000; top: 80pt; background: linear-gradient(-5deg, rgb(60, 20, 50), rgb(40, 0, 80), rgba(40, 0, 80, 0), rgba(40, 0, 80, 0), rgb(60, 20, 50), rgb(60, 20, 50));">
 			<div id="singleTaskSavedLabel" style="display: none;text-align: center;font-weight: bold;font-style: italic;color: #F00;padding-bottom: 10pt;">
 				Saved!
 			</div>
-			<div style="position: relative; padding-bottom: 10pt;">
+			<div style="position: relative; padding-bottom: 270pt;">
 				<span>Title:</span>
 				<input id="singleTaskTitle" type="text" style="width: 90%;position: absolute;right: 20pt;top: 0;" />
 				<span class="button" onclick="secretary.closeSingleTaskModal()" style="position: absolute;right: 0;top: 0;">X</span>
 			</div>
-			<div style="padding-bottom: 10pt; width: 84%; display: inline-block;">
+			<div class="modal" style="padding-bottom: 10pt; width: 84%; display: block;position: absolute;left: -60pt;top: 50pt;">
 				<div>Details:</div>
 				<textarea id="singleTaskDetails" style="height: 200pt;"></textarea>
 			</div>
-			<div style="display: inline-block; width: 15%; float: right; text-align: center;">
+			<div class="modal" style="display: block; width: 15%; text-align: center;position: absolute;right: -40pt;top: 45pt; left: unset;">
 				<div>Duration in HH:MM:</div>
 				<div style="padding-bottom: 10pt;">
 					<input id="singleTaskDuration" type="text" value="0:00" style="width: 100%;" />
@@ -72,7 +72,7 @@
 					<input id="singleTaskPriorityEscalationAfterDays" type="text" value="never" />
 				</div>
 			</div>
-			<div class="buttonBar" style="padding-top: 10pt;">
+			<div class="buttonBar modal" style="position: absolute;left: 200pt;right: 200pt;display: block;top: unset;bottom: -55pt;">
 				<span class="button" onclick="secretary.submitSingleTaskModal(false)">Save</span>
 				<span class="button" onclick="secretary.submitAndCloseSingleTaskModal()">Save and Exit</span>
 				<span id="doneAndCopySingleTaskModalBtn" class="button" onclick="secretary.doneAndCopySingleTaskModal()">Save, Done and Copy</span>
@@ -82,10 +82,10 @@
 
 
 
-		<div class="modal" id="deleteTaskModal" style="z-index: 2000;">
+		<div class="modal" id="deleteTaskModal" style="z-index: 2000; top: 200pt;">
 			<div id="deleteTaskModalContent">
 			</div>
-			<div class="buttonBar" style="padding-top: 10pt;">
+			<div class="buttonBar modal" style="position: absolute;left: 200pt;right: 200pt;display: block;top: unset;bottom: -55pt;">
 				<span class="button" onclick="secretary.doDeleteTask()">Delete</span>
 				<span class="button" onclick="secretary.closeDeleteTaskModal()">Cancel</span>
 			</div>
