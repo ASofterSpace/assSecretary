@@ -521,6 +521,8 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 				indexContent = StrUtils.replaceAll(indexContent, "[[CURDATE]]", DateUtils.serializeDate(DateUtils.now()));
 
+				indexContent = StrUtils.replaceAll(indexContent, "[[MINI_CALENDAR]]", getMiniCalendarHtml());
+
 				locEquiv = "_" + locEquiv;
 				TextFile indexFile = new TextFile(webRoot, locEquiv);
 				indexFile.saveContent(indexContent);
@@ -541,7 +543,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 					public int compare(Task a, Task b) {
 						Date aDone = a.getDoneDate();
 						Date bDone = b.getDoneDate();
-						if (aDone.equals(bDone)) {
+						if (DateUtils.isSameDay(aDone, bDone)) {
 							return a.getCurrentPriority(aDone) - b.getCurrentPriority(bDone);
 						}
 						if (aDone.before(bDone)) {
@@ -663,6 +665,8 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 				indexContent = StrUtils.replaceAll(indexContent, "[[CURDATE]]", DateUtils.serializeDate(DateUtils.now()));
 
+				indexContent = StrUtils.replaceAll(indexContent, "[[MINI_CALENDAR]]", getMiniCalendarHtml());
+
 				locEquiv = "_" + locEquiv;
 				TextFile indexFile = new TextFile(webRoot, locEquiv);
 				indexFile.saveContent(indexContent);
@@ -738,6 +742,29 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 		if (mcInfo.isImportant(key)) {
 			vmStatsHtml.append("<div class='line'>" + name + ": " + mcInfo.get(key) + "</div>");
 		}
+	}
+
+	private String getMiniCalendarHtml() {
+		String html = "";
+		Date today = DateUtils.now();
+		for (int weekCounter = 0; weekCounter < 3; weekCounter++) {
+			List<Date> week = DateUtils.getWeekForDate(today);
+			html += "<tr>";
+			for (Date day : week) {
+				html += "<td style='cursor: pointer;";
+				if (weekCounter == 0) {
+					if (DateUtils.isSameDay(today, day)) {
+						html += " background: rgba(150, 200, 250, 0.3)'";
+					}
+				}
+				html += "' onclick='document.getElementById(\"singleTaskReleaseDate\").value = \"";
+				html += DateUtils.serializeDate(day) + "\"'>";
+				html += DateUtils.getDayOfMonth(day) + "</td>";
+			}
+			html += "</tr>";
+			today = DateUtils.addDays(today, 7);
+		}
+		return html;
 	}
 
 }

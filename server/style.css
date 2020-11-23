@@ -12,8 +12,18 @@ a {
 }
 
 body > div, div#mainContent > div {
-	padding-bottom: 10pt;
 	color: #88AAFF;
+	padding-bottom: 10pt;
+}
+
+input, textarea, select {
+	color: #AACCFF;
+	background: rgb(30, 0, 60);
+	border: 1px solid rgb(80, 60, 160);
+	border-radius: 4pt;
+	padding: 0pt 4pt 1pt 4pt;
+	font-family: "Calibri";
+	font-size: 1em;
 }
 
 div#mainContent {
@@ -54,6 +64,7 @@ div.buttonBar {
 }
 
 span.button {
+	color: #AACCFF;
 	padding: 0pt 4pt;
 	border-radius: 5pt;
 	background: rgba(150, 200, 250, 0.2);
@@ -118,9 +129,9 @@ div.modal {
 	left: 100pt;
 	right: 100pt;
 	border-radius: 16pt;
-	background: rgba(40, 0, 80, 0.9);
+	background: linear-gradient(15deg, rgb(60, 20, 50), rgb(40, 0, 80), rgb(60, 20, 50));
 	padding: 15pt;
-	opacity: 0.9;
+	opacity: 0.95;
 }
 
 div.modal textarea {
@@ -199,6 +210,10 @@ div.projectbar > a {
 	height: 30pt;
 	display: inline-block;
 	text-decoration: none;
+}
+
+div.datepicker td, div.datepicker tr {
+	text-align: center;
 }
 
 span.vertAligner {

@@ -54,6 +54,8 @@ window.secretary = {
 			document.getElementById("doneAndCopySingleTaskModalBtn").style.display = "none";
 
 			this.currentlyEditing = null;
+
+			document.getElementById("modalBackground").style.display = "block";
 		}
 	},
 
@@ -221,6 +223,8 @@ window.secretary = {
 					if (modal) {
 						modal.style.display = "block";
 
+						document.getElementById("modalBackground").style.display = "block";
+
 						document.getElementById("singleTaskTitle").value = result.title;
 						document.getElementById("singleTaskDetails").value = result.details;
 						document.getElementById("singleTaskReleaseDate").value = result.releaseDate;
@@ -277,6 +281,8 @@ window.secretary = {
 
 			document.getElementById("deleteTaskModalContent").innerHTML = "Do you really want to delete this task?" +
 				"<br><br>Title: " + title;
+
+			document.getElementById("modalBackground").style.display = "block";
 		}
 	},
 
@@ -284,6 +290,8 @@ window.secretary = {
 		var modal = document.getElementById("deleteTaskModal");
 		if (modal) {
 			modal.style.display = "none";
+
+			document.getElementById("modalBackground").style.display = "none";
 		}
 	},
 

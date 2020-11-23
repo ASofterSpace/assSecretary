@@ -1,5 +1,9 @@
+		<div id="modalBackground" style="position: absolute; display: none; z-index: 500;top: 0;right: 0;left: 0;bottom: 0;background: black;opacity: 0.65;">
+			&nbsp;
+		</div>
 
-		<div class="modal" id="addSingleTaskModal">
+
+		<div class="modal" id="addSingleTaskModal" style="z-index: 1000;">
 			<div id="singleTaskSavedLabel" style="display: none;text-align: center;font-weight: bold;font-style: italic;color: #F00;padding-bottom: 10pt;">
 				Saved!
 			</div>
@@ -15,7 +19,7 @@
 			<div style="display: inline-block; width: 15%; float: right; text-align: center;">
 				<div>Duration in HH:MM:</div>
 				<div style="padding-bottom: 10pt;">
-					<input id="singleTaskDuration" type="text" value="0:00" />
+					<input id="singleTaskDuration" type="text" value="0:00" style="width: 100%;" />
 				</div>
 				<div class="buttonBar verticalButtonBar">
 					<span class="button" onclick="document.getElementById('singleTaskDuration').value = '0:15';">15 min</span>
@@ -29,11 +33,25 @@
 					<span class="button" onclick="document.getElementById('singleTaskDuration').value = '8:00';">8 hours</span>
 				</div>
 			</div>
-			<div class="column">
+			<div class="column" style="position: relative;">
 				<div>Schedule on:</div>
 				<input id="singleTaskReleaseDate" type="text" value="[[CURDATE]]" />
+				<div class="modal datepicker" style="position: absolute; left: -10pt; top: 30pt; display: block; width: 120pt; padding: 5pt;">
+					<table>
+						<tr>
+							<th>Mo</th>
+							<th>Tu</th>
+							<th>We</th>
+							<th>Th</th>
+							<th>Fr</th>
+							<th>Sa</th>
+							<th>Su</th>
+						</tr>
+						[[MINI_CALENDAR]]
+					</table>
+				</div>
 			</div>
-			<div class="column" style="width: 25%;">
+			<div class="column" style="width: 28%;">
 				<div>Origin:</div>
 				<select id="singleTaskOrigin">
 					<option value="private" selected="selected">private</option>
@@ -64,7 +82,7 @@
 
 
 
-		<div class="modal" id="deleteTaskModal">
+		<div class="modal" id="deleteTaskModal" style="z-index: 2000;">
 			<div id="deleteTaskModalContent">
 			</div>
 			<div class="buttonBar" style="padding-top: 10pt;">
