@@ -134,9 +134,14 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 					} else {
 						Task task = taskCtrl.getTaskById(editingId);
 						if (task != null) {
-							GenericTask newGenericTask = taskCtrl.releaseTaskOn(task, DateUtils.now());
+							// we release on the actual date on which we should have released the task, so that
+							// if anything automated happens (like a title depending on the date), it happens
+							// as it would have happened for the actual release date
+							GenericTask newGenericTask = taskCtrl.releaseTaskOn(task, json.getDate("date"));
 							if (newGenericTask instanceof Task) {
 								Task newTask = (Task) newGenericTask;
+								// and then switch the release date to today after the fact
+								newTask.setReleasedDate(DateUtils.now());
 								taskCtrl.save();
 								answer = new WebServerAnswerInJson(new JSON("{\"success\": true, \"newId\": \"" + newTask.getId() + "\"}"));
 							} else {
@@ -147,6 +152,34 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 							respond(404);
 							return;
 						}
+					}
+					break;
+
+				case "/taskAddToShortList":
+
+					editingId = json.getString("id");
+
+					if (editingId == null) {
+						respond(404);
+						return;
+					} else {
+						taskCtrl.addTaskToShortListById(editingId);
+						taskCtrl.save();
+						answer = new WebServerAnswerInJson(new JSON("{\"success\": true}"));
+					}
+					break;
+
+				case "/taskRemoveFromShortList":
+
+					editingId = json.getString("id");
+
+					if (editingId == null) {
+						respond(404);
+						return;
+					} else {
+						taskCtrl.removeTaskFromShortListById(editingId);
+						taskCtrl.save();
+						answer = new WebServerAnswerInJson(new JSON("{\"success\": true}"));
 					}
 					break;
 
@@ -335,6 +368,35 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 				indexContent = StrUtils.replaceAll(indexContent, "[[TABS]]", tabsHtml);
 
 
+				String taskShortlistHtml = "";
+
+				Date today = DateUtils.now();
+
+				List<Task> shortlistTasks = taskCtrl.getTasksOnShortlist();
+
+				Collections.sort(shortlistTasks, new Comparator<Task>() {
+					public int compare(Task a, Task b) {
+						return a.getCurrentPriority(today) - b.getCurrentPriority(today);
+					}
+				});
+
+				if (shortlistTasks.size() == 0) {
+					taskShortlistHtml += "<div>The task shortlist is empty - well done!</div>";
+				} else {
+					taskShortlistHtml += "<div>Here is the task shortlist for today:</div>";
+					taskShortlistHtml += "<div>";
+					boolean historicalView = false;
+					boolean reducedView = false;
+					boolean onShortlist = true;
+					for (Task shortlistTask : shortlistTasks) {
+						taskShortlistHtml += shortlistTask.toHtmlStr(historicalView, reducedView, onShortlist, today);
+					}
+					taskShortlistHtml += "</div>";
+				}
+
+				indexContent = StrUtils.replaceAll(indexContent, "[[TASK_SHORTLIST]]", taskShortlistHtml);
+
+
 				String mariHtml = "";
 
 				String problems = WebAccessor.get("http://localhost:3011/unacknowledged-problems");
@@ -436,8 +498,6 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 				List<Task> tasks = taskCtrl.getCurrentTaskInstancesAsTasks();
 
-				Date today = DateUtils.now();
-
 				Collections.sort(tasks, new Comparator<Task>() {
 					public int compare(Task a, Task b) {
 						return a.getCurrentPriority(today) - b.getCurrentPriority(today);
@@ -447,9 +507,10 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 				String taskHtml = "";
 				boolean historicalView = false;
 				boolean reducedView = false;
+				boolean onShortlist = false;
 				if (tasks.size() > 0) {
 					for (Task task : tasks) {
-						taskHtml += task.toHtmlStr(historicalView, reducedView, today);
+						taskHtml += task.toHtmlStr(historicalView, reducedView, onShortlist, today);
 					}
 				}
 
@@ -493,6 +554,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 				String taskHtml = "";
 				boolean historicalView = true;
 				boolean reducedView = false;
+				boolean onShortlist = false;
 				if (tasks.size() > 0) {
 					Date prevDate = tasks.get(0).getDoneDate();
 					for (Task task : tasks) {
@@ -502,7 +564,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 							taskHtml += "<div class='separator_top'>&nbsp;</div>";
 							taskHtml += "<div class='separator_bottom'>&nbsp;</div>";
 						}
-						taskHtml += task.toHtmlStr(historicalView, reducedView, curDate);
+						taskHtml += task.toHtmlStr(historicalView, reducedView, onShortlist, curDate);
 					}
 				}
 
@@ -585,7 +647,8 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 					for (Task task : tasksToday) {
 						boolean historicalView = false;
 						boolean reducedView = true;
-						weeklyHtmlStr += task.toHtmlStr(historicalView, reducedView, day);
+						boolean onShortlist = false;
+						weeklyHtmlStr += task.toHtmlStr(historicalView, reducedView, onShortlist, day);
 					}
 
 					weeklyHtmlStr += "</div>";

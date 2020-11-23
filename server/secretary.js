@@ -244,7 +244,7 @@ window.secretary = {
 		request.send();
 	},
 
-	taskPreRelease: function(id) {
+	taskPreRelease: function(id, preReleaseForDate) {
 
 		var request = new XMLHttpRequest();
 		request.open("POST", "taskPreRelease", true);
@@ -261,6 +261,7 @@ window.secretary = {
 
 		var data = {
 			id: id,
+			date: preReleaseForDate,
 		};
 
 		request.send(JSON.stringify(data));
@@ -304,6 +305,50 @@ window.secretary = {
 
 		var data = {
 			id: window.secretary.currentlyDeleting,
+		};
+
+		request.send(JSON.stringify(data));
+	},
+
+	taskAddToShortList: function(id) {
+
+		var request = new XMLHttpRequest();
+		request.open("POST", "taskAddToShortList", true);
+		request.setRequestHeader("Content-Type", "application/json");
+
+		request.onreadystatechange = function() {
+			if (request.readyState == 4 && request.status == 200) {
+				var result = JSON.parse(request.response);
+				if (result.success) {
+					window.location.reload(false);
+				}
+			}
+		}
+
+		var data = {
+			id: id,
+		};
+
+		request.send(JSON.stringify(data));
+	},
+
+	taskRemoveFromShortList: function(id) {
+
+		var request = new XMLHttpRequest();
+		request.open("POST", "taskRemoveFromShortList", true);
+		request.setRequestHeader("Content-Type", "application/json");
+
+		request.onreadystatechange = function() {
+			if (request.readyState == 4 && request.status == 200) {
+				var result = JSON.parse(request.response);
+				if (result.success) {
+					window.location.reload(false);
+				}
+			}
+		}
+
+		var data = {
+			id: id,
 		};
 
 		request.send(JSON.stringify(data));

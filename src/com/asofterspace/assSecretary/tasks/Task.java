@@ -194,7 +194,7 @@ public class Task extends GenericTask {
 		return id;
 	}
 
-	public String toHtmlStr(boolean historicalView, boolean reducedView, Date dateForWhichHtmlGetsDisplayed) {
+	public String toHtmlStr(boolean historicalView, boolean reducedView, boolean onShortlist, Date dateForWhichHtmlGetsDisplayed) {
 
 		String id = getId();
 
@@ -205,12 +205,17 @@ public class Task extends GenericTask {
 			futureTaskStr = " future-task";
 		}
 
-		html += "<div class='line task task-with-origin-" + getOrigin() + futureTaskStr + "' id='task-" + id + "'>";
+		if (onShortlist) {
+			// tasks on the shortlist are not affected by such mundane things as filtering etc.
+			html += "<div class='line'>";
+		} else {
+			html += "<div class='line task task-with-origin-" + getOrigin() + futureTaskStr + "' id='task-" + id + "'>";
+		}
 		if (reducedView) {
 			html += "<div>";
 		}
 		if (!reducedView) {
-			html += "<span style='width: 10%;'>";
+			html += "<span style='width: 8%;'>";
 			if (historicalView) {
 				html += DateUtils.serializeDate(getDoneDate());
 			} else {
@@ -231,7 +236,8 @@ public class Task extends GenericTask {
 
 		boolean hasDetails = false;
 
-		String btnStyle = "width: 5.5%; margin-left: 0.5%;";
+		String miniBtnStyle = "margin-left: 0.5%;";
+		String btnStyle = "width: 5.5%; " + miniBtnStyle;
 
 		if (reducedView) {
 			html += "</div>";
@@ -253,7 +259,8 @@ public class Task extends GenericTask {
 		if (!isInstance()) {
 			// on the other hand, a non-instance CAN be prematurely released to achieve an instance which CAN be edited!
 
-			html += "<span style='" + btnStyle + "' class='button' onclick='secretary.taskPreRelease(\"" + id + "\")'>";
+			html += "<span style='" + btnStyle + "' class='button' onclick='secretary.taskPreRelease(\"" + id + "\", " +
+				"\"" + DateUtils.serializeDate(dateForWhichHtmlGetsDisplayed) + "\")'>";
 			html += "Pre-Release";
 			html += "</span>";
 
@@ -261,7 +268,11 @@ public class Task extends GenericTask {
 
 			if (!reducedView) {
 				if (hasDetails) {
-					html += "<span style='" + btnStyle + "' class='button' onclick='secretary.taskDetails(\"" + id + "\")'>";
+					String detailsId = id;
+					if (onShortlist) {
+						detailsId += "-shortlist";
+					}
+					html += "<span style='" + btnStyle + "' class='button' onclick='secretary.taskDetails(\"" + detailsId + "\")'>";
 					html += "Details";
 					html += "</span>";
 				} else {
@@ -286,6 +297,17 @@ public class Task extends GenericTask {
 			html += "<span style='" + btnStyle + "' class='button' onclick='secretary.taskDelete(\"" + id + "\", \"" + HTML.escapeHTMLstr(StrUtils.replaceAll(title, "\"", "")) + "\")'>";
 			html += "Delete";
 			html += "</span>";
+			if ((!reducedView) && (!historicalView)) {
+				if (onShortlist) {
+					html += "<span style='" + miniBtnStyle + "' class='button' onclick='secretary.taskRemoveFromShortList(\"" + id + "\")'>";
+					html += "&#9734;";
+					html += "</span>";
+				} else {
+					html += "<span style='" + miniBtnStyle + "' class='button' onclick='secretary.taskAddToShortList(\"" + id + "\")'>";
+					html += "&#9733;";
+					html += "</span>";
+				}
+			}
 		}
 
 		if (reducedView) {
@@ -293,7 +315,11 @@ public class Task extends GenericTask {
 		}
 
 		if (hasDetails) {
-			html += "<div style='display: none' class='details' id='task-details-" + id + "'>";
+			html += "<div style='display: none' class='details' id='task-details-" + id;
+			if (onShortlist) {
+				html += "-shortlist";
+			}
+			html += "'>";
 			List<String> safeDetails = new ArrayList<>();
 			if (details != null) {
 				for (String detail : details) {

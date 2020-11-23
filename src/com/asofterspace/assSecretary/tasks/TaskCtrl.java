@@ -38,6 +38,12 @@ public class TaskCtrl extends TaskCtrlBase {
 	// an optional UUID (well, everything is optional, but this is explicitly also optional)
 	private final static String ID = "id";
 
+	// a list of ids of tasks that are on the shortlist
+	private final static String TASK_SHORTLIST = "taskShortlist";
+
+	// a list of ids of the tasks on the shortlist
+	private List<String> shortlistIds = new ArrayList<>();
+
 	private TaskDatabase database;
 
 
@@ -52,6 +58,18 @@ public class TaskCtrl extends TaskCtrlBase {
 		// generate instances, but do not save them yet (so that upon seeing this, someone could edit
 		// the underlying json and then restart hugo to regenerate, if needed)
 		generateNewInstances(DateUtils.now());
+	}
+
+	@Override
+	protected void loadFromRoot(Record root) {
+
+		super.loadFromRoot(root);
+
+		if (root == null) {
+			return;
+		}
+
+		shortlistIds = root.getArrayAsStringList(TASK_SHORTLIST);
 	}
 
 	@Override
@@ -224,6 +242,9 @@ public class TaskCtrl extends TaskCtrlBase {
 	}
 
 	public boolean setTaskToDone(String id) {
+
+		removeTaskFromShortListById(id);
+
 		List<GenericTask> genericTasks = taskInstances;
 		for (GenericTask genericTask : genericTasks) {
 			if (genericTask instanceof Task) {
@@ -257,9 +278,66 @@ public class TaskCtrl extends TaskCtrlBase {
 		return false;
 	}
 
+	public List<Task> getTasksOnShortlist() {
+
+		List<Task> result = new ArrayList<>();
+
+		// look through task instances...
+		List<GenericTask> genericTasks = taskInstances;
+		for (GenericTask genericTask : genericTasks) {
+			if (genericTask instanceof Task) {
+				Task task = (Task) genericTask;
+				for (String id : shortlistIds) {
+					if (task.hasId(id)) {
+						result.add(task);
+					}
+				}
+			}
+		}
+
+		// ... and through scheduled base tasks as well!
+		genericTasks = tasks;
+		for (GenericTask genericTask : genericTasks) {
+			if (genericTask instanceof Task) {
+				Task task = (Task) genericTask;
+				for (String id : shortlistIds) {
+					if (task.hasId(id)) {
+						result.add(task);
+					}
+				}
+			}
+		}
+
+		return result;
+	}
+
+	public void addTaskToShortListById(String id) {
+		if (id == null) {
+			return;
+		}
+		if (!shortlistIds.contains(id)) {
+			shortlistIds.add(id);
+		}
+	}
+
+	public void removeTaskFromShortListById(String id) {
+		if (id == null) {
+			return;
+		}
+		while (shortlistIds.contains(id)) {
+			shortlistIds.remove(id);
+		}
+	}
+
 	public void save() {
 		saveIntoRecord(database.getLoadedRoot());
 		database.save();
+	}
+
+	@Override
+	public void saveIntoRecord(Record root) {
+		super.saveIntoRecord(root);
+		root.set(TASK_SHORTLIST, shortlistIds);
 	}
 
 }
