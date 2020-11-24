@@ -91,12 +91,18 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 					String editingId = json.getString("editingId");
 
+					Date firstReleaseDate = json.getDate("releaseDate");
+					if (firstReleaseDate == null) {
+						respond(404);
+						return;
+					}
+
 					if (editingId == null) {
 						// add new task
 						Task newTask = taskCtrl.addAdHocTask(
 							json.getString("title"),
 							json.getString("details"),
-							json.getString("releaseDate"),
+							firstReleaseDate,
 							json.getString("origin"),
 							json.getInteger("priority"),
 							json.getInteger("priorityEscalationAfterDays"),
@@ -122,6 +128,26 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 							return;
 						}
 					}
+
+					Date lastReleaseDate = json.getDate("releaseUntil");
+					if (lastReleaseDate != null) {
+						List<Date> releaseDates = DateUtils.listDaysFromTo(
+							DateUtils.addDays(firstReleaseDate, 1),
+							DateUtils.addDays(lastReleaseDate, 1)
+						);
+						for (Date relDate : releaseDates) {
+							Task newTask = taskCtrl.addAdHocTask(
+								json.getString("title"),
+								json.getString("details"),
+								relDate,
+								json.getString("origin"),
+								json.getInteger("priority"),
+								json.getInteger("priorityEscalationAfterDays"),
+								json.getString("duration")
+							);
+						}
+					}
+
 					break;
 
 				case "/taskPreRelease":
@@ -208,7 +234,8 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 						return;
 					}
 
-					// edit existing task
+					// edit existing task (this here does not check for the value of the release until field,
+					// but then again, why would anyone put a release until in a done and copy entry?)
 					Task task = taskCtrl.getTaskById(editingId);
 					if (task != null) {
 						task.setTitle(json.getString("title"));
@@ -229,9 +256,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 					}
 
 					// add new task
-					String newReleaseDate = DateUtils.serializeDate(
-						DateUtils.addDays(DateUtils.now(), 1)
-					);
+					Date newReleaseDate = DateUtils.addDays(DateUtils.now(), 1);
 					Task newTask = taskCtrl.addAdHocTask(
 						json.getString("title"),
 						json.getString("details"),
@@ -242,7 +267,8 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 						json.getString("duration")
 					);
 					answer = new WebServerAnswerInJson(new JSON("{\"success\": " + (newTask != null) + ", " +
-						"\"newId\": \"" + newTask.getId() + "\", \"newReleaseDate\": \"" + newReleaseDate + "\"}"));
+						"\"newId\": \"" + newTask.getId() + "\", \"newReleaseDate\": \"" +
+						DateUtils.serializeDate(newReleaseDate) + "\"}"));
 
 					break;
 
@@ -747,9 +773,12 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 	private String getMiniCalendarHtml() {
 		String html = "";
 		Date today = DateUtils.now();
-		for (int weekCounter = 0; weekCounter < 3; weekCounter++) {
+		for (int weekCounter = 0; weekCounter < 6; weekCounter++) {
 			List<Date> week = DateUtils.getWeekForDate(today);
 			html += "<tr>";
+			html += "<td>";
+			html += DateUtils.getMonthNameShortEN(week.get(0));
+			html += "</td>";
 			for (Date day : week) {
 				html += "<td style='cursor: pointer;";
 				if (weekCounter == 0) {

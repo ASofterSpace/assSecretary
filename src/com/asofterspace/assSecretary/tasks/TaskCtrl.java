@@ -210,12 +210,10 @@ public class TaskCtrl extends TaskCtrlBase {
 	}
 
 	/**
-	 * Returns true if it worked and an ad hoc task was created, and false otherwise
+	 * Returns a Task if it worked and an ad hoc task was created, and false otherwise
 	 */
-	public Task addAdHocTask(String title, String details, String dateStr, String origin, Integer priority,
+	public Task addAdHocTask(String title, String details, Date scheduleDate, String origin, Integer priority,
 		Integer priorityEscalationAfterDays, String duration) {
-
-		Date scheduleDate = DateUtils.parseDate(dateStr);
 
 		GenericTask addedTask = super.addAdHocTask(title, details, scheduleDate);
 

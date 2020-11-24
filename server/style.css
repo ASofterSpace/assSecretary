@@ -72,6 +72,10 @@ span.button {
 	text-align: center;
 }
 
+span.button.bigger {
+	font-size: 110%;
+}
+
 span.button.highviz {
 	background: rgba(0, 20, 50, 0.8);
 }

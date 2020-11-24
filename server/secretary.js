@@ -56,6 +56,8 @@ window.secretary = {
 			this.currentlyEditing = null;
 
 			document.getElementById("modalBackground").style.display = "block";
+
+			document.getElementById("singleTaskReleaseUntil").value = "";
 		}
 	},
 
@@ -85,6 +87,7 @@ window.secretary = {
 							singleTaskSavedLabel.style.display = "none";
 						}, 3000);
 					}
+					document.getElementById("singleTaskReleaseUntil").value = "";
 					if (closeOnSubmit) {
 						window.secretary.closeSingleTaskModal();
 					}
@@ -92,7 +95,14 @@ window.secretary = {
 			}
 		}
 
-		var data = {
+		var data = this.gatherDataForSingleTaskSubmit();
+
+		request.send(JSON.stringify(data));
+	},
+
+	gatherDataForSingleTaskSubmit: function() {
+
+		return {
 			editingId: window.secretary.currentlyEditing,
 			title: document.getElementById("singleTaskTitle").value,
 			details: document.getElementById("singleTaskDetails").value,
@@ -101,9 +111,8 @@ window.secretary = {
 			priority: document.getElementById("singleTaskPriority").value,
 			priorityEscalationAfterDays: document.getElementById("singleTaskPriorityEscalationAfterDays").value,
 			duration: document.getElementById("singleTaskDuration").value,
+			releaseUntil: document.getElementById("singleTaskReleaseUntil").value,
 		};
-
-		request.send(JSON.stringify(data));
 	},
 
 	doneAndCopySingleTaskModal: function() {
@@ -117,6 +126,7 @@ window.secretary = {
 				var result = JSON.parse(request.response);
 				// show some sort of confirmation
 				if (result.success) {
+					document.getElementById("singleTaskReleaseUntil").value = "";
 					var singleTaskSavedLabel = document.getElementById("singleTaskSavedLabel");
 					if (singleTaskSavedLabel) {
 						singleTaskSavedLabel.style.display = "block";
@@ -130,16 +140,7 @@ window.secretary = {
 			}
 		}
 
-		var data = {
-			editingId: window.secretary.currentlyEditing,
-			title: document.getElementById("singleTaskTitle").value,
-			details: document.getElementById("singleTaskDetails").value,
-			releaseDate: document.getElementById("singleTaskReleaseDate").value,
-			origin: document.getElementById("singleTaskOrigin").value,
-			priority: document.getElementById("singleTaskPriority").value,
-			priorityEscalationAfterDays: document.getElementById("singleTaskPriorityEscalationAfterDays").value,
-			duration: document.getElementById("singleTaskDuration").value,
-		};
+		var data = this.gatherDataForSingleTaskSubmit();
 
 		request.send(JSON.stringify(data));
 	},
@@ -237,6 +238,7 @@ window.secretary = {
 							document.getElementById("singleTaskPriorityEscalationAfterDays").value = result.priorityEscalationAfterDays;
 						}
 						document.getElementById("singleTaskDuration").value = result.duration;
+						document.getElementById("singleTaskReleaseUntil").value = "";
 
 						document.getElementById("doneAndCopySingleTaskModalBtn").style.display = "inline";
 

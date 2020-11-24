@@ -4,7 +4,7 @@
 
 
 		<div class="modal" id="addSingleTaskModal" style="z-index: 1000; top: 80pt; background: linear-gradient(-5deg, rgb(60, 20, 50), rgb(40, 0, 80), rgba(40, 0, 80, 0), rgba(40, 0, 80, 0), rgb(60, 20, 50), rgb(60, 20, 50));">
-			<div id="singleTaskSavedLabel" style="display: none;text-align: center;font-weight: bold;font-style: italic;color: #F00;padding-bottom: 10pt;">
+			<div id="singleTaskSavedLabel" class="modal" style="display: none;text-align: center;font-weight: bold;font-style: italic;color: #F00;padding-bottom: 10pt; top:-50pt;">
 				Saved!
 			</div>
 			<div style="position: relative; padding-bottom: 270pt;">
@@ -33,12 +33,13 @@
 					<span class="button" onclick="document.getElementById('singleTaskDuration').value = '8:00';">8 hours</span>
 				</div>
 			</div>
-			<div class="column" style="position: relative;">
+			<div class="column" style="position: relative; margin-left: 50pt;">
 				<div>Schedule on:</div>
 				<input id="singleTaskReleaseDate" type="text" value="[[CURDATE]]" />
-				<div class="modal datepicker" style="position: absolute; left: -10pt; top: 30pt; display: block; width: 120pt; padding: 5pt;">
+				<div class="modal datepicker" style="position: absolute; left: -160pt; top: -8pt; display: block; width: 140pt; padding: 5pt;">
 					<table>
 						<tr>
+							<th></th>
 							<th>Mo</th>
 							<th>Tu</th>
 							<th>We</th>
@@ -50,6 +51,10 @@
 						[[MINI_CALENDAR]]
 					</table>
 				</div>
+			</div>
+			<div class="column modal" style="position: absolute; left: 60pt; bottom: -40pt; top: unset; padding: 5pt 5pt 10pt 10pt;">
+				<div>Copy until:</div>
+				<input id="singleTaskReleaseUntil" type="text" value="" />
 			</div>
 			<div class="column" style="width: 28%;">
 				<div>Origin:</div>
@@ -72,11 +77,11 @@
 					<input id="singleTaskPriorityEscalationAfterDays" type="text" value="never" />
 				</div>
 			</div>
-			<div class="buttonBar modal" style="position: absolute;left: 200pt;right: 200pt;display: block;top: unset;bottom: -55pt;">
-				<span class="button" onclick="secretary.submitSingleTaskModal(false)">Save</span>
-				<span class="button" onclick="secretary.submitAndCloseSingleTaskModal()">Save and Exit</span>
-				<span id="doneAndCopySingleTaskModalBtn" class="button" onclick="secretary.doneAndCopySingleTaskModal()">Save, Done and Copy</span>
-				<span class="button" onclick="secretary.closeSingleTaskModal()">Exit</span>
+			<div class="buttonBar modal" style="position: absolute;left: 250pt;right: 200pt;display: block;top: unset;bottom: -55pt;">
+				<span class="button bigger" onclick="secretary.submitSingleTaskModal(false)">Save</span>
+				<span class="button bigger" onclick="secretary.submitAndCloseSingleTaskModal()">Save and Exit</span>
+				<span id="doneAndCopySingleTaskModalBtn" class="button bigger" onclick="secretary.doneAndCopySingleTaskModal()">Save, Done and Copy</span>
+				<span class="button bigger" onclick="secretary.closeSingleTaskModal()">Exit</span>
 			</div>
 		</div>
 
