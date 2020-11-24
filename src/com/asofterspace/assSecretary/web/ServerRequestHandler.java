@@ -409,7 +409,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 				if (shortlistTasks.size() == 0) {
 					taskShortlistHtml += "<div>The task shortlist is empty - well done!</div>";
 				} else {
-					taskShortlistHtml += "<div>Here is the task shortlist for today:</div>";
+					taskShortlistHtml += "<div style='padding-bottom:0;'>Here is the task shortlist for today:</div>";
 					taskShortlistHtml += "<div>";
 					boolean historicalView = false;
 					boolean reducedView = false;
