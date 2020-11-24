@@ -112,6 +112,39 @@ public class TaskCtrl extends TaskCtrlBase {
 		return taskRecord;
 	}
 
+	@Override
+	public List<GenericTask> getUpcomingTaskInstances(int upcomingDays) {
+
+		List<String> shortlistIdCopy = new ArrayList<>(shortlistIds);
+
+		List<GenericTask> result = super.getUpcomingTaskInstances(upcomingDays);
+
+		shortlistIds = shortlistIdCopy;
+
+		return result;
+	}
+
+	/**
+	 * Generates task instances on a particular day and sets the instances relased on that day
+	 * onto the shortlist (which includes the instances that have just been released, as well
+	 * as the instances that have been released before but for a future date which has now been
+	 * reached)- but does not save the taskCtrl as we want it to be called by generateNewInstances
+	 * without saving!
+	 */
+	@Override
+	protected void generateNewInstancesOnDay(Date day) {
+
+		super.generateNewInstancesOnDay(day);
+
+		for (GenericTask genericTask : taskInstances) {
+			if (genericTask instanceof Task) {
+				if (DateUtils.isSameDay(day, genericTask.getReleaseDate())) {
+					shortlistIds.add(((Task) genericTask).getId());
+				}
+			}
+		}
+	}
+
 	public List<Task> getAllTaskInstancesAsTasks() {
 		List<GenericTask> genericTasks = taskInstances;
 		List<Task> result = new ArrayList<>();
@@ -227,6 +260,15 @@ public class TaskCtrl extends TaskCtrlBase {
 			ourTask.setPriority(priority);
 			ourTask.setPriorityEscalationAfterDays(priorityEscalationAfterDays);
 			ourTask.setDurationStr(duration);
+
+			// add newly generated task to the shortlist if it is generated for today
+			// or for an earlier date...
+			// if it is generated for the future, then it will arrive on the shortlist
+			// when the release date comes around
+			if (DateUtils.isSameDay(DateUtils.now(), ourTask.getReleaseDate()) ||
+				ourTask.getReleaseDate().before(DateUtils.now())) {
+				shortlistIds.add(ourTask.getId());
+			}
 
 			save();
 
