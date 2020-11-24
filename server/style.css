@@ -6,6 +6,10 @@ body {
 	padding-right: 60pt;
 }
 
+body.dirty {
+	background: linear-gradient(179deg, #102, #ACF, #102, #201, #FFA, #AFF, #102, #201, #FBF);
+}
+
 a {
 	color: #88AAFF;
 	text-decoration: none;

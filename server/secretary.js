@@ -440,6 +440,28 @@ window.secretary = {
 		}
 	},
 
+	convertSelectionIntoTask: function() {
+		this.showAddSingleTaskModal();
+
+		var inboxArea = document.getElementById("inboxArea");
+
+		if (inboxArea) {
+			var start = inboxArea.selectionStart;
+			var end = inboxArea.selectionEnd;
+			var val = inboxArea.value;
+			var sel = val.substring(start, end);
+			var newTitle = sel;
+			var newDetails = "";
+			if (sel.indexOf("\n") >= 0) {
+				newTitle = sel.substring(0, sel.indexOf("\n"));
+				newDetails = sel.substring(sel.indexOf("\n") + 1);
+			}
+			document.getElementById("singleTaskTitle").value = newTitle;
+			document.getElementById("singleTaskDetails").value = newDetails;
+			inboxArea.value = val.substring(0, start) + val.substring(end);
+		}
+	},
+
 }
 
 

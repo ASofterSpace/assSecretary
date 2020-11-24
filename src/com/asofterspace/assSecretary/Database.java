@@ -25,6 +25,8 @@ public class Database {
 
 	private String username;
 
+	private String inboxContent;
+
 
 	public Database(Directory dataDir) {
 
@@ -45,6 +47,8 @@ public class Database {
 		this.port = root.getInteger("port");
 
 		this.username = root.getString("username");
+
+		this.inboxContent = root.getString("inboxContent");
 	}
 
 	public Record getRoot() {
@@ -62,13 +66,26 @@ public class Database {
 		return username;
 	}
 
+	public String getInboxContent() {
+		return inboxContent;
+	}
+
+	public void setInboxContent(String inboxContent) {
+		this.inboxContent = inboxContent;
+	}
+
 	public void save() {
 
 		root.makeObject();
 
 		root.set("port", port);
 
+		root.set("username", username);
+
+		root.set("inboxContent", inboxContent);
+
 		dbFile.setAllContents(root);
 		dbFile.save();
 	}
+
 }

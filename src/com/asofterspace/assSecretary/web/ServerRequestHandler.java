@@ -286,6 +286,12 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 					answer = new WebServerAnswerInJson(new JSON("{\"success\": " + didSetToNotDone + "}"));
 					break;
 
+				case "/saveInbox":
+					db.setInboxContent(json.getString("content"));
+					db.save();
+					answer = new WebServerAnswerInJson(new JSON("{\"success\": true}"));
+					break;
+
 				default:
 					respond(404);
 					return;
@@ -371,12 +377,10 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 				System.out.println("Answering index request...");
 
-				Database database = AssSecretary.getDatabase();
-
 				TextFile indexBaseFile = new TextFile(webRoot, locEquiv);
 				String indexContent = indexBaseFile.getContent();
 
-				indexContent = StrUtils.replaceAll(indexContent, "[[USERNAME]]", database.getUsername());
+				indexContent = StrUtils.replaceAll(indexContent, "[[USERNAME]]", db.getUsername());
 
 				Date now = new Date();
 				// Today is Monday the 23rd of April 2027 and it is 08:37 right now. You are on planet Earth.
@@ -387,6 +391,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 
 				String tabsHtml = "<div id='tabList'>";
+				tabsHtml += "<a href='/inbox.htm'>Inbox</a>";
 				tabsHtml += "<a href='/tasklog.htm'>Task Log</a>";
 				tabsHtml += "<a href='/weekly.htm'>Weekly Plan</a>";
 				tabsHtml += "</div>";
@@ -555,6 +560,28 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 			}
 
 
+			// answering a request for the inbox tab
+			if (locEquiv.equals("inbox.htm")) {
+
+				System.out.println("Answering inbox request...");
+
+				TextFile indexBaseFile = new TextFile(webRoot, locEquiv);
+				String indexContent = indexBaseFile.getContent();
+
+				indexContent = StrUtils.replaceAll(indexContent, "[[INBOX_CONTENT]]", db.getInboxContent());
+
+				indexContent = StrUtils.replaceAll(indexContent, "[[PROJECTS]]", AssSecretary.getProjHtmlStr());
+
+				indexContent = StrUtils.replaceAll(indexContent, "[[CURDATE]]", DateUtils.serializeDate(DateUtils.now()));
+
+				indexContent = StrUtils.replaceAll(indexContent, "[[MINI_CALENDAR]]", getMiniCalendarHtml());
+
+				locEquiv = "_" + locEquiv;
+				TextFile indexFile = new TextFile(webRoot, locEquiv);
+				indexFile.saveContent(indexContent);
+			}
+
+
 			// answering a request for the task log tab
 			if (locEquiv.equals("tasklog.htm")) {
 
@@ -599,6 +626,8 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 				indexContent = StrUtils.replaceAll(indexContent, "[[TASKS]]", taskHtml);
 
 				indexContent = StrUtils.replaceAll(indexContent, "[[PROJECTS]]", AssSecretary.getProjHtmlStr());
+
+				indexContent = StrUtils.replaceAll(indexContent, "[[CURDATE]]", DateUtils.serializeDate(DateUtils.now()));
 
 				indexContent = StrUtils.replaceAll(indexContent, "[[MINI_CALENDAR]]", getMiniCalendarHtml());
 

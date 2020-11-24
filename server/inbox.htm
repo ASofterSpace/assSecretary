@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+
+	<head>
+		<meta charset="utf-8">
+
+		<title>Hugo, A Softer Space Secretary</title>
+
+		<meta name="keywords" content="secretary">
+
+		<meta name="description" content="Our secretary, who helps us organize things.">
+
+		@include(inc_dependencies.htm)
+	</head>
+
+	<body id="body" style="padding-left: 0px;">
+		<div id="mainContent">
+			<div class="buttonBar">
+				<span class="button" onclick="window.secretary.convertSelectionIntoTask()">Convert Selection into Task</span>
+			</div>
+
+			<textarea id="inboxArea" onchange="window.dirtify();" oninput="window.dirtify();"
+				style="width: 100%;box-sizing: border-box;height: 1000pt;">[[INBOX_CONTENT]]</textarea>
+
+			<script>
+				window.dirtify = function() {
+					if (window.lastSentContent !== document.getElementById("inboxArea").value) {
+						window.inboxDirty = true;
+						document.getElementById("body").className = "dirty";
+					}
+				}
+
+				// every five seconds...
+				window.setInterval(function() {
+					if (window.inboxDirty) {
+						window.inboxDirty = false;
+
+						var request = new XMLHttpRequest();
+						request.open("POST", "saveInbox", true);
+						request.setRequestHeader("Content-Type", "application/json");
+
+						request.onreadystatechange = function() {
+							if (request.readyState == 4 && request.status == 200) {
+								var result = JSON.parse(request.response);
+								if (result.success) {
+									// only adjust the background if the inbox has not become
+									// dirty again in the meantime
+									if (!window.inboxDirty) {
+										document.getElementById("body").className = "";
+									}
+								}
+							}
+						}
+
+						window.lastSentContent = document.getElementById("inboxArea").value;
+
+						var data = {
+							content: window.lastSentContent,
+						};
+
+						request.send(JSON.stringify(data));
+					}
+				}, 5000);
+			</script>
+
+			<div class="footer">&nbsp;</div>
+
+		</div>
+
+		@include(inc_task_modals.htm)
+
+		@include(inc_subpage_end.htm)
