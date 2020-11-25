@@ -107,6 +107,7 @@ window.secretary = {
 			title: document.getElementById("singleTaskTitle").value,
 			details: document.getElementById("singleTaskDetails").value,
 			releaseDate: document.getElementById("singleTaskReleaseDate").value,
+			doneDate: document.getElementById("singleTaskDoneDate").value,
 			origin: document.getElementById("singleTaskOrigin").value,
 			priority: document.getElementById("singleTaskPriority").value,
 			priorityEscalationAfterDays: document.getElementById("singleTaskPriorityEscalationAfterDays").value,
@@ -135,6 +136,7 @@ window.secretary = {
 						}, 3000);
 						window.secretary.currentlyEditing = result.newId;
 						document.getElementById("singleTaskReleaseDate").value = result.newReleaseDate;
+						document.getElementById("singleTaskDoneDate").value = "";
 					}
 				}
 			}
@@ -216,6 +218,7 @@ window.secretary = {
 		document.getElementById("singleTaskDetails").value = "";
 		var DateUtils = toolbox.utils.DateUtils;
 		document.getElementById("singleTaskReleaseDate").value = DateUtils.serializeDate(DateUtils.now());
+		document.getElementById("singleTaskDoneDate").value = "";
 		document.getElementById("singleTaskOrigin").value = "private";
 		document.getElementById("singleTaskPriority").value = 500000;
 		window.secretary.singleTaskPriorityChange();
@@ -243,6 +246,7 @@ window.secretary = {
 						document.getElementById("singleTaskTitle").value = result.title;
 						document.getElementById("singleTaskDetails").value = result.details;
 						document.getElementById("singleTaskReleaseDate").value = result.releaseDate;
+						document.getElementById("singleTaskDoneDate").value = result.doneDate;
 						document.getElementById("singleTaskOrigin").value = result.origin;
 						document.getElementById("singleTaskPriority").value = result.priority;
 						window.secretary.singleTaskPriorityChange();

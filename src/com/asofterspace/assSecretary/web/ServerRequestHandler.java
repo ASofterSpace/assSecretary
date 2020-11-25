@@ -108,6 +108,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 							json.getInteger("priorityEscalationAfterDays"),
 							json.getString("duration")
 						);
+						setDoneDateBasedOnJson(newTask, json);
 						answer = new WebServerAnswerInJson(new JSON("{\"success\": " + (newTask != null) + "}"));
 
 					} else {
@@ -116,7 +117,8 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 						if (task != null) {
 							task.setTitle(json.getString("title"));
 							task.setDetailsStr(json.getString("details"));
-							task.setReleasedDate(DateUtils.parseDate(json.getString("releaseDate")));
+							task.setReleasedDate(json.getDate("releaseDate"));
+							setDoneDateBasedOnJson(task, json);
 							task.setOrigin(json.getString("origin"));
 							task.setPriority(json.getInteger("priority"));
 							task.setPriorityEscalationAfterDays(json.getInteger("priorityEscalationAfterDays"));
@@ -145,6 +147,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 								json.getInteger("priorityEscalationAfterDays"),
 								json.getString("duration")
 							);
+							setDoneDateBasedOnJson(newTask, json);
 						}
 					}
 
@@ -248,6 +251,11 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 						taskCtrl.setTaskToDone(editingId);
 
+						Date doneDate = json.getDate("doneDate");
+						if (doneDate != null) {
+							task.setDoneDate(doneDate);
+						}
+
 						taskCtrl.save();
 						answer = new WebServerAnswerInJson(new JSON("{\"success\": true}"));
 					} else {
@@ -328,6 +336,11 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 					response.set("title", task.getTitle());
 					response.set("details", StrUtils.join("\n", task.getDetails()));
 					response.set("releaseDate", task.getReleasedDateStr());
+					if (task.hasBeenDone()) {
+						response.set("doneDate", DateUtils.serializeDate(task.getDoneDate()));
+					} else {
+						response.set("doneDate", null);
+					}
 					response.set("origin", task.getOrigin());
 					response.set("priority", task.getPriority());
 					response.set("priorityEscalationAfterDays", task.getPriorityEscalationAfterDays());
@@ -888,4 +901,16 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 		return html;
 	}
 
+	private void setDoneDateBasedOnJson(Task task, Record json) {
+		Date doneDate = json.getDate("doneDate");
+		if (doneDate == null) {
+			task.setDone(false);
+			task.setDoneDate(null);
+		} else {
+			task.setDone(true);
+			task.setDoneDate(doneDate);
+			taskCtrl.removeTaskFromShortListById(task.getId());
+			taskCtrl.save();
+		}
+	}
 }
