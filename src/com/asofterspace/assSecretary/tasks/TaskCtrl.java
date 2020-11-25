@@ -41,6 +41,9 @@ public class TaskCtrl extends TaskCtrlBase {
 	// a list of ids of tasks that are on the shortlist
 	private final static String TASK_SHORTLIST = "taskShortlist";
 
+	// the origin for tasks coming from Mari
+	public final static String FINANCE_ORIGIN = "finances";
+
 	// a list of ids of the tasks on the shortlist
 	private List<String> shortlistIds = new ArrayList<>();
 
@@ -96,8 +99,33 @@ public class TaskCtrl extends TaskCtrlBase {
 		return result;
 	}
 
+	public Task taskFromMariRecord(Record recordTask) {
+
+		GenericTask genericTask = null;
+
+		if (recordTask.getInteger(TaskCtrlBase.RELEASED_ON_DAY) == null) {
+			genericTask = super.taskFromRecord(recordTask);
+		} else {
+			genericTask = super.taskInstanceFromRecord(recordTask);
+		}
+
+		if (genericTask instanceof Task) {
+
+			Task task = (Task) genericTask;
+			task.setOrigin(FINANCE_ORIGIN);
+			task.setPriority(300000);
+			task.setPriorityEscalationAfterDays(null);
+			task.setDuration(null);
+			task.setId(null);
+
+			return task;
+		}
+
+		return null;
+	}
+
 	@Override
-	protected Record taskToRecord(GenericTask task) {
+	public Record taskToRecord(GenericTask task) {
 		Record taskRecord = super.taskToRecord(task);
 		if (task instanceof Task) {
 			Task ourTask = (Task) task;

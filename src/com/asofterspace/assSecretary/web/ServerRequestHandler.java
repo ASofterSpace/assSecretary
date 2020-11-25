@@ -592,6 +592,26 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 				List<Task> tasks = taskCtrl.getDoneTaskInstancesAsTasks();
 
+				try {
+					// get task instances from Mari
+					JSON mariTasks = new JSON(WebAccessor.get("http://localhost:3011/taskInstances"));
+
+					// copy the task list we are currently looking at
+					tasks = new ArrayList<>(tasks);
+
+					// generate tasks locally based on the data we got from Mari
+					List<Record> mariRecs = mariTasks.getValues();
+					for (Record mariRec : mariRecs) {
+						Task localTask = taskCtrl.taskFromMariRecord(mariRec);
+						if (localTask.hasBeenDone()) {
+							tasks.add(localTask);
+						}
+					}
+
+				} catch (JsonParseException e) {
+					System.out.println("Mari responded with nonsense for a task instances request!");
+				}
+
 				Collections.sort(tasks, new Comparator<Task>() {
 					public int compare(Task a, Task b) {
 						Date aDone = a.getDoneDate();
@@ -662,7 +682,44 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 				List<Task> tasks = taskCtrl.getAllTaskInstancesAsTasks();
 
+				try {
+					// get task instances from Mari
+					JSON mariTasks = new JSON(WebAccessor.get("http://localhost:3011/taskInstances?from=" +
+						DateUtils.serializeDate(weekDays.get(0)) + "&to=" + DateUtils.serializeDate(weekDays.get(6))));
+
+					// copy the task list we are currently looking at
+					tasks = new ArrayList<>(tasks);
+
+					// generate tasks locally based on the data we got from Mari
+					List<Record> mariRecs = mariTasks.getValues();
+					for (Record mariRec : mariRecs) {
+						Task localTask = taskCtrl.taskFromMariRecord(mariRec);
+						tasks.add(localTask);
+					}
+
+				} catch (JsonParseException e) {
+					System.out.println("Mari responded with nonsense for a task instances request!");
+				}
+
 				List<GenericTask> baseTasksForSchedule = taskCtrl.getTasks();
+
+				try {
+					// get scheduled tasks from Mari
+					JSON mariTasks = new JSON(WebAccessor.get("http://localhost:3011/tasks"));
+
+					// copy the task list we are currently looking at
+					baseTasksForSchedule = new ArrayList<>(baseTasksForSchedule);
+
+					// generate tasks locally based on the data we got from Mari
+					List<Record> mariRecs = mariTasks.getValues();
+					for (Record mariRec : mariRecs) {
+						Task localTask = taskCtrl.taskFromMariRecord(mariRec);
+						baseTasksForSchedule.add(localTask);
+					}
+
+				} catch (JsonParseException e) {
+					System.out.println("Mari responded with nonsense for a tasks request!");
+				}
 
 				for (Date day : weekDays) {
 					boolean isToday = DateUtils.isSameDay(actualToday, day);

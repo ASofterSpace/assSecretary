@@ -254,9 +254,15 @@ public class Task extends GenericTask {
 			}
 		}
 
+		if (TaskCtrl.FINANCE_ORIGIN.equals(origin)) {
+
+			html += "<span style='width: 8%;' class='button'>";
+			html += "(from Mari)";
+			html += "</span>";
+
 		// if this is not an actual instance, but just a ghost of a scheduled task, then of course it cannot
 		// be edited in any way shape or form, so no point in showing any of the regular buttons :)
-		if (!isInstance()) {
+		} else if (!isInstance()) {
 			// on the other hand, a non-instance CAN be prematurely released to achieve an instance which CAN be edited!
 
 			html += "<span style='" + btnStyle + "' class='button' onclick='secretary.taskPreRelease(\"" + id + "\", " +
@@ -380,25 +386,6 @@ public class Task extends GenericTask {
 		}
 
 		return contentStr;
-	}
-
-	public boolean appliesTo(Date day) {
-
-		// entries which are done apply to the date on which they were done
-		if (hasBeenDone()) {
-			return DateUtils.isSameDay(day, getDoneDate());
-		}
-
-		// entries which are not yet done apply to their release date...
-		Date displayDate = getReleaseDate();
-		Date today = DateUtils.now();
-
-		// ... or, if they were released before today, they apply to today
-		if (displayDate.before(today)) {
-			displayDate = today;
-		}
-
-		return DateUtils.isSameDay(day, displayDate);
 	}
 
 }
