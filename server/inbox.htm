@@ -24,42 +24,48 @@
 
 			<script>
 				window.dirtify = function() {
+					window.inboxCurrentlyEdited = true;
 					if (window.lastSentContent !== document.getElementById("inboxArea").value) {
 						window.inboxDirty = true;
 						document.getElementById("body").className = "dirty";
 					}
-				}
+				};
 
-				// every five seconds...
-				window.setInterval(function() {
-					if (window.inboxDirty) {
-						window.inboxDirty = false;
+				window.saveDirtyInbox = function() {
+					window.inboxDirty = false;
 
-						var request = new XMLHttpRequest();
-						request.open("POST", "saveInbox", true);
-						request.setRequestHeader("Content-Type", "application/json");
+					var request = new XMLHttpRequest();
+					request.open("POST", "saveInbox", true);
+					request.setRequestHeader("Content-Type", "application/json");
 
-						request.onreadystatechange = function() {
-							if (request.readyState == 4 && request.status == 200) {
-								var result = JSON.parse(request.response);
-								if (result.success) {
-									// only adjust the background if the inbox has not become
-									// dirty again in the meantime
-									if (!window.inboxDirty) {
-										document.getElementById("body").className = "";
-									}
+					request.onreadystatechange = function() {
+						if (request.readyState == 4 && request.status == 200) {
+							var result = JSON.parse(request.response);
+							if (result.success) {
+								// only adjust the background if the inbox has not become
+								// dirty again in the meantime
+								if (!window.inboxDirty) {
+									document.getElementById("body").className = "";
 								}
 							}
 						}
-
-						window.lastSentContent = document.getElementById("inboxArea").value;
-
-						var data = {
-							content: window.lastSentContent,
-						};
-
-						request.send(JSON.stringify(data));
 					}
+
+					window.lastSentContent = document.getElementById("inboxArea").value;
+
+					var data = {
+						content: window.lastSentContent,
+					};
+
+					request.send(JSON.stringify(data));
+				};
+
+				// every five seconds...
+				window.setInterval(function() {
+					if (window.inboxDirty && !window.inboxCurrentlyEdited) {
+						window.saveDirtyInbox();
+					}
+					window.inboxCurrentlyEdited = false;
 				}, 5000);
 			</script>
 

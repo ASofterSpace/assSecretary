@@ -210,6 +210,20 @@ window.secretary = {
 		request.send(JSON.stringify(data));
 	},
 
+	resetSingleTaskModal: function() {
+
+		document.getElementById("singleTaskTitle").value = "";
+		document.getElementById("singleTaskDetails").value = "";
+		var DateUtils = toolbox.utils.DateUtils;
+		document.getElementById("singleTaskReleaseDate").value = DateUtils.serializeDate(DateUtils.now());
+		document.getElementById("singleTaskOrigin").value = "private";
+		document.getElementById("singleTaskPriority").value = 500000;
+		window.secretary.singleTaskPriorityChange();
+		document.getElementById("singleTaskPriorityEscalationAfterDays").value = "never";
+		document.getElementById("singleTaskDuration").value = "00:00";
+		document.getElementById("singleTaskReleaseUntil").value = "";
+	},
+
 	taskEdit: function(id) {
 
 		var request = new XMLHttpRequest();
@@ -274,7 +288,7 @@ window.secretary = {
 		request.send(JSON.stringify(data));
 	},
 
-	taskDelete: function(id, title) {
+	taskDelete: function(id, title, releaseDate) {
 		var modal = document.getElementById("deleteTaskModal");
 		if (modal) {
 			modal.style.display = "block";
@@ -282,7 +296,8 @@ window.secretary = {
 			this.currentlyDeleting = id;
 
 			document.getElementById("deleteTaskModalContent").innerHTML = "Do you really want to delete this task?" +
-				"<br><br>Title: " + title;
+				"<br><br>Title: " + title +
+				"<br>Release date: " + releaseDate;
 
 			document.getElementById("modalBackground").style.display = "block";
 		}
@@ -463,6 +478,61 @@ window.secretary = {
 	},
 
 }
+
+
+
+// disable any hotkeys while the secretary is open, so that the user cannot
+// accidentally refresh the page or something silly like that
+window.onhelp = function() {
+	// prevent F1 function key
+	return false;
+};
+window.onkeydown = function(event) {
+	// [Ctrl]+[S]
+	if ((event.metaKey || event.ctrlKey) && event.keyCode == 83) {
+		var addSingleTaskModal = document.getElementById("addSingleTaskModal");
+		if (addSingleTaskModal && (addSingleTaskModal.style.display === "block")) {
+			window.secretary.submitSingleTaskModal(false);
+		} else {
+			var inboxArea = document.getElementById("inboxArea");
+			if (inboxArea) {
+				window.saveDirtyInbox();
+			}
+		}
+		// prevent [Ctrl]+[S]
+		event.preventDefault();
+		return false;
+	}
+	if ((event.keyCode > 111) && (event.keyCode < 124)) {
+		if (event.keyCode == 111 + 6) {
+			// if [F6] is pressed, and the singleTaskDetails textarea is visible...
+			var singleTaskDetails = document.getElementById("singleTaskDetails");
+			if (singleTaskDetails && window.singleTaskDetailsHasFocus) {
+				var start = singleTaskDetails.selectionStart;
+				var end = singleTaskDetails.selectionEnd;
+				// ... add a date-time-stamp!
+				var datetimestamp = toolbox.utils.DateUtils.getCurrentDateTimeStamp();
+				singleTaskDetails.value =
+					singleTaskDetails.value.substring(0, start) +
+					datetimestamp +
+					singleTaskDetails.value.substring(end);
+				singleTaskDetails.selectionStart = start + datetimestamp.length;
+				singleTaskDetails.selectionEnd = start + datetimestamp.length;
+			}
+		}
+		// prevent function keys
+		event.preventDefault();
+		return false;
+	}
+	if (event.keyCode == 27) {
+		// prevent escape
+		event.preventDefault();
+		return false;
+	}
+	// allow other keys
+	return true;
+};
+
 
 
 window.addEventListener("resize", window.secretary.onResize);

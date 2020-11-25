@@ -300,7 +300,8 @@ public class Task extends GenericTask {
 			html += "<span style='" + btnStyle + "' class='button' onclick='secretary.taskEdit(\"" + id + "\")'>";
 			html += "Edit";
 			html += "</span>";
-			html += "<span style='" + btnStyle + "' class='button' onclick='secretary.taskDelete(\"" + id + "\", \"" + HTML.escapeHTMLstr(StrUtils.replaceAll(title, "\"", "")) + "\")'>";
+			html += "<span style='" + btnStyle + "' class='button' onclick='secretary.taskDelete(\"" + id + "\", ";
+			html += "\"" + HTML.escapeHTMLstr(StrUtils.replaceAll(title, "\"", "")) + "\", \"" + getReleasedDateStr() + "\")'>";
 			html += "Delete";
 			html += "</span>";
 			if ((!reducedView) && (!historicalView)) {
