@@ -468,8 +468,10 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 					MariTaskCtrl mariTaskCtrl = new MariTaskCtrl(mariDatabase);
 
 					List<GenericTask> tasks = mariTaskCtrl.getCurrentTaskInstances();
+					/*
 					int upcomingDays = 5;
 					List<GenericTask> upcomingTasks = mariTaskCtrl.getUpcomingTaskInstances(upcomingDays);
+					*/
 
 					if (!"no problems".equals(problems)) {
 						mariHtml += "<div>";
@@ -494,6 +496,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 						talkedToMari = true;
 					}
 
+					/*
 					if (upcomingTasks.size() > 0) {
 						mariHtml += "<div>";
 						if (!talkedToMari) {
@@ -508,6 +511,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 						mariHtml += "</div>";
 						talkedToMari = true;
 					}
+					*/
 				}
 				indexContent = StrUtils.replaceAll(indexContent, "[[MARI]]", mariHtml);
 
