@@ -486,6 +486,51 @@ window.secretary = {
 		}
 	},
 
+	removeLinebreaksInInbox: function() {
+
+		var inboxArea = document.getElementById("inboxArea");
+
+		if (inboxArea) {
+			var start = inboxArea.selectionStart;
+			var end = inboxArea.selectionEnd;
+			var val = inboxArea.value;
+			var sel = val.substring(start, end);
+			var sels = sel.split("\n");
+			var last = null;
+			var newSels = [];
+			for (var i = 0; i < sels.length; i++) {
+				var cur = sels[i].trim();
+				if (last === null) {
+					last = cur;
+				} else {
+					if ((cur.indexOf("* ") == 0) || (cur.indexOf("O ") == 0) || (cur.indexOf("- ") == 0) || (cur.indexOf(">") == 0)) {
+						newSels.push(last);
+						last = cur;
+					} else {
+						last += " " + cur;
+					}
+				}
+			}
+			if (last !== null) {
+				newSels.push(last);
+			}
+			sel = newSels.join("\n");
+			var presel = "";
+			var postsel = "";
+			while (sel[0] === ' ') {
+				sel = sel.substring(1);
+				presel += "\n";
+			}
+			while (sel[sel.length - 1] === ' ') {
+				sel = sel.substring(0, sel.length - 1);
+				postsel += "\n";
+			}
+			inboxArea.value = val.substring(0, start) + presel + sel + postsel + val.substring(end);
+		}
+
+		window.dirtify();
+	},
+
 	convertSelectionIntoTask: function() {
 		this.showAddSingleTaskModal();
 
@@ -506,6 +551,8 @@ window.secretary = {
 			document.getElementById("singleTaskDetails").value = newDetails;
 			inboxArea.value = val.substring(0, start) + val.substring(end);
 		}
+
+		window.dirtify();
 	},
 
 }
