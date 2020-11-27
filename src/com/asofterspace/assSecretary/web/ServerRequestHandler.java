@@ -89,73 +89,16 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 				case "/addSingleTask":
 
-					String editingId = json.getString("editingId");
-
-					Date firstReleaseDate = json.getDate("releaseDate");
-					if (firstReleaseDate == null) {
-						respond(404);
+					Task addedOrEditedTask = addOrEditSingleTask(json);
+					if (addedOrEditedTask == null) {
 						return;
 					}
-
-					if (editingId == null) {
-						// add new task
-						Task newTask = taskCtrl.addAdHocTask(
-							json.getString("title"),
-							json.getString("details"),
-							firstReleaseDate,
-							json.getString("origin"),
-							json.getInteger("priority"),
-							json.getInteger("priorityEscalationAfterDays"),
-							json.getString("duration")
-						);
-						setDoneDateBasedOnJson(newTask, json);
-						answer = new WebServerAnswerInJson(new JSON("{\"success\": " + (newTask != null) + "}"));
-
-					} else {
-						// edit existing task
-						Task task = taskCtrl.getTaskById(editingId);
-						if (task != null) {
-							task.setTitle(json.getString("title"));
-							task.setDetailsStr(json.getString("details"));
-							task.setReleasedDate(json.getDate("releaseDate"));
-							setDoneDateBasedOnJson(task, json);
-							task.setOrigin(json.getString("origin"));
-							task.setPriority(json.getInteger("priority"));
-							task.setPriorityEscalationAfterDays(json.getInteger("priorityEscalationAfterDays"));
-							task.setDurationStr(json.getString("duration"));
-							taskCtrl.save();
-							answer = new WebServerAnswerInJson(new JSON("{\"success\": true}"));
-						} else {
-							respond(404);
-							return;
-						}
-					}
-
-					Date lastReleaseDate = json.getDate("releaseUntil");
-					if (lastReleaseDate != null) {
-						List<Date> releaseDates = DateUtils.listDaysFromTo(
-							DateUtils.addDays(firstReleaseDate, 1),
-							DateUtils.addDays(lastReleaseDate, 1)
-						);
-						for (Date relDate : releaseDates) {
-							Task newTask = taskCtrl.addAdHocTask(
-								json.getString("title"),
-								json.getString("details"),
-								relDate,
-								json.getString("origin"),
-								json.getInteger("priority"),
-								json.getInteger("priorityEscalationAfterDays"),
-								json.getString("duration")
-							);
-							setDoneDateBasedOnJson(newTask, json);
-						}
-					}
-
+					answer = new WebServerAnswerInJson(new JSON("{\"success\": true}"));
 					break;
 
 				case "/taskPreRelease":
 
-					editingId = json.getString("id");
+					String editingId = json.getString("id");
 
 					if (editingId == null) {
 						respond(404);
@@ -212,6 +155,21 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 					}
 					break;
 
+				case "/taskPutOnShortListTomorrow":
+
+					editingId = json.getString("id");
+
+					if (editingId == null) {
+						respond(404);
+						return;
+					} else {
+						taskCtrl.removeTaskFromShortListById(editingId);
+						taskCtrl.addTaskToShortListTomorrowById(editingId);
+						taskCtrl.save();
+						answer = new WebServerAnswerInJson(new JSON("{\"success\": true}"));
+					}
+					break;
+
 				case "/taskDelete":
 
 					editingId = json.getString("id");
@@ -228,39 +186,27 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 					}
 					break;
 
-				case "/doneAndCopySingleTask":
+				case "/doneSingleTask":
 
-					editingId = json.getString("editingId");
-
-					if (editingId == null) {
-						respond(404);
+					addedOrEditedTask = addOrEditSingleTask(json);
+					if (addedOrEditedTask == null) {
 						return;
 					}
 
-					// edit existing task (this here does not check for the value of the release until field,
-					// but then again, why would anyone put a release until in a done and copy entry?)
-					Task task = taskCtrl.getTaskById(editingId);
-					if (task != null) {
-						task.setTitle(json.getString("title"));
-						task.setDetailsStr(json.getString("details"));
-						task.setReleasedDate(DateUtils.parseDate(json.getString("releaseDate")));
-						task.setOrigin(json.getString("origin"));
-						task.setPriority(json.getInteger("priority"));
-						task.setPriorityEscalationAfterDays(json.getInteger("priorityEscalationAfterDays"));
-						task.setDurationStr(json.getString("duration"));
+					taskCtrl.setTaskToDone(addedOrEditedTask.getId());
 
-						taskCtrl.setTaskToDone(editingId);
+					Date doneDate = json.getDate("doneDate");
+					if (doneDate != null) {
+						addedOrEditedTask.setDoneDate(doneDate);
+					}
 
-						Date doneDate = json.getDate("doneDate");
-						if (doneDate != null) {
-							task.setDoneDate(doneDate);
-						}
+					taskCtrl.save();
 
-						taskCtrl.save();
-						answer = new WebServerAnswerInJson(new JSON("{\"success\": true}"));
-					} else {
-						respond(404);
-						return;
+					answer = new WebServerAnswerInJson(new JSON("{\"success\": true}"));
+
+					// only continue if a copy of the task should actually be made
+					if ((json.getBoolean("copyAfterwards") == null) || (json.getBoolean("copyAfterwards") == false)) {
+						break;
 					}
 
 					// add new task
@@ -917,4 +863,74 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 			taskCtrl.save();
 		}
 	}
+
+	private Task addOrEditSingleTask(JSON json) throws IOException {
+
+		Task result = null;
+
+		String editingId = json.getString("editingId");
+
+		Date firstReleaseDate = json.getDate("releaseDate");
+		if (firstReleaseDate == null) {
+			respond(404);
+			return null;
+		}
+
+		if (editingId == null) {
+			// add new task
+			Task newTask = taskCtrl.addAdHocTask(
+				json.getString("title"),
+				json.getString("details"),
+				firstReleaseDate,
+				json.getString("origin"),
+				json.getInteger("priority"),
+				json.getInteger("priorityEscalationAfterDays"),
+				json.getString("duration")
+			);
+			setDoneDateBasedOnJson(newTask, json);
+			result = newTask;
+
+		} else {
+			// edit existing task
+			Task task = taskCtrl.getTaskById(editingId);
+			if (task != null) {
+				task.setTitle(json.getString("title"));
+				task.setDetailsStr(json.getString("details"));
+				task.setReleasedDate(json.getDate("releaseDate"));
+				setDoneDateBasedOnJson(task, json);
+				task.setOrigin(json.getString("origin"));
+				task.setPriority(json.getInteger("priority"));
+				task.setPriorityEscalationAfterDays(json.getInteger("priorityEscalationAfterDays"));
+				task.setDurationStr(json.getString("duration"));
+				taskCtrl.save();
+				result = task;
+			} else {
+				respond(404);
+				return null;
+			}
+		}
+
+		Date lastReleaseDate = json.getDate("releaseUntil");
+		if (lastReleaseDate != null) {
+			List<Date> releaseDates = DateUtils.listDaysFromTo(
+				DateUtils.addDays(firstReleaseDate, 1),
+				DateUtils.addDays(lastReleaseDate, 1)
+			);
+			for (Date relDate : releaseDates) {
+				Task newTask = taskCtrl.addAdHocTask(
+					json.getString("title"),
+					json.getString("details"),
+					relDate,
+					json.getString("origin"),
+					json.getInteger("priority"),
+					json.getInteger("priorityEscalationAfterDays"),
+					json.getString("duration")
+				);
+				setDoneDateBasedOnJson(newTask, json);
+			}
+		}
+
+		return result;
+	}
+
 }

@@ -223,7 +223,9 @@ public class Task extends GenericTask {
 			}
 			html += "</span>";
 		}
-		html += "<span style='width: 60%;'";
+		// by default, main Width is 60%
+		int mainWidth = 60;
+		html += "<span style='width: %[WIDTH];'";
 		int prio = getCurrentPriority(dateForWhichHtmlGetsDisplayed);
 		if (prio < 100000) {
 			html += " class='error'";
@@ -282,7 +284,9 @@ public class Task extends GenericTask {
 					html += "Details";
 					html += "</span>";
 				} else {
-					html += "<span style='" + btnStyle + " visibility: hidden;' class='button'>";
+					// this is 1.5% width instead of 5.5%, so that the main width can be increased by 4 percent points
+					mainWidth += 4;
+					html += "<span style='width:1.5%;" + miniBtnStyle + " visibility: hidden;' class='button'>";
 					html += "&nbsp;";
 					html += "</span>";
 				}
@@ -309,6 +313,11 @@ public class Task extends GenericTask {
 					html += "<span style='" + miniBtnStyle + "' class='button' onclick='secretary.taskRemoveFromShortList(\"" + id + "\")'>";
 					html += "&#9734;";
 					html += "</span>";
+					html += "<span style='" + miniBtnStyle + "' class='button' onclick='secretary.taskPutOnShortListTomorrow(\"" + id + "\")'>";
+					html += "&#x2B6F;";
+					html += "</span>";
+					// we are showing two minibuttons instead of one, so the main width has to be shorter here
+					mainWidth -= 3;
 				} else {
 					html += "<span style='" + miniBtnStyle + "' class='button' onclick='secretary.taskAddToShortList(\"" + id + "\")'>";
 					html += "&#9733;";
@@ -341,6 +350,9 @@ public class Task extends GenericTask {
 			html += "</div>";
 		}
 		html += "</div>";
+
+		html = StrUtils.replaceAll(html, "%[WIDTH]", mainWidth + "%");
+
 		return html;
 	}
 

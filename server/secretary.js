@@ -50,8 +50,7 @@ window.secretary = {
 		var modal = document.getElementById("addSingleTaskModal");
 		if (modal) {
 			modal.style.display = "block";
-
-			document.getElementById("doneAndCopySingleTaskModalBtn").style.display = "none";
+			document.getElementById("singleTaskCurrentMode").innerHTML = "adding new entries";
 
 			this.currentlyEditing = null;
 
@@ -116,10 +115,10 @@ window.secretary = {
 		};
 	},
 
-	doneAndCopySingleTaskModal: function() {
+	doneSingleTaskModal: function(copyAfterwards) {
 
 		var request = new XMLHttpRequest();
-		request.open("POST", "doneAndCopySingleTask", true);
+		request.open("POST", "doneSingleTask", true);
 		request.setRequestHeader("Content-Type", "application/json");
 
 		request.onreadystatechange = function() {
@@ -127,22 +126,29 @@ window.secretary = {
 				var result = JSON.parse(request.response);
 				// show some sort of confirmation
 				if (result.success) {
-					document.getElementById("singleTaskReleaseUntil").value = "";
-					var singleTaskSavedLabel = document.getElementById("singleTaskSavedLabel");
-					if (singleTaskSavedLabel) {
-						singleTaskSavedLabel.style.display = "block";
-						window.setTimeout(function () {
-							singleTaskSavedLabel.style.display = "none";
-						}, 3000);
-						window.secretary.currentlyEditing = result.newId;
-						document.getElementById("singleTaskReleaseDate").value = result.newReleaseDate;
-						document.getElementById("singleTaskDoneDate").value = "";
+					if (copyAfterwards) {
+						document.getElementById("singleTaskReleaseUntil").value = "";
+						var singleTaskSavedLabel = document.getElementById("singleTaskSavedLabel");
+						if (singleTaskSavedLabel) {
+							singleTaskSavedLabel.style.display = "block";
+							window.setTimeout(function () {
+								singleTaskSavedLabel.style.display = "none";
+							}, 3000);
+							window.secretary.currentlyEditing = result.newId;
+							document.getElementById("singleTaskReleaseDate").value = result.newReleaseDate;
+							document.getElementById("singleTaskDoneDate").value = "";
+							document.getElementById("singleTaskCurrentMode").innerHTML = "editing one entry";
+						}
+					} else {
+						window.location.reload(false);
 					}
 				}
 			}
 		}
 
 		var data = this.gatherDataForSingleTaskSubmit();
+
+		data.copyAfterwards = copyAfterwards;
 
 		request.send(JSON.stringify(data));
 	},
@@ -240,6 +246,7 @@ window.secretary = {
 					var modal = document.getElementById("addSingleTaskModal");
 					if (modal) {
 						modal.style.display = "block";
+						document.getElementById("singleTaskCurrentMode").innerHTML = "editing one entry";
 
 						document.getElementById("modalBackground").style.display = "block";
 
@@ -257,8 +264,6 @@ window.secretary = {
 						}
 						document.getElementById("singleTaskDuration").value = result.duration;
 						document.getElementById("singleTaskReleaseUntil").value = "";
-
-						document.getElementById("doneAndCopySingleTaskModalBtn").style.display = "inline";
 
 						window.secretary.currentlyEditing = id;
 					}
@@ -366,6 +371,28 @@ window.secretary = {
 
 		var request = new XMLHttpRequest();
 		request.open("POST", "taskRemoveFromShortList", true);
+		request.setRequestHeader("Content-Type", "application/json");
+
+		request.onreadystatechange = function() {
+			if (request.readyState == 4 && request.status == 200) {
+				var result = JSON.parse(request.response);
+				if (result.success) {
+					window.location.reload(false);
+				}
+			}
+		}
+
+		var data = {
+			id: id,
+		};
+
+		request.send(JSON.stringify(data));
+	},
+
+	taskPutOnShortListTomorrow: function(id) {
+
+		var request = new XMLHttpRequest();
+		request.open("POST", "taskPutOnShortListTomorrow", true);
 		request.setRequestHeader("Content-Type", "application/json");
 
 		request.onreadystatechange = function() {

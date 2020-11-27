@@ -41,11 +41,17 @@ public class TaskCtrl extends TaskCtrlBase {
 	// a list of ids of tasks that are on the shortlist
 	private final static String TASK_SHORTLIST = "taskShortlist";
 
+	// a list of ids of tasks that are on the shortlist tomorrow
+	private final static String TASK_SHORTLIST_TOMORROW = "taskShortlistTomorrow";
+
 	// the origin for tasks coming from Mari
 	public final static String FINANCE_ORIGIN = "finances";
 
 	// a list of ids of the tasks on the shortlist
 	private List<String> shortlistIds = new ArrayList<>();
+
+	// a list of ids of the tasks that go onto the shortlist tomorrow
+	private List<String> shortlistIdsTomorrow = new ArrayList<>();
 
 	private TaskDatabase database;
 
@@ -73,6 +79,7 @@ public class TaskCtrl extends TaskCtrlBase {
 		}
 
 		shortlistIds = root.getArrayAsStringList(TASK_SHORTLIST);
+		shortlistIdsTomorrow = root.getArrayAsStringList(TASK_SHORTLIST_TOMORROW);
 	}
 
 	@Override
@@ -144,10 +151,12 @@ public class TaskCtrl extends TaskCtrlBase {
 	public List<GenericTask> getUpcomingTaskInstances(int upcomingDays) {
 
 		List<String> shortlistIdCopy = new ArrayList<>(shortlistIds);
+		List<String> shortlistIdTomorrowCopy = new ArrayList<>(shortlistIdsTomorrow);
 
 		List<GenericTask> result = super.getUpcomingTaskInstances(upcomingDays);
 
 		shortlistIds = shortlistIdCopy;
+		shortlistIdsTomorrow = shortlistIdTomorrowCopy;
 
 		return result;
 	}
@@ -167,10 +176,15 @@ public class TaskCtrl extends TaskCtrlBase {
 		for (GenericTask genericTask : taskInstances) {
 			if (genericTask instanceof Task) {
 				if (DateUtils.isSameDay(day, genericTask.getReleaseDate())) {
-					shortlistIds.add(((Task) genericTask).getId());
+					addTaskToShortListById(((Task) genericTask).getId());
 				}
 			}
 		}
+
+		for (String id : shortlistIdsTomorrow) {
+			addTaskToShortListById(id);
+		}
+		shortlistIdsTomorrow = new ArrayList<>();
 	}
 
 	public List<Task> getAllTaskInstancesAsTasks() {
@@ -388,6 +402,15 @@ public class TaskCtrl extends TaskCtrlBase {
 		}
 	}
 
+	public void addTaskToShortListTomorrowById(String id) {
+		if (id == null) {
+			return;
+		}
+		if (!shortlistIdsTomorrow.contains(id)) {
+			shortlistIdsTomorrow.add(id);
+		}
+	}
+
 	public void removeTaskFromShortListById(String id) {
 		if (id == null) {
 			return;
@@ -406,6 +429,7 @@ public class TaskCtrl extends TaskCtrlBase {
 	public void saveIntoRecord(Record root) {
 		super.saveIntoRecord(root);
 		root.set(TASK_SHORTLIST, shortlistIds);
+		root.set(TASK_SHORTLIST_TOMORROW, shortlistIdsTomorrow);
 	}
 
 }
