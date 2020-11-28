@@ -224,7 +224,7 @@ public class Task extends GenericTask {
 			html += "</span>";
 		}
 		// by default, main Width is 60%
-		int mainWidth = 60;
+		float mainWidth = 60;
 		html += "<span style='width: %[WIDTH];'";
 		int prio = getCurrentPriority(dateForWhichHtmlGetsDisplayed);
 		if (prio < 100000) {
@@ -232,8 +232,9 @@ public class Task extends GenericTask {
 		} else if (prio < 360000) {
 			html += " class='warning'";
 		}
-		html += ">";
-		html += HTML.escapeHTMLstr(title);
+		String escTitle = HTML.escapeHTMLstr(title);
+		html += " title='" + escTitle + "'>";
+		html += escTitle;
 		html += "</span>";
 
 		boolean hasDetails = false;
@@ -261,6 +262,7 @@ public class Task extends GenericTask {
 			html += "<span style='width: 8%;' class='button'>";
 			html += "(from Mari)";
 			html += "</span>";
+			mainWidth += 18.5;
 
 		// if this is not an actual instance, but just a ghost of a scheduled task, then of course it cannot
 		// be edited in any way shape or form, so no point in showing any of the regular buttons :)
