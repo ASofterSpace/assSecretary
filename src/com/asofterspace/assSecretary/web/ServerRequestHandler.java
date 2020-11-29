@@ -35,6 +35,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 
 public class ServerRequestHandler extends WebServerRequestHandler {
@@ -90,6 +91,15 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 				case "/addSingleTask":
 
 					Task addedOrEditedTask = addOrEditSingleTask(json);
+					if (addedOrEditedTask == null) {
+						return;
+					}
+					answer = new WebServerAnswerInJson(new JSON("{\"success\": true}"));
+					break;
+
+				case "/addRepeatingTask":
+
+					addedOrEditedTask = addOrEditRepeatingTask(json);
 					if (addedOrEditedTask == null) {
 						return;
 					}
@@ -260,20 +270,10 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 	}
 
 	@Override
-	protected WebServerAnswer answerGet(String location, String[] arguments) {
+	protected WebServerAnswer answerGet(String location, Map<String, String> arguments) {
 
 		if ("/task".equals(location)) {
-			String id = null;
-			for (String arg : arguments) {
-				if (!arg.contains("=")) {
-					continue;
-				}
-				String key = arg.substring(0, arg.indexOf("="));
-				String value = arg.substring(arg.indexOf("=") + 1);
-				if (key.equals("id")) {
-					id = value;
-				}
-			}
+			String id = arguments.get("id");
 			if (id != null) {
 				Task task = taskCtrl.getTaskById(id);
 				if (task != null) {
@@ -292,6 +292,63 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 					response.set("priorityEscalationAfterDays", task.getPriorityEscalationAfterDays());
 					response.set("duration", task.getDurationStr());
 					response.set("releasedBasedOnId", task.getReleasedBasedOnId());
+					return new WebServerAnswerInJson(response);
+				}
+			}
+		}
+
+		if ("/repeatingTask".equals(location)) {
+			String id = arguments.get("id");
+			if (id != null) {
+				Task task = taskCtrl.getTaskById(id);
+				if (task != null) {
+					JSON response = new JSON(Record.emptyObject());
+					String sep;
+					response.set("success", true);
+					response.set("title", task.getTitle());
+					response.set("details", StrUtils.join("\n", task.getDetails()));
+					response.set("origin", task.getOrigin());
+					response.set("priority", task.getPriority());
+					response.set("priorityEscalationAfterDays", task.getPriorityEscalationAfterDays());
+					response.set("duration", task.getDurationStr());
+					response.set("day", task.getScheduledOnDay());
+
+					String weekdaysStr = "";
+					sep = "";
+					List<String> schedWeekdays = task.getScheduledOnDaysOfWeek();
+					if (schedWeekdays != null) {
+						for (String schedWeekday : schedWeekdays) {
+							weekdaysStr += sep;
+							weekdaysStr += schedWeekday;
+							sep = ", ";
+						}
+					}
+					response.set("weekdays", weekdaysStr);
+
+					String monthsStr = "";
+					sep = "";
+					List<Integer> schedMonths = task.getScheduledInMonths();
+					if (schedMonths != null) {
+						for (Integer schedMonth : schedMonths) {
+							monthsStr += sep;
+							monthsStr += DateUtils.monthNumToName(schedMonth);
+							sep = ", ";
+						}
+					}
+					response.set("months", monthsStr);
+
+					String yearsStr = "";
+					sep = "";
+					List<Integer> schedYears = task.getScheduledInYears();
+					if (schedYears != null) {
+						for (Integer schedYear : schedYears) {
+							yearsStr += sep;
+							yearsStr += schedYear;
+							sep = ", ";
+						}
+					}
+					response.set("years", yearsStr);
+
 					return new WebServerAnswerInJson(response);
 				}
 			}
@@ -934,4 +991,87 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 		return result;
 	}
 
+	private Task addOrEditRepeatingTask(JSON json) throws IOException {
+
+		Task result = null;
+
+		String editingId = json.getString("editingId");
+
+		if (editingId == null) {
+			// add new task
+			Task newTask = new Task();
+			setRepeatingTaskValues(newTask, json);
+			taskCtrl.addNewRepeatingTask(newTask);
+			taskCtrl.save();
+			result = newTask;
+
+		} else {
+			// edit existing task
+			Task task = taskCtrl.getTaskById(editingId);
+			if (task != null) {
+				setRepeatingTaskValues(task, json);
+				taskCtrl.save();
+				result = task;
+			} else {
+				respond(404);
+				return null;
+			}
+		}
+
+		return result;
+	}
+
+	private void setRepeatingTaskValues(Task task, JSON json) {
+
+		task.setTitle(json.getString("title"));
+		task.setDetailsStr(json.getString("details"));
+		task.setOrigin(json.getString("origin"));
+		task.setPriority(json.getInteger("priority"));
+		task.setPriorityEscalationAfterDays(json.getInteger("priorityEscalationAfterDays"));
+		task.setDurationStr(json.getString("duration"));
+
+		task.setScheduledOnDay(json.getInteger("day"));
+
+		String[] weekdaysStrs = splitScheduleField(json.getString("weekdays"));
+		List<String> scheduledOnDaysOfWeek = new ArrayList<>();
+		for (String weekStr : weekdaysStrs) {
+			weekStr = GenericTask.toWeekDay(weekStr);
+			if (weekStr != null) {
+				scheduledOnDaysOfWeek.add(weekStr);
+			}
+		}
+		task.setScheduledOnDaysOfWeek(scheduledOnDaysOfWeek);
+
+		String[] monthsStrs = splitScheduleField(json.getString("months"));
+		List<Integer> scheduledInMonths = new ArrayList<>();
+		for (String monthStr : monthsStrs) {
+			Integer month = DateUtils.monthNameToNum(monthStr);
+			if (month != null) {
+				scheduledInMonths.add(month);
+			}
+		}
+		task.setScheduledInMonths(scheduledInMonths);
+
+		String[] yearsStrs = splitScheduleField(json.getString("years"));
+		List<Integer> scheduledInYears = new ArrayList<>();
+		for (String yearStr : yearsStrs) {
+			Integer year = StrUtils.strToInt(yearStr);
+			if (year != null) {
+				scheduledInYears.add(year);
+			}
+		}
+		task.setScheduledInYears(scheduledInYears);
+	}
+
+	private String[] splitScheduleField(String weekdaysStr) {
+		weekdaysStr = StrUtils.replaceAll(weekdaysStr, ",", " ");
+		weekdaysStr = StrUtils.replaceAll(weekdaysStr, ";", " ");
+		weekdaysStr = StrUtils.replaceAll(weekdaysStr, "|", " ");
+		weekdaysStr = StrUtils.replaceAll(weekdaysStr, "-", " ");
+		weekdaysStr = StrUtils.replaceAll(weekdaysStr, ".", " ");
+		weekdaysStr = StrUtils.replaceAll(weekdaysStr, "&", " ");
+		weekdaysStr = StrUtils.replaceAll(weekdaysStr, "  ", " ");
+		weekdaysStr = weekdaysStr.trim();
+		return weekdaysStr.split(" ");
+	}
 }

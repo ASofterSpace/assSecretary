@@ -41,6 +41,10 @@ public class Task extends GenericTask {
 	private String releasedBasedOnId;
 
 
+	public Task() {
+		super(null, null, null, null, null, null, null);
+	}
+
 	public Task(String title, Integer scheduledOnDay, List<String> scheduledOnDaysOfWeek,
 		List<Integer> scheduledInMonths, List<Integer> scheduledInYears, List<String> details,
 		List<String> onDone) {
@@ -256,7 +260,7 @@ public class Task extends GenericTask {
 
 		if (reducedView) {
 			html += "</div>";
-			html += "<div style='text-align: center;'>";
+			html += "<div style='text-align: center; white-space: nowrap;'>";
 		} else {
 			List<String> details = getDetails();
 			hasDetails = (details != null) && (details.size() > 0);
@@ -284,6 +288,13 @@ public class Task extends GenericTask {
 			html += "<span style='" + btnStyle + "' class='button' onclick='secretary.taskPreRelease(\"" + id + "\", " +
 				"\"" + DateUtils.serializeDate(dateForWhichHtmlGetsDisplayed) + "\")'>";
 			html += "Pre-Release";
+			html += "</span>";
+			html += "<span style='" + btnStyle + "' class='button' onclick='secretary.repeatingTaskEdit(\"" + id + "\")'>";
+			html += "Edit";
+			html += "</span>";
+			html += "<span style='" + btnStyle + "' class='button' onclick='secretary.taskDelete(\"" + id + "\", ";
+			html += "\"" + HTML.escapeHTMLstr(StrUtils.replaceAll(title, "\"", "")) + "\", null)'>";
+			html += "Delete";
 			html += "</span>";
 
 		} else {

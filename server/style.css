@@ -466,3 +466,19 @@ div.machine_inner {
 .wobbling_center_7 {
   animation: wobbling_center_7 90s linear infinite;
 }
+
+@keyframes wobbling_center_8 {
+  0% {
+	transform: rotate(-1deg);
+  }
+  50% {
+	transform: rotate(1deg);
+  }
+  100% {
+	transform: rotate(-1deg);
+  }
+}
+
+.wobbling_center_8 {
+  animation: wobbling_center_8 95s linear infinite;
+}

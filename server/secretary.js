@@ -1,9 +1,15 @@
 window.secretary = {
 
+	// id of the single task we are currently editing
 	currentlyEditing: null,
 
+	// id of the repeating task we are currently editing
+	currentlyEditingRepeating: null,
+
+	// id of the single or repeating task we are currently deleting
 	currentlyDeleting: null,
 
+	// id of the repeating parent task of the single task we are currently editing
 	currentlyRepeatingParent: null,
 
 
@@ -65,15 +71,27 @@ window.secretary = {
 	},
 
 	showAddRepeatingTaskModal: function() {
-		alert("Sorry, this is not yet implemented!");
+		var modal = document.getElementById("addRepeatingTaskModal");
+		if (modal) {
+			modal.style.display = "block";
+			document.getElementById("repeatingTaskCurrentMode").innerHTML = "adding new entries";
+
+			this.currentlyEditingRepeating = null;
+
+			document.getElementById("modalBackground").style.display = "block";
+		}
 	},
 
 	editRepeatingParentTask: function() {
-		this.baseTaskEdit(this.currentlyRepeatingParent);
+		this.repeatingTaskEdit(this.currentlyRepeatingParent);
 	},
 
 	submitAndCloseSingleTaskModal: function() {
 		this.submitSingleTaskModal(true);
+	},
+
+	submitAndCloseRepeatingTaskModal: function() {
+		this.submitRepeatingTaskModal(true);
 	},
 
 	submitSingleTaskModal: function(closeOnSubmit) {
@@ -123,6 +141,53 @@ window.secretary = {
 		};
 	},
 
+	submitRepeatingTaskModal: function(closeOnSubmit) {
+
+		var request = new XMLHttpRequest();
+		request.open("POST", "addRepeatingTask", true);
+		request.setRequestHeader("Content-Type", "application/json");
+
+		request.onreadystatechange = function() {
+			if (request.readyState == 4 && request.status == 200) {
+				var result = JSON.parse(request.response);
+				// show some sort of confirmation
+				if (result.success) {
+					var repeatingTaskSavedLabel = document.getElementById("repeatingTaskSavedLabel");
+					if (repeatingTaskSavedLabel) {
+						repeatingTaskSavedLabel.style.display = "block";
+						window.setTimeout(function () {
+							repeatingTaskSavedLabel.style.display = "none";
+						}, 3000);
+					}
+					if (closeOnSubmit) {
+						window.secretary.closeRepeatingTaskModal();
+					}
+				}
+			}
+		}
+
+		var data = this.gatherDataForRepeatingTaskSubmit();
+
+		request.send(JSON.stringify(data));
+	},
+
+	gatherDataForRepeatingTaskSubmit: function() {
+
+		return {
+			editingId: window.secretary.currentlyEditingRepeating,
+			title: document.getElementById("repeatingTaskTitle").value,
+			details: document.getElementById("repeatingTaskDetails").value,
+			origin: document.getElementById("repeatingTaskOrigin").value,
+			priority: document.getElementById("repeatingTaskPriority").value,
+			priorityEscalationAfterDays: document.getElementById("repeatingTaskPriorityEscalationAfterDays").value,
+			duration: document.getElementById("repeatingTaskDuration").value,
+			day: document.getElementById("repeatingTaskScheduleDay").value,
+			weekdays: document.getElementById("repeatingTaskScheduleWeekdays").value,
+			months: document.getElementById("repeatingTaskScheduleMonths").value,
+			years: document.getElementById("repeatingTaskScheduleYears").value,
+		};
+	},
+
 	doneSingleTaskModal: function(copyAfterwards) {
 
 		var request = new XMLHttpRequest();
@@ -163,6 +228,16 @@ window.secretary = {
 
 	closeSingleTaskModal: function() {
 		var modal = document.getElementById("addSingleTaskModal");
+		if (modal) {
+			modal.style.display = "none";
+		}
+
+		// reload, as data might have changed while the modal was open...
+		window.location.reload(false);
+	},
+
+	closeRepeatingTaskModal: function() {
+		var modal = document.getElementById("addRepeatingTaskModal");
 		if (modal) {
 			modal.style.display = "none";
 		}
@@ -235,10 +310,26 @@ window.secretary = {
 		document.getElementById("singleTaskDoneDate").value = "";
 		document.getElementById("singleTaskOrigin").value = "private";
 		document.getElementById("singleTaskPriority").value = 500000;
-		window.secretary.singleTaskPriorityChange();
+		window.secretary.taskPriorityChange("single");
 		document.getElementById("singleTaskPriorityEscalationAfterDays").value = "never";
 		document.getElementById("singleTaskDuration").value = "00:00";
 		document.getElementById("singleTaskReleaseUntil").value = "";
+	},
+
+	resetRepeatingTaskModal: function() {
+
+		document.getElementById("repeatingTaskTitle").value = "";
+		document.getElementById("repeatingTaskDetails").value = "";
+		document.getElementById("repeatingTaskOrigin").value = "private";
+		document.getElementById("repeatingTaskPriority").value = 500000;
+		window.secretary.taskPriorityChange("repeating");
+		document.getElementById("repeatingTaskPriorityEscalationAfterDays").value = "never";
+		document.getElementById("repeatingTaskDuration").value = "00:00";
+
+		document.getElementById("repeatingTaskScheduleDay").value = "";
+		document.getElementById("repeatingTaskScheduleWeekdays").value = "";
+		document.getElementById("repeatingTaskScheduleMonths").value = "";
+		document.getElementById("repeatingTaskScheduleYears").value = "";
 	},
 
 	taskEdit: function(id) {
@@ -264,7 +355,7 @@ window.secretary = {
 						document.getElementById("singleTaskDoneDate").value = result.doneDate;
 						document.getElementById("singleTaskOrigin").value = result.origin;
 						document.getElementById("singleTaskPriority").value = result.priority;
-						window.secretary.singleTaskPriorityChange();
+						window.secretary.taskPriorityChange("single");
 						if (result.priorityEscalationAfterDays == null) {
 							document.getElementById("singleTaskPriorityEscalationAfterDays").value = "never";
 						} else {
@@ -289,8 +380,45 @@ window.secretary = {
 		request.send();
 	},
 
-	baseTaskEdit: function(id) {
-		alert("Sorry, not yet implemented!");
+	repeatingTaskEdit: function(id) {
+		var request = new XMLHttpRequest();
+		request.open("GET", "repeatingTask?id=" + id, true);
+		request.setRequestHeader("Content-Type", "application/json");
+
+		request.onreadystatechange = function() {
+			if (request.readyState == 4 && request.status == 200) {
+				var result = JSON.parse(request.response);
+				if (result.success) {
+					var modal = document.getElementById("addRepeatingTaskModal");
+					if (modal) {
+						modal.style.display = "block";
+						document.getElementById("repeatingTaskCurrentMode").innerHTML = "editing one entry";
+
+						document.getElementById("modalBackground").style.display = "block";
+
+						document.getElementById("repeatingTaskTitle").value = result.title;
+						document.getElementById("repeatingTaskDetails").value = result.details;
+						document.getElementById("repeatingTaskOrigin").value = result.origin;
+						document.getElementById("repeatingTaskPriority").value = result.priority;
+						window.secretary.taskPriorityChange("repeating");
+						if (result.priorityEscalationAfterDays == null) {
+							document.getElementById("repeatingTaskPriorityEscalationAfterDays").value = "never";
+						} else {
+							document.getElementById("repeatingTaskPriorityEscalationAfterDays").value = result.priorityEscalationAfterDays;
+						}
+						document.getElementById("repeatingTaskDuration").value = result.duration;
+						document.getElementById("repeatingTaskScheduleDay").value = result.day;
+						document.getElementById("repeatingTaskScheduleWeekdays").value = result.weekdays;
+						document.getElementById("repeatingTaskScheduleMonths").value = result.months;
+						document.getElementById("repeatingTaskScheduleYears").value = result.years;
+
+						window.secretary.currentlyEditingRepeating = id;
+					}
+				}
+			}
+		}
+
+		request.send();
 	},
 
 	taskPreRelease: function(id, preReleaseForDate) {
@@ -323,9 +451,16 @@ window.secretary = {
 
 			this.currentlyDeleting = id;
 
-			document.getElementById("deleteTaskModalContent").innerHTML = "Do you really want to delete this task?" +
+			var html = "Do you really want to delete this single task instance?" +
 				"<br><br>Title: " + title +
 				"<br>Release date: " + releaseDate;
+
+			if (releaseDate == null) {
+				html = "Do you really want to delete this repeating task?" +
+					"<br><br>Title: " + title;
+			}
+
+			document.getElementById("deleteTaskModalContent").innerHTML = html;
 
 			document.getElementById("modalBackground").style.display = "block";
 		}
@@ -490,18 +625,18 @@ window.secretary = {
 		this.filterTasks();
 	},
 
-	singleTaskPriorityChange: function() {
-		var prio = document.getElementById("singleTaskPriority").value;
+	taskPriorityChange: function(which) {
+		var prio = document.getElementById(which + "TaskPriority").value;
 
 		if (prio < 100000) {
-			document.getElementById("singleTaskPriorityMaxLabel").className = "error";
-			document.getElementById("singleTaskPriorityNoneLabel").className = "error";
+			document.getElementById(which + "TaskPriorityMaxLabel").className = "error";
+			document.getElementById(which + "TaskPriorityNoneLabel").className = "error";
 		} else if (prio < 360000) {
-			document.getElementById("singleTaskPriorityMaxLabel").className = "warning";
-			document.getElementById("singleTaskPriorityNoneLabel").className = "warning";
+			document.getElementById(which + "TaskPriorityMaxLabel").className = "warning";
+			document.getElementById(which + "TaskPriorityNoneLabel").className = "warning";
 		} else {
-			document.getElementById("singleTaskPriorityMaxLabel").className = "";
-			document.getElementById("singleTaskPriorityNoneLabel").className = "";
+			document.getElementById(which + "TaskPriorityMaxLabel").className = "";
+			document.getElementById(which + "TaskPriorityNoneLabel").className = "";
 		}
 	},
 
