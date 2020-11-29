@@ -409,6 +409,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 				String tabsHtml = "<div id='tabList'>";
 				tabsHtml += "<a href='/inbox.htm'>Inbox</a>";
+				tabsHtml += "<a href='/repeating.htm'>Repeating Tasks</a>";
 				tabsHtml += "<a href='/tasklog.htm'>Task Log</a>";
 				tabsHtml += "<a href='/weekly.htm'>Weekly Plan</a>";
 				tabsHtml += "</div>";
@@ -603,6 +604,37 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 			}
 
 
+			// answering a request for the repeating tasks tab
+			if (locEquiv.equals("repeating.htm")) {
+
+				System.out.println("Answering repeating tasks request...");
+
+				TextFile indexBaseFile = new TextFile(webRoot, locEquiv);
+				String indexContent = indexBaseFile.getContent();
+
+				List<Task> tasks = getHugoAndMariTasks();
+
+				String taskHtml = "";
+				boolean historicalView = true;
+				boolean reducedView = false;
+				boolean onShortlist = false;
+				Date curDate = DateUtils.now();
+				if (tasks.size() > 0) {
+					for (Task task : tasks) {
+						taskHtml += task.toHtmlStr(historicalView, reducedView, onShortlist, curDate);
+					}
+				}
+
+				indexContent = StrUtils.replaceAll(indexContent, "[[TASKS]]", taskHtml);
+
+				indexContent = StrUtils.replaceAll(indexContent, "[[PROJECTS]]", AssSecretary.getProjHtmlStr());
+
+				locEquiv = "_" + locEquiv;
+				TextFile indexFile = new TextFile(webRoot, locEquiv);
+				indexFile.saveContent(indexContent);
+			}
+
+
 			// answering a request for the task log tab
 			if (locEquiv.equals("tasklog.htm")) {
 
@@ -722,25 +754,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 					System.out.println("Mari responded with nonsense for a task instances request!");
 				}
 
-				List<GenericTask> baseTasksForSchedule = taskCtrl.getTasks();
-
-				try {
-					// get scheduled tasks from Mari
-					JSON mariTasks = new JSON(WebAccessor.get("http://localhost:3011/tasks"));
-
-					// copy the task list we are currently looking at
-					baseTasksForSchedule = new ArrayList<>(baseTasksForSchedule);
-
-					// generate tasks locally based on the data we got from Mari
-					List<Record> mariRecs = mariTasks.getValues();
-					for (Record mariRec : mariRecs) {
-						Task localTask = taskCtrl.taskFromMariRecord(mariRec);
-						baseTasksForSchedule.add(localTask);
-					}
-
-				} catch (JsonParseException e) {
-					System.out.println("Mari responded with nonsense for a tasks request!");
-				}
+				List<Task> baseTasksForSchedule = getHugoAndMariTasks();
 
 				for (Date day : weekDays) {
 					boolean isToday = DateUtils.isSameDay(actualToday, day);
@@ -766,11 +780,9 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 					// for days in the future, also add ghost tasks (non-instances) - but no in the past,
 					// as there we would expect real instances to have been created instead!
 					if (day.after(actualToday)) {
-						for (GenericTask task : baseTasksForSchedule) {
-							if (task instanceof Task) {
-								if (task.isScheduledOn(day)) {
-									tasksToday.add((Task) task);
-								}
+						for (Task task : baseTasksForSchedule) {
+							if (task.isScheduledOn(day)) {
+								tasksToday.add(task);
 							}
 						}
 					}
@@ -1074,4 +1086,36 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 		weekdaysStr = weekdaysStr.trim();
 		return weekdaysStr.split(" ");
 	}
+
+	public List<Task> getHugoAndMariTasks() {
+
+		List<GenericTask> baseTasksForSchedule = taskCtrl.getTasks();
+
+		try {
+			// get scheduled tasks from Mari
+			JSON mariTasks = new JSON(WebAccessor.get("http://localhost:3011/tasks"));
+
+			// copy the task list we are currently looking at
+			baseTasksForSchedule = new ArrayList<>(baseTasksForSchedule);
+
+			// generate tasks locally based on the data we got from Mari
+			List<Record> mariRecs = mariTasks.getValues();
+			for (Record mariRec : mariRecs) {
+				Task localTask = taskCtrl.taskFromMariRecord(mariRec);
+				baseTasksForSchedule.add(localTask);
+			}
+
+		} catch (JsonParseException e) {
+			System.out.println("Mari responded with nonsense for a tasks request!");
+		}
+
+		List<Task> result = new ArrayList<>();
+		for (GenericTask task : baseTasksForSchedule) {
+			if (task instanceof Task) {
+				result.add((Task) task);
+			}
+		}
+		return result;
+	}
+
 }

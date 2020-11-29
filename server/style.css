@@ -341,13 +341,16 @@ div.machine_inner {
 
 @keyframes wobbling_center_0 {
   0% {
+	transform: rotate(0deg);
+  }
+  25% {
 	transform: rotate(-1deg);
   }
-  50% {
+  75% {
 	transform: rotate(1deg);
   }
   100% {
-	transform: rotate(-1deg);
+	transform: rotate(0deg);
   }
 }
 
@@ -357,13 +360,16 @@ div.machine_inner {
 
 @keyframes wobbling_center_1 {
   0% {
+	transform: rotate(0deg);
+  }
+  25% {
 	transform: rotate(-3deg);
   }
-  50% {
+  75% {
 	transform: rotate(3deg);
   }
   100% {
-	transform: rotate(-3deg);
+	transform: rotate(0deg);
   }
 }
 
@@ -373,13 +379,16 @@ div.machine_inner {
 
 @keyframes wobbling_center_2 {
   0% {
+	transform: rotate(0deg);
+  }
+  25% {
 	transform: rotate(3deg);
   }
-  50% {
+  75% {
 	transform: rotate(-3deg);
   }
   100% {
-	transform: rotate(3deg);
+	transform: rotate(0deg);
   }
 }
 
@@ -389,13 +398,16 @@ div.machine_inner {
 
 @keyframes wobbling_center_3 {
   0% {
+	transform: rotate(0deg);
+  }
+  25% {
 	transform: rotate(1deg);
   }
-  50% {
+  75% {
 	transform: rotate(-1deg);
   }
   100% {
-	transform: rotate(1deg);
+	transform: rotate(0deg);
   }
 }
 
@@ -405,13 +417,16 @@ div.machine_inner {
 
 @keyframes wobbling_center_4 {
   0% {
+	transform: rotate(0deg);
+  }
+  25% {
 	transform: rotate(1deg);
   }
-  50% {
+  75% {
 	transform: rotate(-1deg);
   }
   100% {
-	transform: rotate(1deg);
+	transform: rotate(0deg);
   }
 }
 
@@ -421,13 +436,16 @@ div.machine_inner {
 
 @keyframes wobbling_center_5 {
   0% {
+	transform: rotate(0deg);
+  }
+  25% {
 	transform: rotate(-1deg);
   }
-  50% {
+  75% {
 	transform: rotate(1deg);
   }
   100% {
-	transform: rotate(-1deg);
+	transform: rotate(0deg);
   }
 }
 
@@ -437,13 +455,16 @@ div.machine_inner {
 
 @keyframes wobbling_center_6 {
   0% {
+	transform: rotate(0deg);
+  }
+  25% {
 	transform: rotate(-1deg);
   }
-  50% {
+  75% {
 	transform: rotate(1deg);
   }
   100% {
-	transform: rotate(-1deg);
+	transform: rotate(0deg);
   }
 }
 
@@ -453,13 +474,16 @@ div.machine_inner {
 
 @keyframes wobbling_center_7 {
   0% {
-	transform: rotate(-1deg);
+	transform: rotate(0deg);
   }
-  50% {
+  25% {
 	transform: rotate(1deg);
   }
-  100% {
+  75% {
 	transform: rotate(-1deg);
+  }
+  100% {
+	transform: rotate(0deg);
   }
 }
 
@@ -469,13 +493,16 @@ div.machine_inner {
 
 @keyframes wobbling_center_8 {
   0% {
-	transform: rotate(-1deg);
+	transform: rotate(0deg);
   }
-  50% {
+  25% {
 	transform: rotate(1deg);
   }
-  100% {
+  75% {
 	transform: rotate(-1deg);
+  }
+  100% {
+	transform: rotate(0deg);
   }
 }
 

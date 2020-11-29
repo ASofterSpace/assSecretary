@@ -216,6 +216,9 @@ public class Task extends GenericTask {
 
 		String html = "";
 
+		// by default, main Width is 60%
+		float mainWidth = 60;
+
 		String futureTaskStr = "";
 		if (releasedInTheFuture()) {
 			futureTaskStr = " future-task";
@@ -231,16 +234,22 @@ public class Task extends GenericTask {
 			html += "<div>";
 		}
 		if (!reducedView) {
-			html += "<span style='width: 8%;'>";
-			if (historicalView) {
-				html += DateUtils.serializeDate(getDoneDate());
+			if (isInstance()) {
+				html += "<span style='width: 8%;'>";
+				if (historicalView) {
+					html += DateUtils.serializeDate(getDoneDate());
+				} else {
+					html += getReleasedDateStr();
+				}
+				html += "</span>";
 			} else {
-				html += getReleasedDateStr();
+				// for a repeating base task, do not show any date, as there is no date to be shown!
+				html += "<span style='width: 0.5%;'>";
+				html += "&nbsp;";
+				html += "</span>";
+				mainWidth -= 7.5;
 			}
-			html += "</span>";
 		}
-		// by default, main Width is 60%
-		float mainWidth = 60;
 		html += "<span style='width: %[WIDTH];'";
 		int prio = getCurrentPriority(dateForWhichHtmlGetsDisplayed);
 		if (prio < 100000) {
@@ -285,7 +294,15 @@ public class Task extends GenericTask {
 		} else if (!isInstance()) {
 			// on the other hand, a non-instance CAN be prematurely released to achieve an instance which CAN be edited!
 
-			html += "<span style='" + btnStyle + "' class='button' onclick='secretary.taskPreRelease(\"" + id + "\", " +
+			html += "<span style='";
+			if (!reducedView) {
+				html += btnStyle;
+				mainWidth += 7;
+			} else {
+				html += "width: 7.5%; " + miniBtnStyle;
+				mainWidth += 5;
+			}
+			html += "' class='button' onclick='secretary.taskPreRelease(\"" + id + "\", " +
 				"\"" + DateUtils.serializeDate(dateForWhichHtmlGetsDisplayed) + "\")'>";
 			html += "Pre-Release";
 			html += "</span>";
