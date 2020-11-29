@@ -243,11 +243,10 @@ public class Task extends GenericTask {
 				}
 				html += "</span>";
 			} else {
-				// for a repeating base task, do not show any date, as there is no date to be shown!
-				html += "<span style='width: 0.5%;'>";
-				html += "&nbsp;";
+				String schedDateStr = getScheduleDateStr();
+				html += "<span style='width: 8%;' title='" + schedDateStr + "'>";
+				html += schedDateStr;
 				html += "</span>";
-				mainWidth -= 7.5;
 			}
 		}
 		html += "<span style='width: %[WIDTH];'";
@@ -295,7 +294,7 @@ public class Task extends GenericTask {
 			// on the other hand, a non-instance CAN be prematurely released to achieve an instance which CAN be edited!
 
 			html += "<span style='";
-			if (!reducedView) {
+			if (reducedView) {
 				html += btnStyle;
 				mainWidth += 7;
 			} else {
