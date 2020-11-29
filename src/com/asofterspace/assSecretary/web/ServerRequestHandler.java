@@ -614,6 +614,12 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 				List<Task> tasks = getHugoAndMariTasks();
 
+				Collections.sort(tasks, new Comparator<Task>() {
+					public int compare(Task a, Task b) {
+						return getScheduleSortValue(a) - getScheduleSortValue(b);
+					}
+				});
+
 				String taskHtml = "";
 				boolean historicalView = true;
 				boolean reducedView = false;
@@ -1115,6 +1121,50 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 				result.add((Task) task);
 			}
 		}
+		return result;
+	}
+
+	private int getScheduleSortValue(Task task) {
+
+		int result = 0;
+
+		List<String> daysOfWeek = task.getScheduledOnDaysOfWeek();
+		if (daysOfWeek != null) {
+			for (String day : daysOfWeek) {
+				day = GenericTask.toWeekDay(day);
+				if (day != null) {
+					for (int i = 0; i < DateUtils.DAY_NAMES.length; i++) {
+						if (day.equals(DateUtils.DAY_NAMES[i])) {
+							result += i;
+						}
+					}
+				}
+			}
+		}
+
+		Integer schedDay = task.getScheduledOnDay();
+		if (schedDay != null) {
+			result += schedDay * 100;
+		}
+
+		List<Integer> schedMonths = task.getScheduledInMonths();
+		if (schedMonths != null) {
+			for (Integer month : schedMonths) {
+				if (month != null) {
+					result += (month+1) * 10000;
+				}
+			}
+		}
+
+		List<Integer> schedYears = task.getScheduledInYears();
+		if (schedYears != null) {
+			for (Integer year : schedYears) {
+				if (year != null) {
+					result += year * 1000000;
+				}
+			}
+		}
+
 		return result;
 	}
 
