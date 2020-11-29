@@ -37,6 +37,9 @@ public class Task extends GenericTask {
 	// it by calling getId(), if none is assigned, one will be given and kept forever
 	private String id;
 
+	// if this task was released based on an id
+	private String releasedBasedOnId;
+
 
 	public Task(String title, Integer scheduledOnDay, List<String> scheduledOnDaysOfWeek,
 		List<Integer> scheduledInMonths, List<Integer> scheduledInYears, List<String> details,
@@ -57,6 +60,7 @@ public class Task extends GenericTask {
 			this.priority = otherTask.priority;
 			this.priorityEscalationAfterDays = otherTask.priorityEscalationAfterDays;
 			this.duration = otherTask.duration;
+			this.releasedBasedOnId = otherTask.releasedBasedOnId;
 
 			// never copy another entry's id, but instead, generate a new one!
 			this.id = null;
@@ -192,6 +196,14 @@ public class Task extends GenericTask {
 			id = "" + UUID.randomUUID();
 		}
 		return id;
+	}
+
+	public String getReleasedBasedOnId() {
+		return releasedBasedOnId;
+	}
+
+	public void setReleasedBasedOnId(String releasedBasedOnId) {
+		this.releasedBasedOnId = releasedBasedOnId;
 	}
 
 	public String toHtmlStr(boolean historicalView, boolean reducedView, boolean onShortlist, Date dateForWhichHtmlGetsDisplayed) {

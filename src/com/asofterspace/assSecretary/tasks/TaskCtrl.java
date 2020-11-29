@@ -38,6 +38,10 @@ public class TaskCtrl extends TaskCtrlBase {
 	// an optional UUID (well, everything is optional, but this is explicitly also optional)
 	private final static String ID = "id";
 
+	// an optional UUID pointing to the scheduled base task from which this instance was released
+	// (null for ad-hoc tasks that we released directly without being scheduled)
+	private final static String RELEASED_BASED_ON_ID = "releasedBasedOnId";
+
 	// a list of ids of tasks that are on the shortlist
 	private final static String TASK_SHORTLIST = "taskShortlist";
 
@@ -102,6 +106,7 @@ public class TaskCtrl extends TaskCtrlBase {
 		result.setPriorityEscalationAfterDays(recordTask.getInteger(PRIORITY_ESCALATION_AFTER_DAYS));
 		result.setDuration(recordTask.getInteger(DURATION));
 		result.setId(recordTask.getString(ID));
+		result.setReleasedBasedOnId(recordTask.getString(RELEASED_BASED_ON_ID));
 
 		return result;
 	}
@@ -124,6 +129,7 @@ public class TaskCtrl extends TaskCtrlBase {
 			task.setPriorityEscalationAfterDays(null);
 			task.setDuration(null);
 			task.setId(null);
+			task.setReleasedBasedOnId(null);
 
 			return task;
 		}
@@ -143,8 +149,25 @@ public class TaskCtrl extends TaskCtrlBase {
 			if (ourTask.hasAnId()) {
 				taskRecord.set(ID, ourTask.getId());
 			}
+			taskRecord.setOrRemove(RELEASED_BASED_ON_ID, ourTask.getReleasedBasedOnId());
 		}
 		return taskRecord;
+	}
+
+	/**
+	 * Releases a task by copying it as an instance and returning the new task instance
+	 */
+	@Override
+	public GenericTask releaseTaskOn(GenericTask genericParentTask, Date day) {
+		GenericTask genericTaskInstance = super.releaseTaskOn(genericParentTask, day);
+		if (genericTaskInstance instanceof Task) {
+			Task taskInstance = (Task) genericTaskInstance;
+			if (genericParentTask instanceof Task) {
+				Task parentTask = (Task) genericParentTask;
+				taskInstance.setReleasedBasedOnId(parentTask.getId());
+			}
+		}
+		return genericTaskInstance;
 	}
 
 	@Override

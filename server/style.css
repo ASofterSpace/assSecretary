@@ -305,3 +305,164 @@ div.machine_inner {
 	height: 90pt;
 	padding: 10pt 0pt 0pt 0pt;
 }
+
+
+@keyframes wobbling_left {
+  0% {
+	transform: rotate(-14deg);
+  }
+  50% {
+	transform: rotate(-18deg);
+  }
+  100% {
+	transform: rotate(-14deg);
+  }
+}
+
+.wobbling_left {
+  animation: wobbling_left 9s linear infinite;
+}
+
+@keyframes wobbling_right {
+  0% {
+	transform: rotate(14deg);
+  }
+  50% {
+	transform: rotate(18deg);
+  }
+  100% {
+	transform: rotate(14deg);
+  }
+}
+
+.wobbling_right {
+  animation: wobbling_right 11s linear infinite;
+}
+
+@keyframes wobbling_center_0 {
+  0% {
+	transform: rotate(-1deg);
+  }
+  50% {
+	transform: rotate(1deg);
+  }
+  100% {
+	transform: rotate(-1deg);
+  }
+}
+
+.wobbling_center_0 {
+  animation: wobbling_center_0 120s linear infinite;
+}
+
+@keyframes wobbling_center_1 {
+  0% {
+	transform: rotate(-3deg);
+  }
+  50% {
+	transform: rotate(3deg);
+  }
+  100% {
+	transform: rotate(-3deg);
+  }
+}
+
+.wobbling_center_1 {
+  animation: wobbling_center_1 65s linear infinite;
+}
+
+@keyframes wobbling_center_2 {
+  0% {
+	transform: rotate(3deg);
+  }
+  50% {
+	transform: rotate(-3deg);
+  }
+  100% {
+	transform: rotate(3deg);
+  }
+}
+
+.wobbling_center_2 {
+  animation: wobbling_center_2 60s linear infinite;
+}
+
+@keyframes wobbling_center_3 {
+  0% {
+	transform: rotate(1deg);
+  }
+  50% {
+	transform: rotate(-1deg);
+  }
+  100% {
+	transform: rotate(1deg);
+  }
+}
+
+.wobbling_center_3 {
+  animation: wobbling_center_3 70s linear infinite;
+}
+
+@keyframes wobbling_center_4 {
+  0% {
+	transform: rotate(1deg);
+  }
+  50% {
+	transform: rotate(-1deg);
+  }
+  100% {
+	transform: rotate(1deg);
+  }
+}
+
+.wobbling_center_4 {
+  animation: wobbling_center_4 75s linear infinite;
+}
+
+@keyframes wobbling_center_5 {
+  0% {
+	transform: rotate(-1deg);
+  }
+  50% {
+	transform: rotate(1deg);
+  }
+  100% {
+	transform: rotate(-1deg);
+  }
+}
+
+.wobbling_center_5 {
+  animation: wobbling_center_5 80s linear infinite;
+}
+
+@keyframes wobbling_center_6 {
+  0% {
+	transform: rotate(-1deg);
+  }
+  50% {
+	transform: rotate(1deg);
+  }
+  100% {
+	transform: rotate(-1deg);
+  }
+}
+
+.wobbling_center_6 {
+  animation: wobbling_center_6 85s linear infinite;
+}
+
+@keyframes wobbling_center_7 {
+  0% {
+	transform: rotate(-1deg);
+  }
+  50% {
+	transform: rotate(1deg);
+  }
+  100% {
+	transform: rotate(-1deg);
+  }
+}
+
+.wobbling_center_7 {
+  animation: wobbling_center_7 90s linear infinite;
+}

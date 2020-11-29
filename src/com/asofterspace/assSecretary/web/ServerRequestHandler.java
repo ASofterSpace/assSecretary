@@ -291,6 +291,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 					response.set("priority", task.getPriority());
 					response.set("priorityEscalationAfterDays", task.getPriorityEscalationAfterDays());
 					response.set("duration", task.getDurationStr());
+					response.set("releasedBasedOnId", task.getReleasedBasedOnId());
 					return new WebServerAnswerInJson(response);
 				}
 			}

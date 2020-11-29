@@ -4,6 +4,8 @@ window.secretary = {
 
 	currentlyDeleting: null,
 
+	currentlyRepeatingParent: null,
+
 
 	onResize: function() {
 
@@ -57,11 +59,17 @@ window.secretary = {
 			document.getElementById("modalBackground").style.display = "block";
 
 			document.getElementById("singleTaskReleaseUntil").value = "";
+
+			document.getElementById("singleTaskBasedOnRepeating").style.display="none";
 		}
 	},
 
 	showAddRepeatingTaskModal: function() {
 		alert("Sorry, this is not yet implemented!");
+	},
+
+	editRepeatingParentTask: function() {
+		this.baseTaskEdit(this.currentlyRepeatingParent);
 	},
 
 	submitAndCloseSingleTaskModal: function() {
@@ -265,6 +273,13 @@ window.secretary = {
 						document.getElementById("singleTaskDuration").value = result.duration;
 						document.getElementById("singleTaskReleaseUntil").value = "";
 
+						if (result.releasedBasedOnId) {
+							window.secretary.currentlyRepeatingParent = result.releasedBasedOnId;
+							document.getElementById("singleTaskBasedOnRepeating").style.display="block";
+						} else {
+							document.getElementById("singleTaskBasedOnRepeating").style.display="none";
+						}
+
 						window.secretary.currentlyEditing = id;
 					}
 				}
@@ -272,6 +287,10 @@ window.secretary = {
 		}
 
 		request.send();
+	},
+
+	baseTaskEdit: function(id) {
+		alert("Sorry, not yet implemented!");
 	},
 
 	taskPreRelease: function(id, preReleaseForDate) {

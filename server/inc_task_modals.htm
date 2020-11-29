@@ -3,8 +3,8 @@
 		</div>
 
 
-		<div class="modal" id="addSingleTaskModal" style="z-index: 1000; top: 80pt; background: linear-gradient(-5deg, rgb(60, 20, 50), rgb(40, 0, 80), rgba(40, 0, 80, 0), rgba(40, 0, 80, 0), rgb(60, 20, 50), rgb(60, 20, 50));">
-			<div id="singleTaskSavedLabel" class="modal" style="display: none;text-align: center;font-weight: bold;font-style: italic;color: #F00;padding-bottom: 10pt; top:-50pt;">
+		<div class="modal wobbling_center_0" id="addSingleTaskModal" style="z-index: 1000; top: 80pt; background: linear-gradient(-5deg, rgb(60, 20, 50), rgb(40, 0, 80), rgba(40, 0, 80, 0), rgba(40, 0, 80, 0), rgb(60, 20, 50), rgb(60, 20, 50));">
+			<div id="singleTaskSavedLabel" class="modal wobbling_center_4" style="display: none;text-align: center;font-weight: bold;font-style: italic;color: #F00;padding-bottom: 10pt; top:-50pt;">
 				Saved!
 			</div>
 			<div style="position: relative; padding-bottom: 270pt;">
@@ -12,15 +12,19 @@
 				<input id="singleTaskTitle" type="text" style="width: 90%;position: absolute;right: 20pt;top: 0;" />
 				<span class="button" onclick="secretary.closeSingleTaskModal()" style="position: absolute;right: 0;top: 0;">X</span>
 			</div>
-			<div class="column modal" style="position: absolute; left: -60pt; top: -40pt; padding: 8pt 4pt 10pt 4pt;width: 200pt;text-align: center;transform: rotate(-16deg);">
+			<div class="column modal wobbling_left" style="position: absolute; left: -60pt; top: -40pt; padding: 8pt 4pt 10pt 4pt;width: 200pt;text-align: center;">
 				<div>Current mode: <span id="singleTaskCurrentMode"></span></div>
 			</div>
-			<div class="modal" style="padding-bottom: 10pt; width: 84%; display: block;position: absolute;left: -60pt;top: 50pt;">
+			<div class="column modal wobbling_right" id="singleTaskBasedOnRepeating" style="position: absolute; left: unset; right: -60px; top: -40pt; padding: 8pt 4pt 10pt 4pt;width: 200pt;text-align: center; display:none;">
+				<div>Based on repeating task:</div>
+				<div class="buttonBar"><span class="button" onclick="secretary.editRepeatingParentTask()">Edit Parent</span></div>
+			</div>
+			<div class="modal wobbling_center_3" style="padding-bottom: 10pt; width: 84%; display: block;position: absolute;left: -60pt;top: 50pt;">
 				<div>Details:</div>
 				<textarea id="singleTaskDetails" style="height: 200pt;" onfocus="window.singleTaskDetailsHasFocus = true;"
 					onblur="window.singleTaskDetailsHasFocus = false;"></textarea>
 			</div>
-			<div class="modal" style="display: block; width: 15%; text-align: center;position: absolute;right: -40pt;top: 45pt; left: unset; transform: rotate(2deg);">
+			<div class="modal wobbling_center_1" style="display: block; width: 15%; text-align: center;position: absolute;right: -40pt;top: 45pt; left: unset;">
 				<div>Duration in HH:MM:</div>
 				<div style="padding-bottom: 10pt;">
 					<input id="singleTaskDuration" type="text" value="0:00" style="width: 100%;" />
@@ -40,7 +44,7 @@
 			<div class="column" style="position: relative; margin-left: 50pt;">
 				<div>Schedule on:</div>
 				<input id="singleTaskReleaseDate" type="text" value="[[CURDATE]]" />
-				<div class="modal datepicker" style="position: absolute; left: -160pt; top: -8pt; display: block; width: 140pt; padding: 5pt;">
+				<div class="modal datepicker wobbling_center_2" style="position: absolute; left: -160pt; top: -8pt; display: block; width: 140pt; padding: 5pt;">
 					<table>
 						<tr>
 							<th></th>
@@ -56,11 +60,11 @@
 					</table>
 				</div>
 			</div>
-			<div class="column modal" style="position: absolute; left: 65pt; bottom: -40pt; top: unset; padding: 5pt 5pt 10pt 10pt;">
+			<div class="column modal wobbling_center_6" style="position: absolute; left: 65pt; bottom: -40pt; top: unset; padding: 5pt 5pt 10pt 10pt;">
 				<div>Copy until:</div>
 				<input id="singleTaskReleaseUntil" type="text" value="" />
 			</div>
-			<div class="column modal" style="position: absolute; left: 60pt; bottom: -80pt; top: unset; padding: 5pt 5pt 10pt 10pt;">
+			<div class="column modal wobbling_center_7" style="position: absolute; left: 60pt; bottom: -80pt; top: unset; padding: 5pt 5pt 10pt 10pt;">
 				<div>Done date:</div>
 				<input id="singleTaskDoneDate" type="text" value="" />
 			</div>
@@ -85,7 +89,7 @@
 					<input id="singleTaskPriorityEscalationAfterDays" type="text" value="never" />
 				</div>
 			</div>
-			<div class="buttonBar modal" style="position: absolute;left: 250pt;right: 80pt;display: block;top: unset;bottom: -55pt;">
+			<div class="buttonBar modal wobbling_center_5" style="position: absolute;left: 250pt;right: 80pt;display: block;top: unset;bottom: -55pt;">
 				<span class="button bigger" onclick="secretary.submitSingleTaskModal(false)">Save</span>
 				<span class="button bigger" onclick="secretary.submitAndCloseSingleTaskModal()">Save &amp; Exit</span>
 				<span class="button bigger" onclick="secretary.doneSingleTaskModal(false)">Done</span>
