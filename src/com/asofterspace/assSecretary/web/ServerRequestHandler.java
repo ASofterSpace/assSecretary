@@ -448,75 +448,78 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 				String mariHtml = "";
 
-				String problems = WebAccessor.get("http://localhost:3011/unacknowledged-problems");
+				if (db.connectToMari()) {
 
-				MariDatabase mariDatabase = new MariDatabase(MARI_DATABASE_FILE);
+					String problems = WebAccessor.get("http://localhost:3011/unacknowledged-problems");
 
-				if ((problems == null) || "".equals(problems) || !mariDatabase.isAvailable()) {
+					MariDatabase mariDatabase = new MariDatabase(MARI_DATABASE_FILE);
 
-					mariHtml += "<div>";
-					mariHtml += "<div><span class='warning'>I haven't heard anything from Mari recently,</span> I wonder how she is doing...</div>";
+					if ((problems == null) || "".equals(problems) || !mariDatabase.isAvailable()) {
 
-					if ((problems == null) || "".equals(problems)) {
-						mariHtml += "<div>(She did not react to me sending a web request to her.)</div>";
-					}
-
-					if (!mariDatabase.isAvailable()) {
-						mariHtml += "<div>(She did not let me access her database.)</div>";
-					}
-					mariHtml += "</div>";
-
-				} else {
-
-					boolean talkedToMari = false;
-
-					MariTaskCtrl mariTaskCtrl = new MariTaskCtrl(mariDatabase);
-
-					List<GenericTask> tasks = mariTaskCtrl.getCurrentTaskInstances();
-					/*
-					int upcomingDays = 5;
-					List<GenericTask> upcomingTasks = mariTaskCtrl.getUpcomingTaskInstances(upcomingDays);
-					*/
-
-					if (!"no problems".equals(problems)) {
 						mariHtml += "<div>";
-						mariHtml += "<div>I talked to Mari and she mentioned these problems:</div>";
-						mariHtml += problems;
-						mariHtml += "</div>";
-						talkedToMari = true;
-					}
+						mariHtml += "<div><span class='warning'>I haven't heard anything from Mari recently,</span> I wonder how she is doing...</div>";
 
-					if (tasks.size() > 0) {
-						mariHtml += "<div>";
-						if (!talkedToMari) {
-							mariHtml += "<div>I talked to Mari, and she ";
-						} else {
-							mariHtml += "<div>She also ";
+						if ((problems == null) || "".equals(problems)) {
+							mariHtml += "<div>(She did not react to me sending a web request to her.)</div>";
 						}
-						mariHtml += "mentioned that these things should be done today:</div>";
-						for (GenericTask task : tasks) {
-							mariHtml += "<div class='line'><span class='warning'>" + task.getReleasedDateStr() + " " + task.getTitle() + "</span></div>";
+
+						if (!mariDatabase.isAvailable()) {
+							mariHtml += "<div>(She did not let me access her database.)</div>";
 						}
 						mariHtml += "</div>";
-						talkedToMari = true;
-					}
 
-					/*
-					if (upcomingTasks.size() > 0) {
-						mariHtml += "<div>";
-						if (!talkedToMari) {
-							mariHtml += "<div>I talked to Mari, and she ";
-						} else {
-							mariHtml += "<div>She also ";
+					} else {
+
+						boolean talkedToMari = false;
+
+						MariTaskCtrl mariTaskCtrl = new MariTaskCtrl(mariDatabase);
+
+						List<GenericTask> tasks = mariTaskCtrl.getCurrentTaskInstances();
+						/*
+						int upcomingDays = 5;
+						List<GenericTask> upcomingTasks = mariTaskCtrl.getUpcomingTaskInstances(upcomingDays);
+						*/
+
+						if (!"no problems".equals(problems)) {
+							mariHtml += "<div>";
+							mariHtml += "<div>I talked to Mari and she mentioned these problems:</div>";
+							mariHtml += problems;
+							mariHtml += "</div>";
+							talkedToMari = true;
 						}
-						mariHtml += "mentioned these things coming up in the next " + upcomingDays + " days:</div>";
-						for (GenericTask task : upcomingTasks) {
-							mariHtml += "<div class='line'>" + task.getReleasedDateStr() + " " + task.getTitle() + "</div>";
+
+						if (tasks.size() > 0) {
+							mariHtml += "<div>";
+							if (!talkedToMari) {
+								mariHtml += "<div>I talked to Mari, and she ";
+							} else {
+								mariHtml += "<div>She also ";
+							}
+							mariHtml += "mentioned that these things should be done today:</div>";
+							for (GenericTask task : tasks) {
+								mariHtml += "<div class='line'><span class='warning'>" + task.getReleasedDateStr() + " " + task.getTitle() + "</span></div>";
+							}
+							mariHtml += "</div>";
+							talkedToMari = true;
 						}
-						mariHtml += "</div>";
-						talkedToMari = true;
+
+						/*
+						if (upcomingTasks.size() > 0) {
+							mariHtml += "<div>";
+							if (!talkedToMari) {
+								mariHtml += "<div>I talked to Mari, and she ";
+							} else {
+								mariHtml += "<div>She also ";
+							}
+							mariHtml += "mentioned these things coming up in the next " + upcomingDays + " days:</div>";
+							for (GenericTask task : upcomingTasks) {
+								mariHtml += "<div class='line'>" + task.getReleasedDateStr() + " " + task.getTitle() + "</div>";
+							}
+							mariHtml += "</div>";
+							talkedToMari = true;
+						}
+						*/
 					}
-					*/
 				}
 				indexContent = StrUtils.replaceAll(indexContent, "[[MARI]]", mariHtml);
 
@@ -651,25 +654,8 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 				List<Task> tasks = taskCtrl.getDoneTaskInstancesAsTasks();
 
-				try {
-					// get task instances from Mari
-					JSON mariTasks = new JSON(WebAccessor.get("http://localhost:3011/taskInstances"));
-
-					// copy the task list we are currently looking at
-					tasks = new ArrayList<>(tasks);
-
-					// generate tasks locally based on the data we got from Mari
-					List<Record> mariRecs = mariTasks.getValues();
-					for (Record mariRec : mariRecs) {
-						Task localTask = taskCtrl.taskFromMariRecord(mariRec);
-						if (localTask.hasBeenDone()) {
-							tasks.add(localTask);
-						}
-					}
-
-				} catch (JsonParseException e) {
-					System.out.println("Mari responded with nonsense for a task instances request!");
-				}
+				boolean onlyGetDone = true;
+				tasks = addTaskInstancesFromMariAndWorkbench(tasks, null, null, onlyGetDone);
 
 				Collections.sort(tasks, new Comparator<Task>() {
 					public int compare(Task a, Task b) {
@@ -741,24 +727,8 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 				List<Task> tasks = taskCtrl.getAllTaskInstancesAsTasks();
 
-				try {
-					// get task instances from Mari
-					JSON mariTasks = new JSON(WebAccessor.get("http://localhost:3011/taskInstances?from=" +
-						DateUtils.serializeDate(weekDays.get(0)) + "&to=" + DateUtils.serializeDate(weekDays.get(6))));
-
-					// copy the task list we are currently looking at
-					tasks = new ArrayList<>(tasks);
-
-					// generate tasks locally based on the data we got from Mari
-					List<Record> mariRecs = mariTasks.getValues();
-					for (Record mariRec : mariRecs) {
-						Task localTask = taskCtrl.taskFromMariRecord(mariRec);
-						tasks.add(localTask);
-					}
-
-				} catch (JsonParseException e) {
-					System.out.println("Mari responded with nonsense for a task instances request!");
-				}
+				boolean onlyGetDone = false;
+				tasks = addTaskInstancesFromMariAndWorkbench(tasks, weekDays.get(0), weekDays.get(6), onlyGetDone);
 
 				List<Task> baseTasksForSchedule = getHugoAndMariTasks();
 
@@ -1097,22 +1067,24 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 		List<GenericTask> baseTasksForSchedule = taskCtrl.getTasks();
 
-		try {
-			// get scheduled tasks from Mari
-			JSON mariTasks = new JSON(WebAccessor.get("http://localhost:3011/tasks"));
+		if (db.connectToMari()) {
+			try {
+				// get scheduled tasks from Mari
+				JSON mariTasks = new JSON(WebAccessor.get("http://localhost:3011/tasks"));
 
-			// copy the task list we are currently looking at
-			baseTasksForSchedule = new ArrayList<>(baseTasksForSchedule);
+				// copy the task list we are currently looking at
+				baseTasksForSchedule = new ArrayList<>(baseTasksForSchedule);
 
-			// generate tasks locally based on the data we got from Mari
-			List<Record> mariRecs = mariTasks.getValues();
-			for (Record mariRec : mariRecs) {
-				Task localTask = taskCtrl.taskFromMariRecord(mariRec);
-				baseTasksForSchedule.add(localTask);
+				// generate tasks locally based on the data we got from Mari
+				List<Record> mariRecs = mariTasks.getValues();
+				for (Record mariRec : mariRecs) {
+					Task localTask = taskCtrl.taskFromMariRecord(mariRec);
+					baseTasksForSchedule.add(localTask);
+				}
+
+			} catch (JsonParseException e) {
+				System.out.println("Mari responded with nonsense for a tasks request!");
 			}
-
-		} catch (JsonParseException e) {
-			System.out.println("Mari responded with nonsense for a tasks request!");
 		}
 
 		List<Task> result = new ArrayList<>();
@@ -1122,6 +1094,85 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 			}
 		}
 		return result;
+	}
+
+	private List<Task> addTaskInstancesFromMariAndWorkbench(List<Task> tasks, Date from, Date to, boolean onlyGetDone) {
+
+		String dateStr = "";
+
+		if (from != null) {
+			dateStr += "?from=" + DateUtils.serializeDate(from);
+		}
+		if (to != null) {
+			if ("".equals(dateStr)) {
+				dateStr += "?";
+			} else {
+				dateStr += "&";
+			}
+			dateStr += "to=" + DateUtils.serializeDate(to);
+		}
+
+		if (db.connectToMari()) {
+			try {
+				// get task instances from Mari
+				JSON mariTasks = new JSON(WebAccessor.get("http://localhost:3011/taskInstances" + dateStr));
+
+				// copy the task list we are currently looking at
+				tasks = new ArrayList<>(tasks);
+
+				// generate tasks locally based on the data we got from Mari
+				List<Record> mariRecs = mariTasks.getValues();
+				for (Record mariRec : mariRecs) {
+					Task localTask = taskCtrl.taskFromMariRecord(mariRec);
+					boolean addTask = false;
+					if (onlyGetDone) {
+						if (localTask.hasBeenDone()) {
+							addTask = true;
+						}
+					} else {
+						addTask = true;
+					}
+					if (addTask) {
+						tasks.add(localTask);
+					}
+				}
+
+			} catch (JsonParseException e) {
+				System.out.println("Mari responded with nonsense for a task instances request!");
+			}
+		}
+
+		if (db.connectToWorkbench()) {
+			try {
+				// get task instances from assWorkbench
+				JSON workbenchTasks = new JSON(WebAccessor.get("http://localhost:3010/taskInstances" + dateStr));
+
+				// copy the task list we are currently looking at
+				tasks = new ArrayList<>(tasks);
+
+				// generate tasks locally based on the data we got from Workbench
+				List<Record> workbenchRecs = workbenchTasks.getValues();
+				for (Record workbenchRec : workbenchRecs) {
+					Task localTask = taskCtrl.taskFromWorkbenchRecord(workbenchRec);
+					boolean addTask = false;
+					if (onlyGetDone) {
+						if (localTask.hasBeenDone()) {
+							addTask = true;
+						}
+					} else {
+						addTask = true;
+					}
+					if (addTask) {
+						tasks.add(localTask);
+					}
+				}
+
+			} catch (JsonParseException e) {
+				System.out.println("assWorkbench responded with nonsense for a task instances request!");
+			}
+		}
+
+		return tasks;
 	}
 
 	private int getScheduleSortValue(Task task) {

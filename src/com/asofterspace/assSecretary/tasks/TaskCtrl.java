@@ -137,6 +137,22 @@ public class TaskCtrl extends TaskCtrlBase {
 		return null;
 	}
 
+	public Task taskFromWorkbenchRecord(Record recordTask) {
+
+		Task task = new Task();
+
+		task.setTitle(recordTask.getString("title"));
+		task.setOrigin(recordTask.getString("origin"));
+
+		Date date = recordTask.getDate("date");
+		task.setReleasedDate(date);
+		task.setDoneDate(date);
+		task.setDone(true);
+		task.setWorkbenchLink(recordTask.getString("link"));
+
+		return task;
+	}
+
 	@Override
 	public Record taskToRecord(GenericTask task) {
 		Record taskRecord = super.taskToRecord(task);

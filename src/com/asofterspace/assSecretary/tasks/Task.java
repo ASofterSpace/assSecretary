@@ -40,6 +40,10 @@ public class Task extends GenericTask {
 	// if this task was released based on an id
 	private String releasedBasedOnId;
 
+	// if this task originated in the assWorkbench, this is the link to it (if null, this task did not
+	// originate in the assWorkbench)
+	private String workbenchLink;
+
 
 	public Task() {
 		super(null, null, null, null, null, null, null);
@@ -65,6 +69,7 @@ public class Task extends GenericTask {
 			this.priorityEscalationAfterDays = otherTask.priorityEscalationAfterDays;
 			this.duration = otherTask.duration;
 			this.releasedBasedOnId = otherTask.releasedBasedOnId;
+			this.workbenchLink = otherTask.workbenchLink;
 
 			// never copy another entry's id, but instead, generate a new one!
 			this.id = null;
@@ -281,7 +286,14 @@ public class Task extends GenericTask {
 			}
 		}
 
-		if (TaskCtrl.FINANCE_ORIGIN.equals(origin)) {
+		if (workbenchLink != null) {
+
+			html += "<span style='width: 10%;' class='button' onclick='secretary.openInNewTab(\"" + workbenchLink + "\")'>";
+			html += "(from Workbench)";
+			html += "</span>";
+			mainWidth += 16.5;
+
+		} else if (TaskCtrl.FINANCE_ORIGIN.equals(origin)) {
 
 			html += "<span style='width: 8%;' class='button'>";
 			html += "(from Mari)";
@@ -440,6 +452,14 @@ public class Task extends GenericTask {
 		}
 
 		return contentStr;
+	}
+
+	public String getWorkbenchLink() {
+		return workbenchLink;
+	}
+
+	public void setWorkbenchLink(String workbenchLink) {
+		this.workbenchLink = workbenchLink;
 	}
 
 }

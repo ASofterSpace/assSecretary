@@ -709,6 +709,10 @@ window.secretary = {
 		window.dirtify();
 	},
 
+	openInNewTab: function(url) {
+		window.open(url, '_blank');
+	},
+
 }
 
 

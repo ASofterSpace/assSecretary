@@ -27,6 +27,16 @@ public class Database {
 
 	private String inboxContent;
 
+	private Boolean connectToMari;
+
+	private Boolean connectToWorkbench;
+
+	private static String PORT = "port";
+	private static String USERNAME = "username";
+	private static String INBOX_CONTENT = "inboxContent";
+	private static String CONNECT_TO_MARI = "connectToMari";
+	private static String CONNECT_TO_WORKBENCH = "connectToWorkbench";
+
 
 	public Database(Directory dataDir) {
 
@@ -44,11 +54,15 @@ public class Database {
 			System.exit(1);
 		}
 
-		this.port = root.getInteger("port");
+		this.port = root.getInteger(PORT);
 
-		this.username = root.getString("username");
+		this.username = root.getString(USERNAME);
 
-		this.inboxContent = root.getString("inboxContent");
+		this.inboxContent = root.getString(INBOX_CONTENT);
+
+		this.connectToMari = root.getBoolean(CONNECT_TO_MARI);
+
+		this.connectToWorkbench = root.getBoolean(CONNECT_TO_WORKBENCH);
 	}
 
 	public Record getRoot() {
@@ -78,14 +92,32 @@ public class Database {
 
 		root.makeObject();
 
-		root.set("port", port);
+		root.set(PORT, port);
 
-		root.set("username", username);
+		root.set(USERNAME, username);
 
-		root.set("inboxContent", inboxContent);
+		root.set(INBOX_CONTENT, inboxContent);
+
+		root.set(CONNECT_TO_MARI, connectToMari);
+
+		root.set(CONNECT_TO_WORKBENCH, connectToWorkbench);
 
 		dbFile.setAllContents(root);
 		dbFile.save();
+	}
+
+	public boolean connectToMari() {
+		if (connectToMari == null) {
+			return true;
+		}
+		return connectToMari;
+	}
+
+	public boolean connectToWorkbench() {
+		if (connectToWorkbench == null) {
+			return true;
+		}
+		return connectToWorkbench;
 	}
 
 }
