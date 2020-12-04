@@ -44,6 +44,9 @@ public class Task extends GenericTask {
 	// originate in the assWorkbench)
 	private String workbenchLink;
 
+	// for a generic external source (like the LTC), this contains the display name of that source
+	private String externalSource;
+
 
 	public Task() {
 		super(null, null, null, null, null, null, null);
@@ -70,6 +73,7 @@ public class Task extends GenericTask {
 			this.duration = otherTask.duration;
 			this.releasedBasedOnId = otherTask.releasedBasedOnId;
 			this.workbenchLink = otherTask.workbenchLink;
+			this.externalSource = otherTask.externalSource;
 
 			// never copy another entry's id, but instead, generate a new one!
 			this.id = null;
@@ -286,7 +290,14 @@ public class Task extends GenericTask {
 			}
 		}
 
-		if (workbenchLink != null) {
+		if (externalSource != null) {
+
+			html += "<span style='width: 8%;' class='button'>";
+			html += "(from " + externalSource + ")";
+			html += "</span>";
+			mainWidth += 18.5;
+
+		} else if (workbenchLink != null) {
 
 			html += "<span style='width: 10%;' class='button' onclick='secretary.openInNewTab(\"" + workbenchLink + "\")'>";
 			html += "(from Workbench)";
@@ -460,6 +471,14 @@ public class Task extends GenericTask {
 
 	public void setWorkbenchLink(String workbenchLink) {
 		this.workbenchLink = workbenchLink;
+	}
+
+	public String getExternalSource() {
+		return externalSource;
+	}
+
+	public void setExternalSource(String externalSource) {
+		this.externalSource = externalSource;
 	}
 
 }

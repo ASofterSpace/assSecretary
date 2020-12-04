@@ -38,6 +38,7 @@ src/com/asofterspace/toolbox
 *.txt
 *.csv
 *.json
+*.stpu
 
 # runtime webserver deployment files
 /deployed

@@ -8,6 +8,7 @@ import com.asofterspace.assSecretary.accountant.MariDatabase;
 import com.asofterspace.assSecretary.accountant.MariTaskCtrl;
 import com.asofterspace.assSecretary.AssSecretary;
 import com.asofterspace.assSecretary.Database;
+import com.asofterspace.assSecretary.ltc.LtcDatabase;
 import com.asofterspace.assSecretary.missionControl.McInfo;
 import com.asofterspace.assSecretary.missionControl.VmInfo;
 import com.asofterspace.assSecretary.missionControl.WebInfo;
@@ -655,7 +656,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 				List<Task> tasks = taskCtrl.getDoneTaskInstancesAsTasks();
 
 				boolean onlyGetDone = true;
-				tasks = addTaskInstancesFromMariAndWorkbench(tasks, null, null, onlyGetDone);
+				tasks = addExternalTaskInstances(tasks, null, null, onlyGetDone);
 
 				Collections.sort(tasks, new Comparator<Task>() {
 					public int compare(Task a, Task b) {
@@ -728,7 +729,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 				List<Task> tasks = taskCtrl.getAllTaskInstancesAsTasks();
 
 				boolean onlyGetDone = false;
-				tasks = addTaskInstancesFromMariAndWorkbench(tasks, weekDays.get(0), weekDays.get(6), onlyGetDone);
+				tasks = addExternalTaskInstances(tasks, weekDays.get(0), weekDays.get(6), onlyGetDone);
 
 				List<Task> baseTasksForSchedule = getHugoAndMariTasks();
 
@@ -1096,7 +1097,10 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 		return result;
 	}
 
-	private List<Task> addTaskInstancesFromMariAndWorkbench(List<Task> tasks, Date from, Date to, boolean onlyGetDone) {
+	/**
+	 * To the list of tasks add task instances from Mari, from the assWorkbench and from the legacy LTC
+	 */
+	private List<Task> addExternalTaskInstances(List<Task> tasks, Date from, Date to, boolean onlyGetDone) {
 
 		String dateStr = "";
 
@@ -1170,6 +1174,12 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 			} catch (JsonParseException e) {
 				System.out.println("assWorkbench responded with nonsense for a task instances request!");
 			}
+		}
+
+		if (db.connectToLtc()) {
+			// ignore onlyGetDone, as all LTC tasks are done ;)
+			List<Task> ltcTasks = LtcDatabase.getTaskInstances(from, to);
+			tasks.addAll(ltcTasks);
 		}
 
 		return tasks;

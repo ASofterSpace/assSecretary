@@ -28,14 +28,15 @@ public class Database {
 	private String inboxContent;
 
 	private Boolean connectToMari;
-
 	private Boolean connectToWorkbench;
+	private Boolean connectToLtc;
 
 	private static String PORT = "port";
 	private static String USERNAME = "username";
 	private static String INBOX_CONTENT = "inboxContent";
 	private static String CONNECT_TO_MARI = "connectToMari";
 	private static String CONNECT_TO_WORKBENCH = "connectToWorkbench";
+	private static String CONNECT_TO_LTC = "connectToLtc";
 
 
 	public Database(Directory dataDir) {
@@ -63,6 +64,8 @@ public class Database {
 		this.connectToMari = root.getBoolean(CONNECT_TO_MARI);
 
 		this.connectToWorkbench = root.getBoolean(CONNECT_TO_WORKBENCH);
+
+		this.connectToLtc = root.getBoolean(CONNECT_TO_LTC);
 	}
 
 	public Record getRoot() {
@@ -102,6 +105,8 @@ public class Database {
 
 		root.set(CONNECT_TO_WORKBENCH, connectToWorkbench);
 
+		root.set(CONNECT_TO_LTC, connectToLtc);
+
 		dbFile.setAllContents(root);
 		dbFile.save();
 	}
@@ -118,6 +123,13 @@ public class Database {
 			return true;
 		}
 		return connectToWorkbench;
+	}
+
+	public boolean connectToLtc() {
+		if (connectToLtc == null) {
+			return true;
+		}
+		return connectToLtc;
 	}
 
 }

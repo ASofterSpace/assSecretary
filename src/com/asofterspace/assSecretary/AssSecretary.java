@@ -4,6 +4,7 @@
  */
 package com.asofterspace.assSecretary;
 
+import com.asofterspace.assSecretary.ltc.LtcDatabase;
 import com.asofterspace.assSecretary.missionControl.MissionControlDatabase;
 import com.asofterspace.assSecretary.missionControl.VmInfo;
 import com.asofterspace.assSecretary.missionControl.WebInfo;
@@ -78,7 +79,11 @@ public class AssSecretary {
 		System.out.println("Loading database...");
 
 		database = new Database(dataDir);
+
 		MissionControlDatabase missionControlDatabase = new MissionControlDatabase(dataDir, "mission_control");
+
+		// this one can be static, as it does not ever really change anymore :)
+		LtcDatabase.init(dataDir);
 
 		TaskDatabase taskDatabase = new TaskDatabase(dataDir);
 		TaskCtrl taskCtrl = new TaskCtrl(taskDatabase);
