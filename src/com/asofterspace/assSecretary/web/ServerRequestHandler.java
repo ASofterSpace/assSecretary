@@ -418,7 +418,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 				indexContent = StrUtils.replaceAll(indexContent, "[[TABS]]", tabsHtml);
 
 
-				String taskShortlistHtml = "";
+				StringBuilder taskShortlistHtml = new StringBuilder();
 
 				Date today = DateUtils.now();
 
@@ -431,20 +431,20 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 				});
 
 				if (shortlistTasks.size() == 0) {
-					taskShortlistHtml += "<div>The task shortlist is empty - well done!</div>";
+					taskShortlistHtml.append("<div>The task shortlist is empty - well done!</div>");
 				} else {
-					taskShortlistHtml += "<div style='padding-bottom:0;'>Here is the task shortlist for today:</div>";
-					taskShortlistHtml += "<div>";
+					taskShortlistHtml.append("<div style='padding-bottom:0;'>Here is the task shortlist for today:</div>");
+					taskShortlistHtml.append("<div>");
 					boolean historicalView = false;
 					boolean reducedView = false;
 					boolean onShortlist = true;
 					for (Task shortlistTask : shortlistTasks) {
-						taskShortlistHtml += shortlistTask.toHtmlStr(historicalView, reducedView, onShortlist, today);
+						shortlistTask.appendHtmlTo(taskShortlistHtml, historicalView, reducedView, onShortlist, today);
 					}
-					taskShortlistHtml += "</div>";
+					taskShortlistHtml.append("</div>");
 				}
 
-				indexContent = StrUtils.replaceAll(indexContent, "[[TASK_SHORTLIST]]", taskShortlistHtml);
+				indexContent = StrUtils.replaceAll(indexContent, "[[TASK_SHORTLIST]]", taskShortlistHtml.toString());
 
 
 				String mariHtml = "";
@@ -561,17 +561,17 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 					}
 				});
 
-				String taskHtml = "";
+				StringBuilder taskHtml = new StringBuilder();
 				boolean historicalView = false;
 				boolean reducedView = false;
 				boolean onShortlist = false;
 				if (tasks.size() > 0) {
 					for (Task task : tasks) {
-						taskHtml += task.toHtmlStr(historicalView, reducedView, onShortlist, today);
+						task.appendHtmlTo(taskHtml, historicalView, reducedView, onShortlist, today);
 					}
 				}
 
-				indexContent = StrUtils.replaceAll(indexContent, "[[TASKS]]", taskHtml);
+				indexContent = StrUtils.replaceAll(indexContent, "[[TASKS]]", taskHtml.toString());
 
 
 				indexContent = StrUtils.replaceAll(indexContent, "[[MISSION_CONTROL_PREVIEW]]", getMissionControlHtml(false));
@@ -624,18 +624,18 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 					}
 				});
 
-				String taskHtml = "";
+				StringBuilder taskHtml = new StringBuilder();
 				boolean historicalView = true;
 				boolean reducedView = false;
 				boolean onShortlist = false;
 				Date curDate = DateUtils.now();
 				if (tasks.size() > 0) {
 					for (Task task : tasks) {
-						taskHtml += task.toHtmlStr(historicalView, reducedView, onShortlist, curDate);
+						task.appendHtmlTo(taskHtml, historicalView, reducedView, onShortlist, curDate);
 					}
 				}
 
-				indexContent = StrUtils.replaceAll(indexContent, "[[TASKS]]", taskHtml);
+				indexContent = StrUtils.replaceAll(indexContent, "[[TASKS]]", taskHtml.toString());
 
 				indexContent = StrUtils.replaceAll(indexContent, "[[PROJECTS]]", AssSecretary.getProjHtmlStr());
 
@@ -691,7 +691,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 							taskHtml.append("<div class='separator_top'>&nbsp;</div>");
 							taskHtml.append("<div class='separator_bottom'>&nbsp;</div>");
 						}
-						taskHtml.append(task.toHtmlStr(historicalView, reducedView, onShortlist, curDate));
+						task.appendHtmlTo(taskHtml, historicalView, reducedView, onShortlist, curDate);
 					}
 				}
 
@@ -711,7 +711,6 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 				TextFile indexBaseFile = new TextFile(webRoot, locEquiv);
 				String indexContent = indexBaseFile.getContent();
 
-				String weeklyHtmlStr = "";
 				// the actual today that it really is... today
 				Date actualToday = DateUtils.now();
 				// the "today" for which the chart is generated, by default the actual today
@@ -724,6 +723,22 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 						}
 					}
 				}
+
+				indexContent = StrUtils.replaceAll(indexContent, "[[PREV_DATE_YEAR]]", DateUtils.serializeDate(DateUtils.addDays(today, -365)));
+				indexContent = StrUtils.replaceAll(indexContent, "[[PREV_DATE_MONTH]]", DateUtils.serializeDate(DateUtils.addDays(today, -30)));
+				indexContent = StrUtils.replaceAll(indexContent, "[[PREV_DATE_WEEK]]", DateUtils.serializeDate(DateUtils.addDays(today, -7)));
+				indexContent = StrUtils.replaceAll(indexContent, "[[NEXT_DATE_WEEK]]", DateUtils.serializeDate(DateUtils.addDays(today, 7)));
+				indexContent = StrUtils.replaceAll(indexContent, "[[NEXT_DATE_MONTH]]", DateUtils.serializeDate(DateUtils.addDays(today, 30)));
+				indexContent = StrUtils.replaceAll(indexContent, "[[NEXT_DATE_YEAR]]", DateUtils.serializeDate(DateUtils.addDays(today, 365)));
+
+				indexContent = StrUtils.replaceAll(indexContent, "[[PROJECTS]]", AssSecretary.getProjHtmlStr());
+
+				indexContent = StrUtils.replaceAll(indexContent, "[[CURDATE]]", DateUtils.serializeDate(DateUtils.now()));
+
+				indexContent = StrUtils.replaceAll(indexContent, "[[MINI_CALENDAR]]", getMiniCalendarHtml());
+
+				StringBuilder weeklyHtmlStr = new StringBuilder();
+
 				List<Date> weekDays = DateUtils.getWeekForDate(today);
 
 				List<Task> tasks = taskCtrl.getAllTaskInstancesAsTasks();
@@ -735,15 +750,23 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 				for (Date day : weekDays) {
 					boolean isToday = DateUtils.isSameDay(actualToday, day);
-					weeklyHtmlStr += "<div class='weekly_day";
+					weeklyHtmlStr.append("<div class='weekly_day");
 					String boldness = "";
 					if (isToday) {
-						weeklyHtmlStr += " today";
+						weeklyHtmlStr.append(" today");
 						boldness = "font-weight: bold;";
 					}
-					weeklyHtmlStr += "'>";
-					weeklyHtmlStr += "<div style='text-align: center; " + boldness + "'>" + DateUtils.serializeDate(day) + "</div>";
-					weeklyHtmlStr += "<div style='text-align: center; " + boldness + " padding-bottom: 10pt;'>" + DateUtils.getDayOfWeekNameEN(day) + "</div>";
+					weeklyHtmlStr.append("'>");
+					weeklyHtmlStr.append("<div style='text-align: center; ");
+					weeklyHtmlStr.append(boldness);
+					weeklyHtmlStr.append("'>");
+					weeklyHtmlStr.append(DateUtils.serializeDate(day));
+					weeklyHtmlStr.append("</div>");
+					weeklyHtmlStr.append("<div style='text-align: center; ");
+					weeklyHtmlStr.append(boldness);
+					weeklyHtmlStr.append(" padding-bottom: 10pt;'>");
+					weeklyHtmlStr.append(DateUtils.getDayOfWeekNameEN(day));
+					weeklyHtmlStr.append("</div>");
 
 					List<Task> tasksToday = new ArrayList<>();
 
@@ -774,26 +797,13 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 						boolean historicalView = false;
 						boolean reducedView = true;
 						boolean onShortlist = false;
-						weeklyHtmlStr += task.toHtmlStr(historicalView, reducedView, onShortlist, day);
+						task.appendHtmlTo(weeklyHtmlStr, historicalView, reducedView, onShortlist, day);
 					}
 
-					weeklyHtmlStr += "</div>";
+					weeklyHtmlStr.append("</div>");
 				}
 
-				indexContent = StrUtils.replaceAll(indexContent, "[[WEEKLY_PLAN]]", weeklyHtmlStr);
-
-				indexContent = StrUtils.replaceAll(indexContent, "[[PREV_DATE_YEAR]]", DateUtils.serializeDate(DateUtils.addDays(today, -365)));
-				indexContent = StrUtils.replaceAll(indexContent, "[[PREV_DATE_MONTH]]", DateUtils.serializeDate(DateUtils.addDays(today, -30)));
-				indexContent = StrUtils.replaceAll(indexContent, "[[PREV_DATE_WEEK]]", DateUtils.serializeDate(DateUtils.addDays(today, -7)));
-				indexContent = StrUtils.replaceAll(indexContent, "[[NEXT_DATE_WEEK]]", DateUtils.serializeDate(DateUtils.addDays(today, 7)));
-				indexContent = StrUtils.replaceAll(indexContent, "[[NEXT_DATE_MONTH]]", DateUtils.serializeDate(DateUtils.addDays(today, 30)));
-				indexContent = StrUtils.replaceAll(indexContent, "[[NEXT_DATE_YEAR]]", DateUtils.serializeDate(DateUtils.addDays(today, 365)));
-
-				indexContent = StrUtils.replaceAll(indexContent, "[[PROJECTS]]", AssSecretary.getProjHtmlStr());
-
-				indexContent = StrUtils.replaceAll(indexContent, "[[CURDATE]]", DateUtils.serializeDate(DateUtils.now()));
-
-				indexContent = StrUtils.replaceAll(indexContent, "[[MINI_CALENDAR]]", getMiniCalendarHtml());
+				indexContent = StrUtils.replaceAll(indexContent, "[[WEEKLY_PLAN]]", weeklyHtmlStr.toString());
 
 				locEquiv = "_" + locEquiv;
 				TextFile indexFile = new TextFile(webRoot, locEquiv);

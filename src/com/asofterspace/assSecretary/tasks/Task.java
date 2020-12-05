@@ -219,11 +219,10 @@ public class Task extends GenericTask {
 		this.releasedBasedOnId = releasedBasedOnId;
 	}
 
-	public String toHtmlStr(boolean historicalView, boolean reducedView, boolean onShortlist, Date dateForWhichHtmlGetsDisplayed) {
+	public void appendHtmlTo(StringBuilder html, boolean historicalView, boolean reducedView,
+		boolean onShortlist, Date dateForWhichHtmlGetsDisplayed) {
 
 		String id = getId();
-
-		String html = "";
 
 		// by default, main Width is 60%
 		float mainWidth = 60;
@@ -235,40 +234,51 @@ public class Task extends GenericTask {
 
 		if (onShortlist) {
 			// tasks on the shortlist are not affected by such mundane things as filtering etc.
-			html += "<div class='line'>";
+			html.append("<div class='line'>");
 		} else {
-			html += "<div class='line task task-with-origin-" + getOrigin() + futureTaskStr + "' id='task-" + id + "'>";
+			html.append("<div class='line task task-with-origin-");
+			html.append(getOrigin());
+			html.append(futureTaskStr);
+			html.append("' id='task-");
+			html.append(id);
+			html.append("'>");
 		}
 		if (reducedView) {
-			html += "<div>";
+			html.append("<div>");
 		}
 		if (!reducedView) {
 			if (isInstance()) {
-				html += "<span style='width: 8%;'>";
+				html.append("<span style='width: 8%;'>");
 				if (historicalView) {
-					html += DateUtils.serializeDate(getDoneDate());
+					html.append(DateUtils.serializeDate(getDoneDate()));
 				} else {
-					html += getReleasedDateStr();
+					html.append(getReleasedDateStr());
 				}
-				html += "</span>";
+				html.append("</span>");
 			} else {
 				String schedDateStr = getScheduleDateStr();
-				html += "<span style='width: 8%;' title='" + schedDateStr + "'>";
-				html += schedDateStr;
-				html += "</span>";
+				html.append("<span style='width: 8%;' title='");
+				html.append(schedDateStr);
+				html.append("'>");
+				html.append(schedDateStr);
+				html.append("</span>");
 			}
 		}
-		html += "<span style='width: %[WIDTH];'";
+		html.append("<span style='width: ");
+		int charsBeforeWidth = html.length();
+		html.append(";'");
 		int prio = getCurrentPriority(dateForWhichHtmlGetsDisplayed);
 		if (prio < 100000) {
-			html += " class='error'";
+			html.append(" class='error'");
 		} else if (prio < 360000) {
-			html += " class='warning'";
+			html.append(" class='warning'");
 		}
 		String escTitle = HTML.escapeHTMLstr(title);
-		html += " title='" + escTitle + "'>";
-		html += escTitle;
-		html += "</span>";
+		html.append(" title='");
+		html.append(escTitle);
+		html.append("'>");
+		html.append(escTitle);
+		html.append("</span>");
 
 		boolean hasDetails = false;
 
@@ -276,8 +286,8 @@ public class Task extends GenericTask {
 		String btnStyle = "width: 5.5%; " + miniBtnStyle;
 
 		if (reducedView) {
-			html += "</div>";
-			html += "<div style='text-align: center; white-space: nowrap;'>";
+			html.append("</div>");
+			html.append("<div style='text-align: center; white-space: nowrap;'>");
 		} else {
 			List<String> details = getDetails();
 			hasDetails = (details != null) && (details.size() > 0);
@@ -292,23 +302,27 @@ public class Task extends GenericTask {
 
 		if (externalSource != null) {
 
-			html += "<span style='width: 8%;' class='button'>";
-			html += "(from " + externalSource + ")";
-			html += "</span>";
+			html.append("<span style='width: 8%;' class='button'>");
+			html.append("(from ");
+			html.append(externalSource);
+			html.append(")");
+			html.append("</span>");
 			mainWidth += 18.5;
 
 		} else if (workbenchLink != null) {
 
-			html += "<span style='width: 10%;' class='button' onclick='secretary.openInNewTab(\"" + workbenchLink + "\")'>";
-			html += "(from Workbench)";
-			html += "</span>";
+			html.append("<span style='width: 10%;' class='button' onclick='secretary.openInNewTab(\"");
+			html.append(workbenchLink);
+			html.append("\")'>");
+			html.append("(from Workbench)");
+			html.append("</span>");
 			mainWidth += 16.5;
 
 		} else if (TaskCtrl.FINANCE_ORIGIN.equals(origin)) {
 
-			html += "<span style='width: 8%;' class='button'>";
-			html += "(from Mari)";
-			html += "</span>";
+			html.append("<span style='width: 8%;' class='button'>");
+			html.append("(from Mari)");
+			html.append("</span>");
 			mainWidth += 18.5;
 
 		// if this is not an actual instance, but just a ghost of a scheduled task, then of course it cannot
@@ -316,25 +330,40 @@ public class Task extends GenericTask {
 		} else if (!isInstance()) {
 			// on the other hand, a non-instance CAN be prematurely released to achieve an instance which CAN be edited!
 
-			html += "<span style='";
+			html.append("<span style='");
 			if (reducedView) {
-				html += btnStyle;
+				html.append(btnStyle);
 				mainWidth += 7;
 			} else {
-				html += "width: 7.5%; " + miniBtnStyle;
+				html.append("width: 7.5%; ");
+				html.append(miniBtnStyle);
 				mainWidth += 5;
 			}
-			html += "' class='button' onclick='secretary.taskPreRelease(\"" + id + "\", " +
-				"\"" + DateUtils.serializeDate(dateForWhichHtmlGetsDisplayed) + "\")'>";
-			html += "Pre-Release";
-			html += "</span>";
-			html += "<span style='" + btnStyle + "' class='button' onclick='secretary.repeatingTaskEdit(\"" + id + "\")'>";
-			html += "Edit";
-			html += "</span>";
-			html += "<span style='" + btnStyle + "' class='button' onclick='secretary.taskDelete(\"" + id + "\", ";
-			html += "\"" + HTML.escapeHTMLstr(StrUtils.replaceAll(title, "\"", "")) + "\", null)'>";
-			html += "Delete";
-			html += "</span>";
+			html.append("' class='button' onclick='secretary.taskPreRelease(\"");
+			html.append(id);
+			html.append("\", ");
+			html.append("\"");
+			html.append(DateUtils.serializeDate(dateForWhichHtmlGetsDisplayed));
+			html.append("\")'>");
+			html.append("Pre-Release");
+			html.append("</span>");
+			html.append("<span style='");
+			html.append(btnStyle);
+			html.append("' class='button' onclick='secretary.repeatingTaskEdit(\"");
+			html.append(id);
+			html.append("\")'>");
+			html.append("Edit");
+			html.append("</span>");
+			html.append("<span style='");
+			html.append(btnStyle);
+			html.append("' class='button' onclick='secretary.taskDelete(\"");
+			html.append(id);
+			html.append("\", ");
+			html.append("\"");
+			html.append(HTML.escapeHTMLstr(StrUtils.replaceAll(title, "\"", "")));
+			html.append("\", null)'>");
+			html.append("Delete");
+			html.append("</span>");
 
 		} else {
 
@@ -344,80 +373,120 @@ public class Task extends GenericTask {
 					if (onShortlist) {
 						detailsId += "-shortlist";
 					}
-					html += "<span style='" + btnStyle + "' class='button' onclick='secretary.taskDetails(\"" + detailsId + "\")'>";
-					html += "Details";
-					html += "</span>";
+					html.append("<span style='");
+					html.append(btnStyle);
+					html.append("' class='button' onclick='secretary.taskDetails(\"");
+					html.append(detailsId);
+					html.append("\")'>");
+					html.append("Details");
+					html.append("</span>");
 				} else {
 					// this is 1.5% width instead of 5.5%, so that the main width can be increased by 4 percent points
 					mainWidth += 4;
-					html += "<span style='width:1.5%;" + miniBtnStyle + " visibility: hidden;' class='button'>";
-					html += "&nbsp;";
-					html += "</span>";
+					html.append("<span style='width:1.5%;");
+					html.append(miniBtnStyle);
+					html.append(" visibility: hidden;' class='button'>");
+					html.append("&nbsp;");
+					html.append("</span>");
 				}
 			}
 
 			if (hasBeenDone()) {
-				html += "<span style='" + btnStyle + "' class='button' onclick='secretary.taskUnDone(\"" + id + "\")'>";
-				html += "Un-done";
-				html += "</span>";
+				html.append("<span style='");
+				html.append(btnStyle);
+				html.append("' class='button' onclick='secretary.taskUnDone(\"");
+				html.append(id);
+				html.append("\")'>");
+				html.append("Un-done");
+				html.append("</span>");
 			} else {
-				html += "<span style='" + btnStyle + "' class='button' onclick='secretary.taskDone(\"" + id + "\")'>";
-				html += "Done";
-				html += "</span>";
+				html.append("<span style='");
+				html.append(btnStyle);
+				html.append("' class='button' onclick='secretary.taskDone(\"");
+				html.append(id);
+				html.append("\")'>");
+				html.append("Done");
+				html.append("</span>");
 			}
-			html += "<span style='" + btnStyle + "' class='button' onclick='secretary.taskEdit(\"" + id + "\")'>";
-			html += "Edit";
-			html += "</span>";
-			html += "<span style='" + btnStyle + "' class='button' onclick='secretary.taskDelete(\"" + id + "\", ";
-			html += "\"" + HTML.escapeHTMLstr(StrUtils.replaceAll(title, "\"", "")) + "\", \"" + getReleasedDateStr() + "\")'>";
-			html += "Delete";
-			html += "</span>";
+			html.append("<span style='");
+			html.append(btnStyle);
+			html.append("' class='button' onclick='secretary.taskEdit(\"");
+			html.append(id);
+			html.append("\")'>");
+			html.append("Edit");
+			html.append("</span>");
+			html.append("<span style='");
+			html.append(btnStyle);
+			html.append("' class='button' onclick='secretary.taskDelete(\"");
+			html.append(id);
+			html.append("\", ");
+			html.append("\"");
+			html.append(HTML.escapeHTMLstr(StrUtils.replaceAll(title, "\"", "")));
+			html.append("\", \"");
+			html.append(getReleasedDateStr());
+			html.append("\")'>");
+			html.append("Delete");
+			html.append("</span>");
 			if ((!reducedView) && (!historicalView)) {
 				if (onShortlist) {
-					html += "<span style='" + miniBtnStyle + "' class='button' onclick='secretary.taskRemoveFromShortList(\"" + id + "\")'>";
-					html += "&#9734;";
-					html += "</span>";
-					html += "<span style='" + miniBtnStyle + "' class='button' onclick='secretary.taskPutOnShortListTomorrow(\"" + id + "\")'>";
-					html += "&#x2B6F;";
-					html += "</span>";
+					html.append("<span style='");
+					html.append(miniBtnStyle);
+					html.append("' class='button' onclick='secretary.taskRemoveFromShortList(\"");
+					html.append(id);
+					html.append("\")'>");
+					html.append("&#9734;");
+					html.append("</span>");
+					html.append("<span style='");
+					html.append(miniBtnStyle);
+					html.append("' class='button' onclick='secretary.taskPutOnShortListTomorrow(\"");
+					html.append(id);
+					html.append("\")'>");
+					html.append("&#x2B6F;");
+					html.append("</span>");
 					// we are showing two minibuttons instead of one, so the main width has to be shorter here
 					mainWidth -= 3;
 				} else {
-					html += "<span style='" + miniBtnStyle + "' class='button' onclick='secretary.taskAddToShortList(\"" + id + "\")'>";
-					html += "&#9733;";
-					html += "</span>";
+					html.append("<span style='");
+					html.append(miniBtnStyle);
+					html.append("' class='button' onclick='secretary.taskAddToShortList(\"");
+					html.append(id);
+					html.append("\")'>");
+					html.append("&#9733;");
+					html.append("</span>");
 				}
 			}
 		}
 
 		if (reducedView) {
-			html += "</div>";
+			html.append("</div>");
 		}
 
 		if (hasDetails) {
-			html += "<div style='display: none' class='details' id='task-details-" + id;
+			html.append("<div style='display: none' class='details' id='task-details-");
+			html.append(id);
 			if (onShortlist) {
-				html += "-shortlist";
+				html.append("-shortlist");
 			}
-			html += "'>";
+			html.append("'>");
 			List<String> safeDetails = new ArrayList<>();
 			if (details != null) {
+				String br = "";
 				for (String detail : details) {
 					detail = StrUtils.replaceAll(detail, "<", "&lt;");
 					detail = StrUtils.replaceAll(detail, ">", "&gt;");
 					detail = addHtmlLinkToStringContent(detail, "http://");
 					detail = addHtmlLinkToStringContent(detail, "https://");
 					safeDetails.add(detail);
+					html.append(br);
+					br = "<br>";
+					html.append(detail);
 				}
 			}
-			html += StrUtils.join("<br>", safeDetails);
-			html += "</div>";
+			html.append("</div>");
 		}
-		html += "</div>";
+		html.append("</div>");
 
-		html = StrUtils.replaceAll(html, "%[WIDTH]", mainWidth + "%");
-
-		return html;
+		html.insert(charsBeforeWidth, mainWidth + "%");
 	}
 
 	public static String addHtmlLinkToStringContent(String contentStr, String prefix) {
