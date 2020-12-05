@@ -83,6 +83,14 @@ window.secretary = {
 	},
 
 	editRepeatingParentTask: function() {
+		// hide single task modal
+		// (but do refresh, which will be done anyway after closing the repeating task modal)
+		var modal = document.getElementById("addSingleTaskModal");
+		if (modal) {
+			modal.style.display = "none";
+		}
+
+		// then open the repeating task modal
 		this.repeatingTaskEdit(this.currentlyRepeatingParent);
 	},
 
@@ -709,6 +717,19 @@ window.secretary = {
 		window.dirtify();
 	},
 
+	insertDateTimeStampIntoTextarea: function(textareaEl) {
+		var start = textareaEl.selectionStart;
+		var end = textareaEl.selectionEnd;
+		// ... add a date-time-stamp!
+		var datetimestamp = toolbox.utils.DateUtils.getCurrentDateTimeStamp();
+		textareaEl.value =
+			textareaEl.value.substring(0, start) +
+			datetimestamp +
+			textareaEl.value.substring(end);
+		textareaEl.selectionStart = start + datetimestamp.length;
+		textareaEl.selectionEnd = start + datetimestamp.length;
+	},
+
 	openInNewTab: function(url) {
 		window.open(url, '_blank');
 	},
@@ -730,9 +751,14 @@ window.onkeydown = function(event) {
 		if (addSingleTaskModal && (addSingleTaskModal.style.display === "block")) {
 			window.secretary.submitSingleTaskModal(false);
 		} else {
-			var inboxArea = document.getElementById("inboxArea");
-			if (inboxArea) {
-				window.saveDirtyInbox();
+			var addRepeatingTaskModal = document.getElementById("addRepeatingTaskModal");
+			if (addRepeatingTaskModal && (addRepeatingTaskModal.style.display === "block")) {
+				window.secretary.submitRepeatingTaskModal(false);
+			} else {
+				var inboxArea = document.getElementById("inboxArea");
+				if (inboxArea) {
+					window.saveDirtyInbox();
+				}
 			}
 		}
 		// prevent [Ctrl]+[S]
@@ -741,19 +767,17 @@ window.onkeydown = function(event) {
 	}
 	if ((event.keyCode > 111) && (event.keyCode < 124)) {
 		if (event.keyCode == 111 + 6) {
-			// if [F6] is pressed, and the singleTaskDetails textarea is visible...
-			var singleTaskDetails = document.getElementById("singleTaskDetails");
-			if (singleTaskDetails && window.singleTaskDetailsHasFocus) {
-				var start = singleTaskDetails.selectionStart;
-				var end = singleTaskDetails.selectionEnd;
-				// ... add a date-time-stamp!
-				var datetimestamp = toolbox.utils.DateUtils.getCurrentDateTimeStamp();
-				singleTaskDetails.value =
-					singleTaskDetails.value.substring(0, start) +
-					datetimestamp +
-					singleTaskDetails.value.substring(end);
-				singleTaskDetails.selectionStart = start + datetimestamp.length;
-				singleTaskDetails.selectionEnd = start + datetimestamp.length;
+			// if [F6] is pressed, and the repeatingTaskDetails textarea is visible...
+			var repeatingTaskDetails = document.getElementById("repeatingTaskDetails");
+			if (repeatingTaskDetails && window.repeatingTaskDetailsHasFocus) {
+				// ... add a datetimestamp!
+				window.secretary.insertDateTimeStampIntoTextarea(repeatingTaskDetails);
+			} else {
+				// same for the single task modal :)
+				var singleTaskDetails = document.getElementById("singleTaskDetails");
+				if (singleTaskDetails && window.singleTaskDetailsHasFocus) {
+					window.secretary.insertDateTimeStampIntoTextarea(singleTaskDetails);
+				}
 			}
 		}
 		// prevent function keys
