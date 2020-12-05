@@ -653,6 +653,12 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 				TextFile indexBaseFile = new TextFile(webRoot, locEquiv);
 				String indexContent = indexBaseFile.getContent();
 
+				indexContent = StrUtils.replaceAll(indexContent, "[[PROJECTS]]", AssSecretary.getProjHtmlStr());
+
+				indexContent = StrUtils.replaceAll(indexContent, "[[CURDATE]]", DateUtils.serializeDate(DateUtils.now()));
+
+				indexContent = StrUtils.replaceAll(indexContent, "[[MINI_CALENDAR]]", getMiniCalendarHtml());
+
 				List<Task> tasks = taskCtrl.getDoneTaskInstancesAsTasks();
 
 				boolean onlyGetDone = true;
@@ -672,7 +678,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 					}
 				});
 
-				String taskHtml = "";
+				StringBuilder taskHtml = new StringBuilder();
 				boolean historicalView = true;
 				boolean reducedView = false;
 				boolean onShortlist = false;
@@ -682,20 +688,14 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 						Date curDate = task.getDoneDate();
 						if (!DateUtils.isSameDay(curDate, prevDate)) {
 							prevDate = curDate;
-							taskHtml += "<div class='separator_top'>&nbsp;</div>";
-							taskHtml += "<div class='separator_bottom'>&nbsp;</div>";
+							taskHtml.append("<div class='separator_top'>&nbsp;</div>");
+							taskHtml.append("<div class='separator_bottom'>&nbsp;</div>");
 						}
-						taskHtml += task.toHtmlStr(historicalView, reducedView, onShortlist, curDate);
+						taskHtml.append(task.toHtmlStr(historicalView, reducedView, onShortlist, curDate));
 					}
 				}
 
-				indexContent = StrUtils.replaceAll(indexContent, "[[TASKS]]", taskHtml);
-
-				indexContent = StrUtils.replaceAll(indexContent, "[[PROJECTS]]", AssSecretary.getProjHtmlStr());
-
-				indexContent = StrUtils.replaceAll(indexContent, "[[CURDATE]]", DateUtils.serializeDate(DateUtils.now()));
-
-				indexContent = StrUtils.replaceAll(indexContent, "[[MINI_CALENDAR]]", getMiniCalendarHtml());
+				indexContent = StrUtils.replaceAll(indexContent, "[[TASKS]]", taskHtml.toString());
 
 				locEquiv = "_" + locEquiv;
 				TextFile indexFile = new TextFile(webRoot, locEquiv);

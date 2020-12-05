@@ -111,10 +111,12 @@ public class AssSecretary {
 			StringBuilder projHtml = new StringBuilder();
 
 			for (GenericProject proj : projects) {
-				projHtml.append("\n");
-				projHtml.append("  <a href=\"localhost:3010/projects/" + proj.getShortName() + "/?open=logbook\" target=\"_blank\" class=\"project\" style=\"border-color: " + proj.getColor().toHexString() + "\">");
-				projHtml.append("    <span class=\"vertAligner\"></span><img src=\"projectlogos/" + proj.getShortName() + "/logo.png\" />");
-				projHtml.append("  </a>");
+				if (proj.isOnShortlist()) {
+					projHtml.append("\n");
+					projHtml.append("  <a href=\"localhost:3010/projects/" + proj.getShortName() + "/?open=logbook\" target=\"_blank\" class=\"project\" style=\"border-color: " + proj.getColor().toHexString() + "\">");
+					projHtml.append("    <span class=\"vertAligner\"></span><img src=\"projectlogos/" + proj.getShortName() + "/logo.png\" />");
+					projHtml.append("  </a>");
+				}
 			}
 
 			projHtmlStr = projHtml.toString();
