@@ -142,7 +142,14 @@ public class TaskCtrl extends TaskCtrlBase {
 		Task task = new Task();
 
 		task.setTitle(recordTask.getString("title"));
-		task.setOrigin(recordTask.getString("origin"));
+		String origin = recordTask.getString("origin");
+		if (origin == null) {
+			task.setOrigin("private");
+		} else if (origin.startsWith("recoded")) {
+			task.setOrigin("recoded");
+		} else {
+			task.setOrigin(origin);
+		}
 
 		Date date = recordTask.getDate("date");
 		task.setReleasedDate(date);
