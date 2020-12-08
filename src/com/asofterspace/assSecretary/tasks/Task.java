@@ -17,6 +17,13 @@ import java.util.UUID;
 
 public class Task extends GenericTask {
 
+	private final static int HUNDREDTH_PRIORITY = 10000;
+	private final static int TENTH_PRIORITY = 10 * HUNDREDTH_PRIORITY;
+	private final static int HALF_PRIORITY = 5 * TENTH_PRIORITY;
+	private final static int MAX_PRIORITY = 10 * TENTH_PRIORITY;
+	private final static int ERROR_CUTOFF = 10 * HUNDREDTH_PRIORITY;
+	private final static int WARNING_CUTOFF = 36 * HUNDREDTH_PRIORITY;
+
 	// the origin of the task - can be a company customer we are working for, or "private"
 	private String origin;
 
@@ -102,8 +109,24 @@ public class Task extends GenericTask {
 	 */
 	public int getCurrentPriority(Date currentDay) {
 
+		// if this task is "scheduled" for a particular time (so if its title starts with "HH:MM "
+		// or "HH:MM.."), then reduce priority by A LOT, also based on the time, so that timed
+		// entries are (nearly) always at the top of the list, sorted by their time
+		if (title.length() > 5) {
+			if ((title.charAt(2) == ':') && ((title.charAt(5) == ' ') || (title.charAt(5) == '.')) &&
+				Character.isDigit(title.charAt(0)) && Character.isDigit(title.charAt(1)) &&
+				Character.isDigit(title.charAt(3)) && Character.isDigit(title.charAt(4))) {
+				return -(2500 - StrUtils.strToInt(title.substring(0, 2) + title.substring(3, 5)));
+			}
+		}
+
+		return getCurrentPriorityIgnoringTime(currentDay);
+	}
+
+	public int getCurrentPriorityIgnoringTime(Date currentDay) {
+
 		// set a useful default
-		int result = 500000;
+		int result = HALF_PRIORITY;
 
 		// get the baseline priority set by the user
 		if (priority != null) {
@@ -125,7 +148,7 @@ public class Task extends GenericTask {
 				if (difference >= priorityEscalationAfterDays) {
 					// if priorityEscalationAfterDays have passed, then reduce priority by 10%,
 					// and keep reducing a bit more each day
-					result -= (100000 * difference) / priorityEscalationAfterDays;
+					result -= (TENTH_PRIORITY * difference) / priorityEscalationAfterDays;
 				}
 			}
 
@@ -267,10 +290,10 @@ public class Task extends GenericTask {
 		html.append("<span style='width: ");
 		int charsBeforeWidth = html.length();
 		html.append(";'");
-		int prio = getCurrentPriority(dateForWhichHtmlGetsDisplayed);
-		if (prio < 100000) {
+		int prio = getCurrentPriorityIgnoringTime(dateForWhichHtmlGetsDisplayed);
+		if (prio < ERROR_CUTOFF) {
 			html.append(" class='error'");
-		} else if (prio < 360000) {
+		} else if (prio < WARNING_CUTOFF) {
 			html.append(" class='warning'");
 		}
 		String escTitle = HTML.escapeHTMLstr(title);
