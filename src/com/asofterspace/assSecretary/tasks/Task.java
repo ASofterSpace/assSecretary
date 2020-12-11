@@ -105,9 +105,10 @@ public class Task extends GenericTask {
 	}
 
 	/**
-	 * Get the current priority on a certain day
+	 * Get the current priority on a certain day, and if historicalView is true, order later entries
+	 * to the top, while if it is false, order earlier entries to the top (like on the shortlist)
 	 */
-	public int getCurrentPriority(Date currentDay) {
+	public int getCurrentPriority(Date currentDay, boolean historicalView) {
 
 		// if this task is "scheduled" for a particular time (so if its title starts with "HH:MM "
 		// or "HH:MM.."), then reduce priority by A LOT, also based on the time, so that timed
@@ -116,7 +117,13 @@ public class Task extends GenericTask {
 			if ((title.charAt(2) == ':') && ((title.charAt(5) == ' ') || (title.charAt(5) == '.')) &&
 				Character.isDigit(title.charAt(0)) && Character.isDigit(title.charAt(1)) &&
 				Character.isDigit(title.charAt(3)) && Character.isDigit(title.charAt(4))) {
-				return -(2500 - StrUtils.strToInt(title.substring(0, 2) + title.substring(3, 5)));
+
+				int timeVal = StrUtils.strToInt(title.substring(0, 2) + title.substring(3, 5));
+				if (historicalView) {
+					return -(100 + timeVal);
+				} else {
+					return -(2500 - timeVal);
+				}
 			}
 		}
 

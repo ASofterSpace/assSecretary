@@ -440,12 +440,26 @@ public class TaskCtrl extends TaskCtrlBase {
 	}
 
 	public void addTaskToShortListById(String id) {
+
 		if (id == null) {
 			return;
 		}
-		if (!shortlistIds.contains(id)) {
-			shortlistIds.add(id);
+
+		Task task = getTaskById(id);
+
+		if (task == null) {
+			return;
 		}
+
+		if (task.hasBeenDone()) {
+			return;
+		}
+
+		if (shortlistIds.contains(id)) {
+			return;
+		}
+
+		shortlistIds.add(id);
 	}
 
 	public void addTaskToShortListTomorrowById(String id) {

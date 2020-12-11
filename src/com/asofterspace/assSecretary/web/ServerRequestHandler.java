@@ -424,9 +424,11 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 				List<Task> shortlistTasks = taskCtrl.getTasksOnShortlist();
 
+				boolean historicalView = false;
+
 				Collections.sort(shortlistTasks, new Comparator<Task>() {
 					public int compare(Task a, Task b) {
-						return a.getCurrentPriority(today) - b.getCurrentPriority(today);
+						return a.getCurrentPriority(today, historicalView) - b.getCurrentPriority(today, historicalView);
 					}
 				});
 
@@ -435,7 +437,6 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 				} else {
 					taskShortlistHtml.append("<div style='padding-bottom:0;'>Here is the task shortlist for today:</div>");
 					taskShortlistHtml.append("<div>");
-					boolean historicalView = false;
 					boolean reducedView = false;
 					boolean onShortlist = true;
 					for (Task shortlistTask : shortlistTasks) {
@@ -557,12 +558,11 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 				Collections.sort(tasks, new Comparator<Task>() {
 					public int compare(Task a, Task b) {
-						return a.getCurrentPriority(today) - b.getCurrentPriority(today);
+						return a.getCurrentPriority(today, historicalView) - b.getCurrentPriority(today, historicalView);
 					}
 				});
 
 				StringBuilder taskHtml = new StringBuilder();
-				boolean historicalView = false;
 				boolean reducedView = false;
 				boolean onShortlist = false;
 				if (tasks.size() > 0) {
@@ -664,12 +664,14 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 				boolean onlyGetDone = true;
 				tasks = addExternalTaskInstances(tasks, null, null, onlyGetDone);
 
+				boolean historicalView = true;
+
 				Collections.sort(tasks, new Comparator<Task>() {
 					public int compare(Task a, Task b) {
 						Date aDone = a.getDoneDate();
 						Date bDone = b.getDoneDate();
 						if (DateUtils.isSameDay(aDone, bDone)) {
-							return a.getCurrentPriority(aDone) - b.getCurrentPriority(bDone);
+							return a.getCurrentPriority(aDone, historicalView) - b.getCurrentPriority(bDone, historicalView);
 						}
 						if (aDone.before(bDone)) {
 							return 1;
@@ -679,7 +681,6 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 				});
 
 				StringBuilder taskHtml = new StringBuilder();
-				boolean historicalView = true;
 				boolean reducedView = false;
 				boolean onShortlist = false;
 				if (tasks.size() > 0) {
@@ -787,14 +788,15 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 						}
 					}
 
+					boolean historicalView = false;
+
 					Collections.sort(tasksToday, new Comparator<Task>() {
 						public int compare(Task a, Task b) {
-							return a.getCurrentPriority(day) - b.getCurrentPriority(day);
+							return a.getCurrentPriority(day, historicalView) - b.getCurrentPriority(day, historicalView);
 						}
 					});
 
 					for (Task task : tasksToday) {
-						boolean historicalView = false;
 						boolean reducedView = true;
 						boolean onShortlist = false;
 						task.appendHtmlTo(weeklyHtmlStr, historicalView, reducedView, onShortlist, day);
