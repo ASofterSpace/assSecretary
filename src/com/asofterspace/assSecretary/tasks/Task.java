@@ -127,7 +127,15 @@ public class Task extends GenericTask {
 			}
 		}
 
-		return getCurrentPriorityIgnoringTime(currentDay);
+		// timed entries start at priority -100, so ensure that untimed entries do not go below -50,
+		// so as to not become mixed up among them
+		int result = getCurrentPriorityIgnoringTime(currentDay);
+
+		if (result < -50) {
+			return -50;
+		}
+
+		return result;
 	}
 
 	public int getCurrentPriorityIgnoringTime(Date currentDay) {
