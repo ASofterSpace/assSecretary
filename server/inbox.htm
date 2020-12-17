@@ -14,14 +14,14 @@
 	</head>
 
 	<body id="body" style="padding-left: 0px;">
-		<div id="mainContent">
-			<div class="buttonBar">
+		<div id="mainContent" style="overflow: hidden;">
+			<div class="buttonBar" style="padding-top: 3pt;">
 				<span class="button" onclick="window.secretary.removeLinebreaksInInbox()">Remove Linebreaks</span>
 				<span class="button" onclick="window.secretary.convertSelectionIntoTask()">Convert Selection into Task</span>
 			</div>
 
 			<textarea id="inboxArea" onchange="window.dirtify();" oninput="window.dirtify();"
-				style="width: 100%;box-sizing: border-box;height: 1000pt;">[[INBOX_CONTENT]]</textarea>
+				style="width: 100%;box-sizing: border-box;height: 96%;">[[INBOX_CONTENT]]</textarea>
 
 			<script>
 				window.dirtify = function() {
@@ -69,8 +69,6 @@
 					window.inboxCurrentlyEdited = false;
 				}, 5000);
 			</script>
-
-			<div class="footer">&nbsp;</div>
 
 		</div>
 
