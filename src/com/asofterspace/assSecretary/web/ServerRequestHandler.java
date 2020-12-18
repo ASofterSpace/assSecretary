@@ -363,14 +363,9 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 	@Override
 	protected File getFileFromLocation(String location, String[] arguments) {
 
-		// get project logo files from assWorkbench
-		if (location.startsWith("/projectlogos/") && location.endsWith(".png") && !location.contains("..")) {
-			location = location.substring("/projectlogos/".length());
-			location = System.getProperty("java.class.path") + "/../../assWorkbench/server/projects/" + location;
-			File result = new File(location);
-			if (result.exists()) {
-				return result;
-			}
+		File sideBarImageFile = SideBarCtrl.getSideBarImageFile(location);
+		if (sideBarImageFile != null) {
+			return sideBarImageFile;
 		}
 
 		String locEquiv = getWhitelistedLocationEquivalent(location);
