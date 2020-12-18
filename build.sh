@@ -18,6 +18,7 @@ mkdir images
 mkdir io
 mkdir projects
 mkdir utils
+mkdir virtualEmployees
 mkdir web
 
 cd ../../../..
@@ -29,6 +30,7 @@ cp ../Toolbox-Java/src/com/asofterspace/toolbox/images/*.* src/com/asofterspace/
 cp ../Toolbox-Java/src/com/asofterspace/toolbox/io/*.* src/com/asofterspace/toolbox/io
 cp ../Toolbox-Java/src/com/asofterspace/toolbox/projects/*.* src/com/asofterspace/toolbox/projects
 cp ../Toolbox-Java/src/com/asofterspace/toolbox/utils/*.* src/com/asofterspace/toolbox/utils
+cp ../Toolbox-Java/src/com/asofterspace/toolbox/virtualEmployees/*.* src/com/asofterspace/toolbox/virtualEmployees
 cp ../Toolbox-Java/src/com/asofterspace/toolbox/web/*.* src/com/asofterspace/toolbox/web
 
 

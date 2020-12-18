@@ -18,9 +18,6 @@ import com.asofterspace.toolbox.io.JSON;
 import com.asofterspace.toolbox.io.JsonFile;
 import com.asofterspace.toolbox.io.JsonParseException;
 import com.asofterspace.toolbox.io.SimpleFile;
-import com.asofterspace.toolbox.io.TextFile;
-import com.asofterspace.toolbox.projects.GenericProject;
-import com.asofterspace.toolbox.projects.GenericProjectCtrl;
 import com.asofterspace.toolbox.utils.StrUtils;
 import com.asofterspace.toolbox.Utils;
 import com.asofterspace.toolbox.web.WebAccessedCallback;
@@ -39,14 +36,13 @@ public class AssSecretary {
 	public final static String WEB_ROOT_DIR = "deployed";
 
 	public final static String PROGRAM_TITLE = "assSecretary (Hugo)";
-	public final static String VERSION_NUMBER = "0.0.0.9(" + Utils.TOOLBOX_VERSION_NUMBER + ")";
-	public final static String VERSION_DATE = "21. October 2020 - 2. December 2020";
+	public final static String VERSION_NUMBER = "0.0.1.0(" + Utils.TOOLBOX_VERSION_NUMBER + ")";
+	public final static String VERSION_DATE = "21. October 2020 - 18. December 2020";
 
 	private static Database database;
 
 	private static VmInfo vmInfo;
 	private static WebInfo webInfo;
-	private static String projHtmlStr;
 
 
 	public static void main(String[] args) {
@@ -103,28 +99,6 @@ public class AssSecretary {
 			WebTemplateEngine engine = new WebTemplateEngine(serverDir, jsonConfig);
 
 			engine.compileTo(webRoot);
-
-
-			GenericProjectCtrl projectCtrl = new GenericProjectCtrl(
-				System.getProperty("java.class.path") + "/../../assWorkbench/server/projects");
-			List<GenericProject> projects = projectCtrl.getGenericProjects();
-			StringBuilder projHtml = new StringBuilder();
-
-			for (GenericProject proj : projects) {
-				if (proj.isOnShortlist()) {
-					projHtml.append("\n");
-					projHtml.append("  <a href=\"localhost:3010/projects/" + proj.getShortName() + "/?open=logbook\" target=\"_blank\" class=\"project\" style=\"border-color: " + proj.getColor().toHexString() + "\">");
-					projHtml.append("    <span class=\"vertAligner\"></span><img src=\"projectlogos/" + proj.getShortName() + "/logo.png\" />");
-					projHtml.append("  </a>");
-				}
-			}
-
-			projHtmlStr = projHtml.toString();
-
-			TextFile indexBaseFile = new TextFile(webRoot, "index.htm");
-			String indexContent = indexBaseFile.getContent();
-			indexContent = StrUtils.replaceAll(indexContent, "[[PROJECTS]]", projHtmlStr);
-			indexBaseFile.saveContent(indexContent);
 
 
 			System.out.println("Starting the server on port " + database.getPort() + "...");
@@ -252,10 +226,6 @@ public class AssSecretary {
 		WebAccessedCallback callback = new WebInfoCallback(webInfo, origin, which, missionControlDatabase);
 
 		WebAccessor.getAsynch(url, callback);
-	}
-
-	public static String getProjHtmlStr() {
-		return projHtmlStr;
 	}
 
 }
