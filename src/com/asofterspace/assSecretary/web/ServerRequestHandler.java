@@ -960,7 +960,17 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 			if (task != null) {
 				task.setTitle(json.getString("title"));
 				task.setDetailsStr(json.getString("details"));
-				task.setReleasedDate(json.getDate("releaseDate"));
+
+				// if we are changing the released date to a new one, which is after the current released date,
+				// AND after today, then remove it from the shortlist (in case it is on it)!
+				Date newReleasedDate = json.getDate("releaseDate");
+				Date prevReleaseDate = task.getReleaseDate();
+				if (DateUtils.dateAAfterDateB(newReleasedDate, prevReleaseDate) &&
+					DateUtils.dateAAfterDateB(newReleasedDate, DateUtils.now())) {
+					taskCtrl.removeTaskFromShortListById(task.getId());
+				}
+				task.setReleasedDate(newReleasedDate);
+
 				setDoneDateBasedOnJson(task, json);
 				task.setOrigin(json.getString("origin"));
 				task.setPriority(json.getInteger("priority"));
