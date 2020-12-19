@@ -176,17 +176,14 @@ img.avatar {
 	border-radius: 20pt;
 }
 
-a.sidebar, div.projectbar {
+a.sidebar, div.sidebar, div.projectbar {
 	position: absolute;
 	right: 10pt;
 	width: 50pt;
+	cursor: pointer;
 }
 
-a.sidebar {
-	top: 10pt;
-}
-
-a.sidebar > img.avatar {
+a.sidebar > img.avatar, div.sidebar > img.avatar {
 	position: relative;
 	width: 100%;
 	border-radius: 5pt;

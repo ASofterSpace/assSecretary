@@ -74,6 +74,12 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 			return;
 		}
 
+		WebServerAnswer sideBarAnswer = SideBarCtrl.handlePost(fileLocation, jsonData);
+		if (sideBarAnswer != null) {
+			respond(200, sideBarAnswer);
+			return;
+		}
+
 
 		// TODO :: catch some IO exceptions? (or make sure that none are thrown?)
 
