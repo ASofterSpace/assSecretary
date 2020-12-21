@@ -4,6 +4,7 @@
  */
 package com.asofterspace.assSecretary.tasks;
 
+import com.asofterspace.assSecretary.AssSecretary;
 import com.asofterspace.toolbox.calendar.GenericTask;
 import com.asofterspace.toolbox.io.HTML;
 import com.asofterspace.toolbox.utils.DateUtils;
@@ -94,6 +95,31 @@ public class Task extends GenericTask {
 
 	public String getOrigin() {
 		return origin;
+	}
+
+	/**
+	 * get three letter abbreviation of the origin
+	 */
+	public String getOriginTLA() {
+		String tla = getOrigin();
+		if (tla == null) {
+			return "N/A";
+		}
+		switch (tla) {
+			case "private":
+				tla = AssSecretary.getDatabase().getUsername();
+				break;
+			case "asofterspace":
+				return "ASS";
+			case "ppcc":
+				return "PPCC";
+			case "supervisionearth":
+				return "SVE";
+			case "firefighting":
+				return "FF";
+		}
+		tla = tla.substring(0, 3).toUpperCase();
+		return tla;
 	}
 
 	public void setOrigin(String origin) {
@@ -262,8 +288,8 @@ public class Task extends GenericTask {
 
 		String id = getId();
 
-		// by default, main Width is 60%
-		float mainWidth = 60;
+		// by default, main Width is 68%
+		float mainWidth = 68;
 
 		String futureTaskStr = "";
 		if (releasedInTheFuture()) {
@@ -286,7 +312,7 @@ public class Task extends GenericTask {
 		}
 		if (!reducedView) {
 			if (isInstance()) {
-				html.append("<span style='width: 8%;'>");
+				html.append("<span style='width: 7.5%;'>");
 				if (historicalView) {
 					html.append(DateUtils.serializeDate(getDoneDate()));
 				} else {
@@ -295,13 +321,24 @@ public class Task extends GenericTask {
 				html.append("</span>");
 			} else {
 				String schedDateStr = getScheduleDateStr();
-				html.append("<span style='width: 8%;' title='");
+				html.append("<span style='width: 7.5%;' title='");
 				html.append(schedDateStr);
 				html.append("'>");
 				html.append(schedDateStr);
 				html.append("</span>");
 			}
+			mainWidth -= 7.5;
 		}
+
+		html.append("<span class='tla'");
+		if (reducedView) {
+			html.append(" style='vertical-align: 1pt;'");
+		}
+		html.append(">");
+		html.append(getOriginTLA());
+		html.append("</span>");
+		mainWidth -= 3;
+
 		html.append("<span style='width: ");
 		int charsBeforeWidth = html.length();
 		html.append(";'");
@@ -315,6 +352,9 @@ public class Task extends GenericTask {
 		html.append(" title='");
 		html.append(escTitle);
 		html.append("'>");
+		if (reducedView) {
+			html.append("&nbsp;");
+		}
 		html.append(escTitle);
 		html.append("</span>");
 

@@ -221,6 +221,14 @@ div.datepicker td, div.datepicker tr {
 	text-align: center;
 }
 
+span.tla {
+	width: 3%;
+	text-overflow: clip;
+	text-align: center;
+	font-size: 80%;
+	padding-top: 2pt;
+}
+
 span.vertAligner {
 	display: inline-block;
 	height: 100%;
