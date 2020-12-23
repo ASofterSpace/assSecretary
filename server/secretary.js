@@ -66,7 +66,9 @@ window.secretary = {
 
 			document.getElementById("singleTaskReleaseUntil").value = "";
 
-			document.getElementById("singleTaskBasedOnRepeating").style.display="none";
+			document.getElementById("singleTaskBasedOnRepeating").style.display = "none";
+
+			window.secretary.taskPriorityChange("single");
 		}
 	},
 
@@ -79,6 +81,8 @@ window.secretary = {
 			this.currentlyEditingRepeating = null;
 
 			document.getElementById("modalBackground").style.display = "block";
+
+			window.secretary.taskPriorityChange("repeating");
 		}
 	},
 
