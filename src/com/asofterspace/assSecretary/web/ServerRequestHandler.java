@@ -415,7 +415,8 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 				tabsHtml += "<a href='/inbox.htm'>Inbox</a>";
 				tabsHtml += "<a href='/repeating.htm'>Repeating Tasks</a>";
 				tabsHtml += "<a href='/tasklog.htm'>Task Log</a>";
-				tabsHtml += "<a href='/weekly.htm'>Weekly Plan</a>";
+				tabsHtml += "<a href='/weekly.htm'>Weekly View</a>";
+				tabsHtml += "<a href='/monthly.htm'>Monthly View</a>";
 				tabsHtml += "</div>";
 
 				indexContent = StrUtils.replaceAll(indexContent, "[[TABS]]", tabsHtml);
@@ -811,6 +812,137 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 				}
 
 				indexContent = StrUtils.replaceAll(indexContent, "[[WEEKLY_PLAN]]", weeklyHtmlStr.toString());
+
+				locEquiv = "_" + locEquiv;
+				TextFile indexFile = new TextFile(webRoot, locEquiv);
+				indexFile.saveContent(indexContent);
+			}
+
+
+			// answering a request for the monthly view
+			if (locEquiv.equals("monthly.htm")) {
+
+				System.out.println("Answering monthly view request...");
+
+				TextFile indexBaseFile = new TextFile(webRoot, locEquiv);
+				String indexContent = indexBaseFile.getContent();
+
+				// the actual today that it really is... today
+				Date actualToday = DateUtils.now();
+				// the "today" for which the chart is generated, by default the actual today
+				Date today = actualToday;
+				for (String arg : arguments) {
+					if (arg.contains("=")) {
+						String key = arg.substring(0, arg.indexOf("="));
+						if ("date".equals(key)) {
+							today = DateUtils.parseDate(arg.substring(arg.indexOf("=") + 1));
+						}
+					}
+				}
+
+				int dayNum = 1;
+				int month = DateUtils.getMonth(today);
+				int year = DateUtils.getYear(today);
+				indexContent = StrUtils.replaceAll(indexContent, "[[PREV_DATE_YEAR]]", DateUtils.serializeDate(DateUtils.parseDateNumbers(1, month, year - 1)));
+				indexContent = StrUtils.replaceAll(indexContent, "[[PREV_DATE_MONTH]]", DateUtils.serializeDate(DateUtils.parseDateNumbers(1, month - 1, year)));
+				indexContent = StrUtils.replaceAll(indexContent, "[[NEXT_DATE_MONTH]]", DateUtils.serializeDate(DateUtils.parseDateNumbers(1, month + 1, year)));
+				indexContent = StrUtils.replaceAll(indexContent, "[[NEXT_DATE_YEAR]]", DateUtils.serializeDate(DateUtils.parseDateNumbers(1, month, year + 1)));
+
+				indexContent = StrUtils.replaceAll(indexContent, "[[CURDATE]]", DateUtils.serializeDate(DateUtils.now()));
+
+				indexContent = StrUtils.replaceAll(indexContent, "[[MINI_CALENDAR]]", getMiniCalendarHtml());
+
+				indexContent = StrUtils.replaceAll(indexContent, "[[SIDEBAR]]", SideBarCtrl.getSidebarHtmlStr());
+
+				StringBuilder monthlyHtmlStr = new StringBuilder();
+
+				today = DateUtils.parseDateNumbers(dayNum, month, year);
+
+				while (DateUtils.getMonth(today) == month) {
+
+					monthlyHtmlStr.append("<div>");
+
+					StringBuilder weeklyHtmlStr = new StringBuilder();
+
+					List<Date> weekDays = DateUtils.getWeekForDate(today);
+
+					List<Task> tasks = taskCtrl.getAllTaskInstancesAsTasks();
+
+					boolean onlyGetDone = false;
+					tasks = addExternalTaskInstances(tasks, weekDays.get(0), weekDays.get(6), onlyGetDone);
+
+					List<Task> baseTasksForSchedule = getHugoAndMariTasks();
+
+					for (Date day : weekDays) {
+						boolean isToday = DateUtils.isSameDay(actualToday, day);
+						weeklyHtmlStr.append("<div class='weekly_day");
+						String boldness = "";
+						if (isToday) {
+							weeklyHtmlStr.append(" today");
+							boldness = "font-weight: bold;";
+						}
+						weeklyHtmlStr.append("'");
+						// set days to transparent which do not actually belong to the current month
+						if (DateUtils.getMonth(day) != month) {
+							weeklyHtmlStr.append(" style='opacity: 0.4;'");
+						}
+						weeklyHtmlStr.append(">");
+						weeklyHtmlStr.append("<div style='text-align: center; ");
+						weeklyHtmlStr.append(boldness);
+						weeklyHtmlStr.append("'>");
+						weeklyHtmlStr.append(DateUtils.serializeDate(day));
+						weeklyHtmlStr.append("</div>");
+						weeklyHtmlStr.append("<div style='text-align: center; ");
+						weeklyHtmlStr.append(boldness);
+						weeklyHtmlStr.append(" padding-bottom: 10pt;'>");
+						weeklyHtmlStr.append(DateUtils.getDayOfWeekNameEN(day));
+						weeklyHtmlStr.append("</div>");
+
+						List<Task> tasksToday = new ArrayList<>();
+
+						// check for all task instances if they apply today
+						for (Task task : tasks) {
+							if (task.appliesTo(day)) {
+								tasksToday.add(task);
+							}
+						}
+
+						// for days in the future, also add ghost tasks (non-instances) - but no in the past,
+						// as there we would expect real instances to have been created instead!
+						if (day.after(actualToday)) {
+							for (Task task : baseTasksForSchedule) {
+								if (task.isScheduledOn(day)) {
+									tasksToday.add(task);
+								}
+							}
+						}
+
+						boolean historicalView = false;
+
+						Collections.sort(tasksToday, new Comparator<Task>() {
+							public int compare(Task a, Task b) {
+								return a.getCurrentPriority(day, historicalView) - b.getCurrentPriority(day, historicalView);
+							}
+						});
+
+						for (Task task : tasksToday) {
+							boolean reducedView = true;
+							boolean onShortlist = false;
+							task.appendHtmlTo(weeklyHtmlStr, historicalView, reducedView, onShortlist, day);
+						}
+
+						weeklyHtmlStr.append("</div>");
+					}
+
+					monthlyHtmlStr.append("</div>");
+
+					monthlyHtmlStr.append(weeklyHtmlStr);
+
+					dayNum += 7;
+					today = DateUtils.parseDateNumbers(dayNum, month, year);
+				}
+
+				indexContent = StrUtils.replaceAll(indexContent, "[[MONTHLY_PLAN]]", monthlyHtmlStr.toString());
 
 				locEquiv = "_" + locEquiv;
 				TextFile indexFile = new TextFile(webRoot, locEquiv);
