@@ -10,7 +10,6 @@ import com.asofterspace.toolbox.io.HTML;
 import com.asofterspace.toolbox.utils.DateUtils;
 import com.asofterspace.toolbox.utils.StrUtils;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -546,19 +545,24 @@ public class Task extends GenericTask {
 				html.append("-shortlist");
 			}
 			html.append("'>");
-			List<String> safeDetails = new ArrayList<>();
 			if (details != null) {
-				String br = "";
-				for (String detail : details) {
+				int lastDetail = details.size() - 1;
+				while (lastDetail >= 0) {
+					if (!details.get(lastDetail).equals("")) {
+						break;
+					}
+					lastDetail--;
+				}
+				for (int i = 0; i <= lastDetail; i++) {
+					String detail = details.get(i);
 					detail = StrUtils.replaceAll(detail, "<", "&lt;");
 					detail = StrUtils.replaceAll(detail, ">", "&gt;");
 					detail = addHtmlLinkToStringContent(detail, "http://");
 					detail = addHtmlLinkToStringContent(detail, "https://");
-					safeDetails.add(detail);
-					html.append(br);
-					br = "<br>";
 					html.append(detail);
+					html.append("<br>");
 				}
+				html.append("&nbsp;");
 			}
 			html.append("</div>");
 		}
