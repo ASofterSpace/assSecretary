@@ -233,6 +233,9 @@ public class Task extends GenericTask {
 		if (str == null) {
 			return null;
 		}
+		// accept o and O as 0 in the duration field
+		str = StrUtils.replaceAll(str, "o", "0");
+		str = StrUtils.replaceAll(str, "O", "0");
 		if (str.contains(":")) {
 			String[] strs = str.split(":");
 			String hours = strs[0];
