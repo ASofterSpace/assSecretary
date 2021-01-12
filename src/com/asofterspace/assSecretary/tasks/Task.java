@@ -290,8 +290,8 @@ public class Task extends GenericTask {
 
 		String id = getId();
 
-		// by default, main Width is 68%
-		float mainWidth = 68;
+		// by default, main Width is the full 100%
+		float mainWidth = 100;
 
 		String futureTaskStr = "";
 		if (releasedInTheFuture()) {
@@ -362,8 +362,8 @@ public class Task extends GenericTask {
 
 		boolean hasDetails = false;
 
-		String miniBtnStyle = "margin-left: 0.5%;";
-		String btnStyle = "width: 5.5%; " + miniBtnStyle;
+		String miniBtnStyle = "margin-left: 0.5%; box-sizing: border-box; ";
+		String btnStyle = "width: 6%; " + miniBtnStyle;
 
 		if (reducedView) {
 			html.append("</div>");
@@ -380,30 +380,47 @@ public class Task extends GenericTask {
 			}
 		}
 
+		if (!reducedView) {
+			if (hasDetails) {
+				String detailsId = id;
+				if (onShortlist) {
+					detailsId += "-shortlist";
+				}
+				html.append("<span style='");
+				html.append(btnStyle);
+				html.append("' class='button' onclick='secretary.taskDetails(\"");
+				html.append(detailsId);
+				html.append("\")'>");
+				html.append("Details");
+				html.append("</span>");
+				mainWidth -= 6.5;
+			}
+		}
+
 		if (externalSource != null) {
 
-			html.append("<span style='width: 8%;' class='button'>");
+			html.append("<span style='width: 8%; " + miniBtnStyle + "' class='button'>");
 			html.append("(from ");
 			html.append(externalSource);
 			html.append(")");
 			html.append("</span>");
-			mainWidth += 18.5;
+			mainWidth -= 8.5;
 
 		} else if (workbenchLink != null) {
 
-			html.append("<span style='width: 10%;' class='button' onclick='secretary.openInNewTab(\"");
+			html.append("<span style='width: 10%; " + miniBtnStyle + "' class='button' onclick='secretary.openInNewTab(\"");
 			html.append(workbenchLink);
 			html.append("\")'>");
 			html.append("(from Workbench)");
 			html.append("</span>");
-			mainWidth += 16.5;
+			mainWidth -= 10.5;
 
 		} else if (TaskCtrl.FINANCE_ORIGIN.equals(origin)) {
 
-			html.append("<span style='width: 8%;' class='button'>");
+			html.append("<span style='width: 8%; " + miniBtnStyle + "' class='button'>");
 			html.append("(from Mari)");
 			html.append("</span>");
-			mainWidth += 18.5;
+			mainWidth -= 8.5;
 
 		// if this is not an actual instance, but just a ghost of a scheduled task, then of course it cannot
 		// be edited in any way shape or form, so no point in showing any of the regular buttons :)
@@ -413,11 +430,11 @@ public class Task extends GenericTask {
 			html.append("<span style='");
 			if (reducedView) {
 				html.append(btnStyle);
-				mainWidth += 7;
+				mainWidth -= 6.5;
 			} else {
 				html.append("width: 7.5%; ");
 				html.append(miniBtnStyle);
-				mainWidth += 5;
+				mainWidth -= 8;
 			}
 			html.append("' class='button' onclick='secretary.taskPreRelease(\"");
 			html.append(id);
@@ -427,6 +444,7 @@ public class Task extends GenericTask {
 			html.append("\")'>");
 			html.append("Pre-Release");
 			html.append("</span>");
+
 			html.append("<span style='");
 			html.append(btnStyle);
 			html.append("' class='button' onclick='secretary.repeatingTaskEdit(\"");
@@ -434,6 +452,8 @@ public class Task extends GenericTask {
 			html.append("\")'>");
 			html.append("Edit");
 			html.append("</span>");
+			mainWidth -= 6.5;
+
 			html.append("<span style='");
 			html.append(btnStyle);
 			html.append("' class='button' onclick='secretary.taskDelete(\"");
@@ -444,32 +464,9 @@ public class Task extends GenericTask {
 			html.append("\", null)'>");
 			html.append("Delete");
 			html.append("</span>");
+			mainWidth -= 6.5;
 
 		} else {
-
-			if (!reducedView) {
-				if (hasDetails) {
-					String detailsId = id;
-					if (onShortlist) {
-						detailsId += "-shortlist";
-					}
-					html.append("<span style='");
-					html.append(btnStyle);
-					html.append("' class='button' onclick='secretary.taskDetails(\"");
-					html.append(detailsId);
-					html.append("\")'>");
-					html.append("Details");
-					html.append("</span>");
-				} else {
-					// this is 1.5% width instead of 5.5%, so that the main width can be increased by 4 percent points
-					mainWidth += 4;
-					html.append("<span style='width:1.5%;");
-					html.append(miniBtnStyle);
-					html.append(" visibility: hidden;' class='button'>");
-					html.append("&nbsp;");
-					html.append("</span>");
-				}
-			}
 
 			if (hasBeenDone()) {
 				html.append("<span style='");
@@ -479,6 +476,7 @@ public class Task extends GenericTask {
 				html.append("\")'>");
 				html.append("Un-done");
 				html.append("</span>");
+				mainWidth -= 6.5;
 			} else {
 				html.append("<span style='");
 				html.append(btnStyle);
@@ -487,7 +485,9 @@ public class Task extends GenericTask {
 				html.append("\")'>");
 				html.append("Done");
 				html.append("</span>");
+				mainWidth -= 6.5;
 			}
+
 			html.append("<span style='");
 			html.append(btnStyle);
 			html.append("' class='button' onclick='secretary.taskEdit(\"");
@@ -495,6 +495,8 @@ public class Task extends GenericTask {
 			html.append("\")'>");
 			html.append("Edit");
 			html.append("</span>");
+			mainWidth -= 6.5;
+
 			html.append("<span style='");
 			html.append(btnStyle);
 			html.append("' class='button' onclick='secretary.taskDelete(\"");
@@ -507,32 +509,36 @@ public class Task extends GenericTask {
 			html.append("\")'>");
 			html.append("Delete");
 			html.append("</span>");
+			mainWidth -= 6.5;
+
 			if ((!reducedView) && (!historicalView)) {
 				if (onShortlist) {
-					html.append("<span style='");
+					html.append("<span style='width: 2.5%; ");
 					html.append(miniBtnStyle);
 					html.append("' class='button' onclick='secretary.taskRemoveFromShortList(\"");
 					html.append(id);
 					html.append("\")'>");
 					html.append("&#9734;");
 					html.append("</span>");
-					html.append("<span style='");
+					mainWidth -= 3;
+
+					html.append("<span style='width: 2.5%; ");
 					html.append(miniBtnStyle);
 					html.append("' class='button' onclick='secretary.taskPutOnShortListTomorrow(\"");
 					html.append(id);
 					html.append("\")'>");
 					html.append("&#x2B6F;");
 					html.append("</span>");
-					// we are showing two minibuttons instead of one, so the main width has to be shorter here
 					mainWidth -= 3;
 				} else {
-					html.append("<span style='");
+					html.append("<span style='width: 2.5%; ");
 					html.append(miniBtnStyle);
 					html.append("' class='button' onclick='secretary.taskAddToShortList(\"");
 					html.append(id);
 					html.append("\")'>");
 					html.append("&#9733;");
 					html.append("</span>");
+					mainWidth -= 3;
 				}
 			}
 		}
