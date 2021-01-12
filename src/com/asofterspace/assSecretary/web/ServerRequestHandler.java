@@ -393,6 +393,13 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 			}
 
 
+			// whenever any page is loaded, generate instances up until today, but do not save them yet
+			// (saving will be done when anything is actually done with the generated instances)
+			if (locEquiv.endsWith(".htm")) {
+				taskCtrl.generateNewInstances(DateUtils.now());
+			}
+
+
 			// answering a request for general information
 			if (locEquiv.equals("index.htm")) {
 
