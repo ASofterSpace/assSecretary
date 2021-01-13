@@ -543,7 +543,13 @@ window.secretary = {
 			if (request.readyState == 4 && request.status == 200) {
 				var result = JSON.parse(request.response);
 				if (result.success) {
-					window.location.reload(false);
+					// just hiding the task div is actually perfectly enough, a full refresh is not necessary
+					var taskDiv = document.getElementById("task-" + id + "-on-shortlist");
+					if (taskDiv) {
+						taskDiv.style.display = 'none';
+					} else {
+						window.location.reload(false);
+					}
 				}
 			}
 		}
@@ -565,7 +571,13 @@ window.secretary = {
 			if (request.readyState == 4 && request.status == 200) {
 				var result = JSON.parse(request.response);
 				if (result.success) {
-					window.location.reload(false);
+					// just hiding the task div is actually perfectly enough, a full refresh is not necessary
+					var taskDiv = document.getElementById("task-" + id + "-on-shortlist");
+					if (taskDiv) {
+						taskDiv.style.display = 'none';
+					} else {
+						window.location.reload(false);
+					}
 				}
 			}
 		}

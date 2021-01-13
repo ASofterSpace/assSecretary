@@ -303,14 +303,21 @@ public class Task extends GenericTask {
 
 		if (onShortlist) {
 			// tasks on the shortlist are not affected by such mundane things as filtering etc.
-			html.append("<div class='line'>");
-		} else {
-			html.append("<div class='line task task-with-origin-");
-			html.append(getOrigin());
-			html.append(futureTaskStr);
-			html.append("' id='task-");
+			html.append("<div class='line' id='task-");
 			html.append(id);
-			html.append("'>");
+			html.append("-on-shortlist'>");
+		} else {
+			if (readonly) {
+				// readonly tasks are not affected by such mundane things as filtering etc. either
+				html.append("<div class='line'>");
+			} else {
+				html.append("<div class='line task task-with-origin-");
+				html.append(getOrigin());
+				html.append(futureTaskStr);
+				html.append("' id='task-");
+				html.append(id);
+				html.append("'>");
+			}
 		}
 		if (reducedView) {
 			html.append("<div>");
