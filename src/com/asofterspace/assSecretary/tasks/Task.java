@@ -286,7 +286,7 @@ public class Task extends GenericTask {
 	}
 
 	public void appendHtmlTo(StringBuilder html, boolean historicalView, boolean reducedView,
-		boolean onShortlist, Date dateForWhichHtmlGetsDisplayed, boolean readonly) {
+		boolean onShortlist, Date dateForWhichHtmlGetsDisplayed, boolean standalone) {
 
 		String id = getId();
 
@@ -295,9 +295,7 @@ public class Task extends GenericTask {
 
 		String futureTaskStr = "";
 
-		// future tasks are invisible by default, but if the tasks are readonly then they are
-		// shown in some other place and can actually be seen
-		if ((!readonly) && releasedInTheFuture()) {
+		if (releasedInTheFuture()) {
 			futureTaskStr = " future-task";
 		}
 
@@ -307,8 +305,8 @@ public class Task extends GenericTask {
 			html.append(id);
 			html.append("-on-shortlist'>");
 		} else {
-			if (readonly) {
-				// readonly tasks are not affected by such mundane things as filtering etc. either
+			if (standalone) {
+				// standalone tasks are not affected by such mundane things as filtering etc. either
 				html.append("<div class='line'>");
 			} else {
 				html.append("<div class='line task task-with-origin-");
@@ -437,122 +435,118 @@ public class Task extends GenericTask {
 		} else if (!isInstance()) {
 			// on the other hand, a non-instance CAN be prematurely released to achieve an instance which CAN be edited!
 
-			if (!readonly) {
-				html.append("<span style='");
-				if (reducedView) {
-					html.append(btnStyle);
-					mainWidth -= 6.5;
-				} else {
-					html.append("width: 7.5%; ");
-					html.append(miniBtnStyle);
-					mainWidth -= 8;
-				}
-				html.append("' class='button' onclick='secretary.taskPreRelease(\"");
-				html.append(id);
-				html.append("\", ");
-				html.append("\"");
-				html.append(DateUtils.serializeDate(dateForWhichHtmlGetsDisplayed));
-				html.append("\")'>");
-				html.append("Pre-Release");
-				html.append("</span>");
+			html.append("<span style='");
+			if (reducedView) {
+				html.append(btnStyle);
+				mainWidth -= 6.5;
+			} else {
+				html.append("width: 9.5%; ");
+				html.append(miniBtnStyle);
+				mainWidth -= 10;
+			}
+			html.append("' class='button' onclick='secretary.taskPreRelease(\"");
+			html.append(id);
+			html.append("\", ");
+			html.append("\"");
+			html.append(DateUtils.serializeDate(dateForWhichHtmlGetsDisplayed));
+			html.append("\")'>");
+			html.append("Pre-Release");
+			html.append("</span>");
 
+			html.append("<span style='");
+			html.append(btnStyle);
+			html.append("' class='button' onclick='secretary.repeatingTaskEdit(\"");
+			html.append(id);
+			html.append("\")'>");
+			html.append("Edit");
+			html.append("</span>");
+			mainWidth -= 6.5;
+
+			html.append("<span style='");
+			html.append(btnStyle);
+			html.append("' class='button' onclick='secretary.taskDelete(\"");
+			html.append(id);
+			html.append("\", ");
+			html.append("\"");
+			html.append(HTML.escapeHTMLstr(StrUtils.replaceAll(title, "\"", "")));
+			html.append("\", null)'>");
+			html.append("Delete");
+			html.append("</span>");
+			mainWidth -= 6.5;
+
+		} else {
+
+			if (hasBeenDone()) {
 				html.append("<span style='");
 				html.append(btnStyle);
-				html.append("' class='button' onclick='secretary.repeatingTaskEdit(\"");
+				html.append("' class='button' onclick='secretary.taskUnDone(\"");
 				html.append(id);
 				html.append("\")'>");
-				html.append("Edit");
+				html.append("Un-done");
 				html.append("</span>");
 				mainWidth -= 6.5;
-
+			} else {
 				html.append("<span style='");
 				html.append(btnStyle);
-				html.append("' class='button' onclick='secretary.taskDelete(\"");
+				html.append("' class='button' onclick='secretary.taskDone(\"");
 				html.append(id);
-				html.append("\", ");
-				html.append("\"");
-				html.append(HTML.escapeHTMLstr(StrUtils.replaceAll(title, "\"", "")));
-				html.append("\", null)'>");
-				html.append("Delete");
+				html.append("\")'>");
+				html.append("Done");
 				html.append("</span>");
 				mainWidth -= 6.5;
 			}
 
-		} else {
+			html.append("<span style='");
+			html.append(btnStyle);
+			html.append("' class='button' onclick='secretary.taskEdit(\"");
+			html.append(id);
+			html.append("\")'>");
+			html.append("Edit");
+			html.append("</span>");
+			mainWidth -= 6.5;
 
-			if (!readonly) {
-				if (hasBeenDone()) {
-					html.append("<span style='");
-					html.append(btnStyle);
-					html.append("' class='button' onclick='secretary.taskUnDone(\"");
+			html.append("<span style='");
+			html.append(btnStyle);
+			html.append("' class='button' onclick='secretary.taskDelete(\"");
+			html.append(id);
+			html.append("\", ");
+			html.append("\"");
+			html.append(HTML.escapeHTMLstr(StrUtils.replaceAll(title, "\"", "")));
+			html.append("\", \"");
+			html.append(getReleasedDateStr());
+			html.append("\")'>");
+			html.append("Delete");
+			html.append("</span>");
+			mainWidth -= 6.5;
+
+			if ((!reducedView) && (!historicalView) && (!standalone)) {
+				if (onShortlist) {
+					html.append("<span style='width: 2.5%; ");
+					html.append(miniBtnStyle);
+					html.append("' class='button' onclick='secretary.taskRemoveFromShortList(\"");
 					html.append(id);
 					html.append("\")'>");
-					html.append("Un-done");
+					html.append("&#9734;");
 					html.append("</span>");
-					mainWidth -= 6.5;
+					mainWidth -= 3;
+
+					html.append("<span style='width: 2.5%; ");
+					html.append(miniBtnStyle);
+					html.append("' class='button' onclick='secretary.taskPutOnShortListTomorrow(\"");
+					html.append(id);
+					html.append("\")'>");
+					html.append("&#x2B6F;");
+					html.append("</span>");
+					mainWidth -= 3;
 				} else {
-					html.append("<span style='");
-					html.append(btnStyle);
-					html.append("' class='button' onclick='secretary.taskDone(\"");
+					html.append("<span style='width: 2.5%; ");
+					html.append(miniBtnStyle);
+					html.append("' class='button' onclick='secretary.taskAddToShortList(\"");
 					html.append(id);
 					html.append("\")'>");
-					html.append("Done");
+					html.append("&#9733;");
 					html.append("</span>");
-					mainWidth -= 6.5;
-				}
-
-				html.append("<span style='");
-				html.append(btnStyle);
-				html.append("' class='button' onclick='secretary.taskEdit(\"");
-				html.append(id);
-				html.append("\")'>");
-				html.append("Edit");
-				html.append("</span>");
-				mainWidth -= 6.5;
-
-				html.append("<span style='");
-				html.append(btnStyle);
-				html.append("' class='button' onclick='secretary.taskDelete(\"");
-				html.append(id);
-				html.append("\", ");
-				html.append("\"");
-				html.append(HTML.escapeHTMLstr(StrUtils.replaceAll(title, "\"", "")));
-				html.append("\", \"");
-				html.append(getReleasedDateStr());
-				html.append("\")'>");
-				html.append("Delete");
-				html.append("</span>");
-				mainWidth -= 6.5;
-
-				if ((!reducedView) && (!historicalView)) {
-					if (onShortlist) {
-						html.append("<span style='width: 2.5%; ");
-						html.append(miniBtnStyle);
-						html.append("' class='button' onclick='secretary.taskRemoveFromShortList(\"");
-						html.append(id);
-						html.append("\")'>");
-						html.append("&#9734;");
-						html.append("</span>");
-						mainWidth -= 3;
-
-						html.append("<span style='width: 2.5%; ");
-						html.append(miniBtnStyle);
-						html.append("' class='button' onclick='secretary.taskPutOnShortListTomorrow(\"");
-						html.append(id);
-						html.append("\")'>");
-						html.append("&#x2B6F;");
-						html.append("</span>");
-						mainWidth -= 3;
-					} else {
-						html.append("<span style='width: 2.5%; ");
-						html.append(miniBtnStyle);
-						html.append("' class='button' onclick='secretary.taskAddToShortList(\"");
-						html.append(id);
-						html.append("\")'>");
-						html.append("&#9733;");
-						html.append("</span>");
-						mainWidth -= 3;
-					}
+					mainWidth -= 3;
 				}
 			}
 		}

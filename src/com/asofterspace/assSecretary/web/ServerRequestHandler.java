@@ -450,9 +450,9 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 					taskShortlistHtml.append("<div>");
 					boolean reducedView = false;
 					boolean onShortlist = true;
-					boolean readonly = false;
+					boolean standalone = false;
 					for (Task shortlistTask : shortlistTasks) {
-						shortlistTask.appendHtmlTo(taskShortlistHtml, historicalView, reducedView, onShortlist, today, readonly);
+						shortlistTask.appendHtmlTo(taskShortlistHtml, historicalView, reducedView, onShortlist, today, standalone);
 					}
 					taskShortlistHtml.append("</div>");
 				}
@@ -573,10 +573,10 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 				StringBuilder taskHtml = new StringBuilder();
 				boolean reducedView = false;
 				boolean onShortlist = false;
-				boolean readonly = false;
+				boolean standalone = false;
 				if (tasks.size() > 0) {
 					for (Task task : tasks) {
-						task.appendHtmlTo(taskHtml, historicalView, reducedView, onShortlist, today, readonly);
+						task.appendHtmlTo(taskHtml, historicalView, reducedView, onShortlist, today, standalone);
 					}
 				}
 
@@ -598,11 +598,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 				for (Task task : baseTasksForSchedule) {
 					if (task.isScheduledOn(tomorrow)) {
-						Task taskInstance = new Task(task);
-						taskInstance.setDone(false);
-						taskInstance.setReleasedDate(tomorrow);
-						taskInstance.setDoneDate(null);
-						tasks.add(taskInstance);
+						tasks.add(task);
 					}
 				}
 
@@ -615,13 +611,13 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 				taskHtml.append("These tasks are scheduled for tomorrow:");
 				taskHtml.append("</div>");
 
-				readonly = true;
+				standalone = true;
 
 				boolean appendedOne = false;
 
 				if (tasks.size() > 0) {
 					for (Task task : tasks) {
-						task.appendHtmlTo(taskHtml, historicalView, reducedView, onShortlist, today, readonly);
+						task.appendHtmlTo(taskHtml, historicalView, reducedView, onShortlist, today, standalone);
 						appendedOne = true;
 					}
 				}
@@ -695,11 +691,11 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 				boolean historicalView = true;
 				boolean reducedView = false;
 				boolean onShortlist = false;
-				boolean readonly = false;
+				boolean standalone = false;
 				Date curDate = DateUtils.now();
 				if (tasks.size() > 0) {
 					for (Task task : tasks) {
-						task.appendHtmlTo(taskHtml, historicalView, reducedView, onShortlist, curDate, readonly);
+						task.appendHtmlTo(taskHtml, historicalView, reducedView, onShortlist, curDate, standalone);
 					}
 				}
 
@@ -751,7 +747,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 				StringBuilder taskHtml = new StringBuilder();
 				boolean reducedView = false;
 				boolean onShortlist = false;
-				boolean readonly = false;
+				boolean standalone = false;
 				if (tasks.size() > 0) {
 					Date prevDate = tasks.get(0).getDoneDate();
 					for (Task task : tasks) {
@@ -761,7 +757,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 							taskHtml.append("<div class='separator_top'>&nbsp;</div>");
 							taskHtml.append("<div class='separator_bottom'>&nbsp;</div>");
 						}
-						task.appendHtmlTo(taskHtml, historicalView, reducedView, onShortlist, curDate, readonly);
+						task.appendHtmlTo(taskHtml, historicalView, reducedView, onShortlist, curDate, standalone);
 					}
 				}
 
@@ -867,10 +863,10 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 					boolean reducedView = true;
 					boolean onShortlist = false;
-					boolean readonly = false;
+					boolean standalone = false;
 
 					for (Task task : tasksToday) {
-						task.appendHtmlTo(weeklyHtmlStr, historicalView, reducedView, onShortlist, day, readonly);
+						task.appendHtmlTo(weeklyHtmlStr, historicalView, reducedView, onShortlist, day, standalone);
 					}
 
 					weeklyHtmlStr.append("</div>");
@@ -992,10 +988,10 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 						boolean reducedView = true;
 						boolean onShortlist = false;
-						boolean readonly = false;
+						boolean standalone = false;
 
 						for (Task task : tasksToday) {
-							task.appendHtmlTo(weeklyHtmlStr, historicalView, reducedView, onShortlist, day, readonly);
+							task.appendHtmlTo(weeklyHtmlStr, historicalView, reducedView, onShortlist, day, standalone);
 						}
 
 						weeklyHtmlStr.append("</div>");
