@@ -450,8 +450,9 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 					taskShortlistHtml.append("<div>");
 					boolean reducedView = false;
 					boolean onShortlist = true;
+					boolean readonly = false;
 					for (Task shortlistTask : shortlistTasks) {
-						shortlistTask.appendHtmlTo(taskShortlistHtml, historicalView, reducedView, onShortlist, today);
+						shortlistTask.appendHtmlTo(taskShortlistHtml, historicalView, reducedView, onShortlist, today, readonly);
 					}
 					taskShortlistHtml.append("</div>");
 				}
@@ -567,22 +568,75 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 				List<Task> tasks = taskCtrl.getCurrentTaskInstancesAsTasks();
 
-				Collections.sort(tasks, new Comparator<Task>() {
-					public int compare(Task a, Task b) {
-						return a.getCurrentPriority(today, historicalView) - b.getCurrentPriority(today, historicalView);
-					}
-				});
+				sortTasksByPriority(tasks, today, historicalView);
 
 				StringBuilder taskHtml = new StringBuilder();
 				boolean reducedView = false;
 				boolean onShortlist = false;
+				boolean readonly = false;
 				if (tasks.size() > 0) {
 					for (Task task : tasks) {
-						task.appendHtmlTo(taskHtml, historicalView, reducedView, onShortlist, today);
+						task.appendHtmlTo(taskHtml, historicalView, reducedView, onShortlist, today, readonly);
 					}
 				}
 
 				indexContent = StrUtils.replaceAll(indexContent, "[[TASKS]]", taskHtml.toString());
+
+
+				tasks = new ArrayList<>();
+
+				Date tomorrow = DateUtils.daysInTheFuture(1);
+
+				List<Task> currentTasks = taskCtrl.getCurrentTaskInstancesAsTasks();
+				for (Task task : currentTasks) {
+					if (task.appliesTo(tomorrow)) {
+						tasks.add(task);
+					}
+				}
+
+				List<Task> baseTasksForSchedule = getHugoAndMariTasks();
+
+				for (Task task : baseTasksForSchedule) {
+					if (task.isScheduledOn(tomorrow)) {
+						Task taskInstance = new Task(task);
+						taskInstance.setDone(false);
+						taskInstance.setReleasedDate(tomorrow);
+						taskInstance.setDoneDate(null);
+						tasks.add(taskInstance);
+					}
+				}
+
+				sortTasksByPriority(tasks, tomorrow, historicalView);
+
+				taskHtml = new StringBuilder();
+
+				taskHtml.append("<div>");
+				taskHtml.append("<div>");
+				taskHtml.append("These tasks are scheduled for tomorrow:");
+				taskHtml.append("</div>");
+
+				readonly = true;
+
+				boolean appendedOne = false;
+
+				if (tasks.size() > 0) {
+					for (Task task : tasks) {
+						task.appendHtmlTo(taskHtml, historicalView, reducedView, onShortlist, today, readonly);
+						appendedOne = true;
+					}
+				}
+
+				taskHtml.append("</div>");
+
+				if (!appendedOne) {
+					taskHtml = new StringBuilder();
+
+					taskHtml.append("<div>");
+					taskHtml.append("For tomorrow, no tasks at all are scheduled.");
+					taskHtml.append("</div>");
+				}
+
+				indexContent = StrUtils.replaceAll(indexContent, "[[TASKS_TOMORROW]]", taskHtml.toString());
 
 
 				indexContent = StrUtils.replaceAll(indexContent, "[[MISSION_CONTROL_PREVIEW]]", getMissionControlHtml(false));
@@ -641,10 +695,11 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 				boolean historicalView = true;
 				boolean reducedView = false;
 				boolean onShortlist = false;
+				boolean readonly = false;
 				Date curDate = DateUtils.now();
 				if (tasks.size() > 0) {
 					for (Task task : tasks) {
-						task.appendHtmlTo(taskHtml, historicalView, reducedView, onShortlist, curDate);
+						task.appendHtmlTo(taskHtml, historicalView, reducedView, onShortlist, curDate, readonly);
 					}
 				}
 
@@ -696,6 +751,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 				StringBuilder taskHtml = new StringBuilder();
 				boolean reducedView = false;
 				boolean onShortlist = false;
+				boolean readonly = false;
 				if (tasks.size() > 0) {
 					Date prevDate = tasks.get(0).getDoneDate();
 					for (Task task : tasks) {
@@ -705,7 +761,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 							taskHtml.append("<div class='separator_top'>&nbsp;</div>");
 							taskHtml.append("<div class='separator_bottom'>&nbsp;</div>");
 						}
-						task.appendHtmlTo(taskHtml, historicalView, reducedView, onShortlist, curDate);
+						task.appendHtmlTo(taskHtml, historicalView, reducedView, onShortlist, curDate, readonly);
 					}
 				}
 
@@ -809,10 +865,12 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 						}
 					});
 
+					boolean reducedView = true;
+					boolean onShortlist = false;
+					boolean readonly = false;
+
 					for (Task task : tasksToday) {
-						boolean reducedView = true;
-						boolean onShortlist = false;
-						task.appendHtmlTo(weeklyHtmlStr, historicalView, reducedView, onShortlist, day);
+						task.appendHtmlTo(weeklyHtmlStr, historicalView, reducedView, onShortlist, day, readonly);
 					}
 
 					weeklyHtmlStr.append("</div>");
@@ -865,6 +923,8 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 				today = DateUtils.parseDateNumbers(dayNum, month, year);
 
+				List<Task> baseTasksForSchedule = getHugoAndMariTasks();
+
 				while (DateUtils.getMonth(today) == month) {
 
 					monthlyHtmlStr.append("<div>");
@@ -877,8 +937,6 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 					boolean onlyGetDone = false;
 					tasks = addExternalTaskInstances(tasks, weekDays.get(0), weekDays.get(6), onlyGetDone);
-
-					List<Task> baseTasksForSchedule = getHugoAndMariTasks();
 
 					for (Date day : weekDays) {
 						boolean isToday = DateUtils.isSameDay(actualToday, day);
@@ -932,10 +990,12 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 							}
 						});
 
+						boolean reducedView = true;
+						boolean onShortlist = false;
+						boolean readonly = false;
+
 						for (Task task : tasksToday) {
-							boolean reducedView = true;
-							boolean onShortlist = false;
-							task.appendHtmlTo(weeklyHtmlStr, historicalView, reducedView, onShortlist, day);
+							task.appendHtmlTo(weeklyHtmlStr, historicalView, reducedView, onShortlist, day, readonly);
 						}
 
 						weeklyHtmlStr.append("</div>");
@@ -1393,6 +1453,15 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 		}
 
 		return result;
+	}
+
+	private void sortTasksByPriority(List<Task> tasks, Date today, boolean historicalView) {
+
+		Collections.sort(tasks, new Comparator<Task>() {
+			public int compare(Task a, Task b) {
+				return a.getCurrentPriority(today, historicalView) - b.getCurrentPriority(today, historicalView);
+			}
+		});
 	}
 
 }
