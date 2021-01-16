@@ -36,8 +36,8 @@ public class AssSecretary {
 	public final static String WEB_ROOT_DIR = "deployed";
 
 	public final static String PROGRAM_TITLE = "assSecretary (Hugo)";
-	public final static String VERSION_NUMBER = "0.0.1.3(" + Utils.TOOLBOX_VERSION_NUMBER + ")";
-	public final static String VERSION_DATE = "21. October 2020 - 13. January 2021";
+	public final static String VERSION_NUMBER = "0.0.1.4(" + Utils.TOOLBOX_VERSION_NUMBER + ")";
+	public final static String VERSION_DATE = "21. October 2020 - 15. January 2021";
 
 	private static Database database;
 
@@ -82,7 +82,7 @@ public class AssSecretary {
 		LtcDatabase.init(dataDir);
 
 		TaskDatabase taskDatabase = new TaskDatabase(dataDir);
-		TaskCtrl taskCtrl = new TaskCtrl(taskDatabase);
+		TaskCtrl taskCtrl = new TaskCtrl(database, taskDatabase);
 
 
 		try {

@@ -10,6 +10,10 @@ import com.asofterspace.toolbox.io.JsonFile;
 import com.asofterspace.toolbox.io.JsonParseException;
 import com.asofterspace.toolbox.utils.Record;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 
 public class Database {
 
@@ -31,12 +35,15 @@ public class Database {
 	private Boolean connectToWorkbench;
 	private Boolean connectToLtc;
 
+	private Map<String, List<String>> shortlistAdvances;
+
 	private static String PORT = "port";
 	private static String USERNAME = "username";
 	private static String INBOX_CONTENT = "inboxContent";
 	private static String CONNECT_TO_MARI = "connectToMari";
 	private static String CONNECT_TO_WORKBENCH = "connectToWorkbench";
 	private static String CONNECT_TO_LTC = "connectToLtc";
+	private static String SHORTLIST_ADVANCES = "shortlistAdvances";
 
 
 	public Database(Directory dataDir) {
@@ -66,6 +73,15 @@ public class Database {
 		this.connectToWorkbench = root.getBoolean(CONNECT_TO_WORKBENCH);
 
 		this.connectToLtc = root.getBoolean(CONNECT_TO_LTC);
+
+
+		this.shortlistAdvances = new HashMap<String, List<String>>();
+
+		Map<String, Record> shortlistAdvanceMap = root.getValueMap(SHORTLIST_ADVANCES);
+
+		for (Map.Entry<String, Record> entry : shortlistAdvanceMap.entrySet()) {
+			shortlistAdvances.put(entry.getKey(), entry.getValue().getStringValues());
+		}
 	}
 
 	public Record getRoot() {
@@ -107,6 +123,8 @@ public class Database {
 
 		root.set(CONNECT_TO_LTC, connectToLtc);
 
+		root.set(SHORTLIST_ADVANCES, shortlistAdvances);
+
 		dbFile.setAllContents(root);
 		dbFile.save();
 	}
@@ -130,6 +148,10 @@ public class Database {
 			return true;
 		}
 		return connectToLtc;
+	}
+
+	public Map<String, List<String>> getShortlistAdvances() {
+		return shortlistAdvances;
 	}
 
 }

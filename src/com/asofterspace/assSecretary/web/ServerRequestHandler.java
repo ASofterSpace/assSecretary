@@ -1246,7 +1246,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 		String[] weekdaysStrs = splitScheduleField(json.getString("weekdays"));
 		List<String> scheduledOnDaysOfWeek = new ArrayList<>();
 		for (String weekStr : weekdaysStrs) {
-			weekStr = GenericTask.toWeekDay(weekStr);
+			weekStr = DateUtils.toDayOfWeekNameEN(weekStr);
 			if (weekStr != null) {
 				scheduledOnDaysOfWeek.add(weekStr);
 			}
@@ -1414,7 +1414,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 		List<String> daysOfWeek = task.getScheduledOnDaysOfWeek();
 		if (daysOfWeek != null) {
 			for (String day : daysOfWeek) {
-				day = GenericTask.toWeekDay(day);
+				day = DateUtils.toDayOfWeekNameEN(day);
 				if (day != null) {
 					for (int i = 0; i < DateUtils.DAY_NAMES.length; i++) {
 						if (day.equals(DateUtils.DAY_NAMES[i])) {

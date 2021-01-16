@@ -4,6 +4,7 @@
  */
 package com.asofterspace.assSecretary.tasks;
 
+import com.asofterspace.assSecretary.Database;
 import com.asofterspace.toolbox.calendar.GenericTask;
 import com.asofterspace.toolbox.calendar.TaskCtrlBase;
 import com.asofterspace.toolbox.utils.DateUtils;
@@ -12,6 +13,7 @@ import com.asofterspace.toolbox.utils.Record;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -45,8 +47,8 @@ public class TaskCtrl extends TaskCtrlBase {
 	// a list of ids of tasks that are on the shortlist
 	private final static String TASK_SHORTLIST = "taskShortlist";
 
-	// a list of ids of tasks that are on the shortlist tomorrow
-	private final static String TASK_SHORTLIST_TOMORROW = "taskShortlistTomorrow";
+	// a list of ids of tasks that are on the shortlist tomorrow, the day after, etc.
+	private final static String FUTURE_TASK_SHORTLIST = "futureTaskShortlist";
 
 	// the origin for tasks coming from Mari
 	public final static String FINANCE_ORIGIN = "finances";
@@ -54,23 +56,31 @@ public class TaskCtrl extends TaskCtrlBase {
 	// a list of ids of the tasks on the shortlist
 	private List<String> shortlistIds = new ArrayList<>();
 
-	// a list of ids of the tasks that go onto the shortlist tomorrow
-	private List<String> shortlistIdsTomorrow = new ArrayList<>();
+	// a list of ids of the tasks that go onto the shortlist tomorrow, or the day after, or the day after that,
+	// etc. (so index 0 is tomorrow, index 1 is day after tomorrow, etc.)
+	private List<List<String>> futureShortlistIds = new ArrayList<>();
 
-	private TaskDatabase database;
+	private Database database;
+
+	private TaskDatabase taskDatabase;
 
 
-	public TaskCtrl(TaskDatabase database) {
+	public TaskCtrl(Database database, TaskDatabase taskDatabase) {
 
 		this.database = database;
 
-		Record root = database.getLoadedRoot();
+		this.taskDatabase = taskDatabase;
+
+		Record root = taskDatabase.getLoadedRoot();
 
 		loadFromRoot(root);
 
 		// generate instances, but do not save them yet (so that upon seeing this, someone could edit
 		// the underlying json and then restart hugo to regenerate, if needed)
 		generateNewInstances(DateUtils.now());
+
+		// cleanup the shortlist once on startup, again without saving for now
+		cleanupShortlist();
 	}
 
 	@Override
@@ -83,7 +93,11 @@ public class TaskCtrl extends TaskCtrlBase {
 		}
 
 		shortlistIds = root.getArrayAsStringList(TASK_SHORTLIST);
-		shortlistIdsTomorrow = root.getArrayAsStringList(TASK_SHORTLIST_TOMORROW);
+		List<Record> futureShortlistRec = root.getArray(FUTURE_TASK_SHORTLIST);
+		futureShortlistIds = new ArrayList<>();
+		for (Record rec : futureShortlistRec) {
+			futureShortlistIds.add(rec.getStringValues());
+		}
 	}
 
 	@Override
@@ -197,12 +211,15 @@ public class TaskCtrl extends TaskCtrlBase {
 	public List<GenericTask> getUpcomingTaskInstances(int upcomingDays) {
 
 		List<String> shortlistIdCopy = new ArrayList<>(shortlistIds);
-		List<String> shortlistIdTomorrowCopy = new ArrayList<>(shortlistIdsTomorrow);
+		List<List<String>> futureShortlistIdsCopy = new ArrayList<>();
+		for (List<String> list : futureShortlistIds) {
+			futureShortlistIdsCopy.add(new ArrayList<String>(list));
+		}
 
 		List<GenericTask> result = super.getUpcomingTaskInstances(upcomingDays);
 
 		shortlistIds = shortlistIdCopy;
-		shortlistIdsTomorrow = shortlistIdTomorrowCopy;
+		futureShortlistIds = futureShortlistIdsCopy;
 
 		return result;
 	}
@@ -227,10 +244,13 @@ public class TaskCtrl extends TaskCtrlBase {
 			}
 		}
 
-		for (String id : shortlistIdsTomorrow) {
-			addTaskToShortListById(id);
+		if (futureShortlistIds.size() > 0) {
+			List<String> shortlistIdsTomorrow = futureShortlistIds.get(0);
+			for (String id : shortlistIdsTomorrow) {
+				addTaskToShortListById(id);
+			}
+			futureShortlistIds.remove(0);
 		}
-		shortlistIdsTomorrow = new ArrayList<>();
 	}
 
 	public List<Task> getAllTaskInstancesAsTasks() {
@@ -410,33 +430,23 @@ public class TaskCtrl extends TaskCtrlBase {
 
 		List<Task> result = new ArrayList<>();
 
-		// look through task instances...
-		List<GenericTask> genericTasks = taskInstances;
-		for (GenericTask genericTask : genericTasks) {
-			if (genericTask instanceof Task) {
-				Task task = (Task) genericTask;
-				for (String id : shortlistIds) {
-					if (task.hasId(id)) {
-						result.add(task);
-					}
-				}
-			}
-		}
-
-		// ... and through scheduled base tasks as well!
-		genericTasks = tasks;
-		for (GenericTask genericTask : genericTasks) {
-			if (genericTask instanceof Task) {
-				Task task = (Task) genericTask;
-				for (String id : shortlistIds) {
-					if (task.hasId(id)) {
-						result.add(task);
-					}
-				}
+		for (String id : shortlistIds) {
+			Task task = getTaskById(id);
+			if (task != null) {
+				result.add(task);
 			}
 		}
 
 		return result;
+	}
+
+	private void cleanupShortlist() {
+
+		for (int i = shortlistIds.size() - 1; i >= 0; i--) {
+			if (getTaskById(shortlistIds.get(i)) == null) {
+				shortlistIds.remove(i);
+			}
+		}
 	}
 
 	public void addTaskToShortListById(String id) {
@@ -466,8 +476,55 @@ public class TaskCtrl extends TaskCtrlBase {
 		if (id == null) {
 			return;
 		}
-		if (!shortlistIdsTomorrow.contains(id)) {
-			shortlistIdsTomorrow.add(id);
+
+		Task task = getTaskById(id);
+		if (task == null) {
+			return;
+		}
+
+		// by default, we want to put this entry into the shortlist for tomorrow
+		int shortlistIndex = 0;
+
+		// however, some entries want to be put into different shortlists, based on what day it is today
+		Map<String, List<String>> shortlistAdvanceMap = database.getShortlistAdvances();
+		List<String> shortlistAdvanceWeekdays = shortlistAdvanceMap.get(task.getOrigin());
+		if (shortlistAdvanceWeekdays != null) {
+			// we not have a list of weekday-names, and each of them is acceptable as next day...
+			// so we check basically if tomorrow is one of these days, and if yes: shortlistIndex stays at 0
+			// if not, we check if the day after tomorrow is one of these days, and if yes: shortlistIndex set to 1
+			// if not, we check the day after the day after tomorrow, etc.
+
+			Date today = DateUtils.now();
+
+			List<String> weekdays = new ArrayList<>();
+			for (String weekday : shortlistAdvanceWeekdays) {
+				weekday = DateUtils.toDayOfWeekNameEN(weekday);
+				weekdays.add(weekday);
+			}
+
+			int howManyDaysInTheFuture = 0;
+			while (true) {
+				howManyDaysInTheFuture++;
+				Date futureDay = DateUtils.addDays(today, howManyDaysInTheFuture);
+				String futureWeekday = DateUtils.getDayOfWeekNameEN(futureDay);
+				if (weekdays.contains(futureWeekday)) {
+					shortlistIndex = howManyDaysInTheFuture - 1;
+					break;
+				}
+			}
+		}
+
+		// fill up with empty shortlist days until we reach the one we want to insert into
+		while (futureShortlistIds.size() <= shortlistIndex) {
+			futureShortlistIds.add(new ArrayList<String>());
+		}
+
+		// get the one we just added, or if it already exists, the pre-existing one
+		List<String> shortlistIdsTomorrowOrLater = futureShortlistIds.get(shortlistIndex);
+
+		// insert the new id into the shortlist of that day, unless it already exists
+		if (!shortlistIdsTomorrowOrLater.contains(id)) {
+			shortlistIdsTomorrowOrLater.add(id);
 		}
 	}
 
@@ -481,15 +538,15 @@ public class TaskCtrl extends TaskCtrlBase {
 	}
 
 	public void save() {
-		saveIntoRecord(database.getLoadedRoot());
-		database.save();
+		saveIntoRecord(taskDatabase.getLoadedRoot());
+		taskDatabase.save();
 	}
 
 	@Override
 	public void saveIntoRecord(Record root) {
 		super.saveIntoRecord(root);
 		root.set(TASK_SHORTLIST, shortlistIds);
-		root.set(TASK_SHORTLIST_TOMORROW, shortlistIdsTomorrow);
+		root.set(FUTURE_TASK_SHORTLIST, futureShortlistIds);
 	}
 
 }
