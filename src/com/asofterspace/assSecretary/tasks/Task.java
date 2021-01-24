@@ -425,10 +425,10 @@ public class Task extends GenericTask {
 
 		} else if (TaskCtrl.FINANCE_ORIGIN.equals(origin)) {
 
-			html.append("<span style='width: 8%; " + miniBtnStyle + "' class='button'>");
+			html.append("<span style='width: 9%; " + miniBtnStyle + "' class='button'>");
 			html.append("(from Mari)");
 			html.append("</span>");
-			mainWidth -= 8.5;
+			mainWidth -= 9.5;
 
 		// if this is not an actual instance, but just a ghost of a scheduled task, then of course it cannot
 		// be edited in any way shape or form, so no point in showing any of the regular buttons :)

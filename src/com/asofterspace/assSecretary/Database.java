@@ -32,6 +32,7 @@ public class Database {
 	private String inboxContent;
 
 	private Boolean connectToMari;
+	private Boolean connectToTowa;
 	private Boolean connectToWorkbench;
 	private Boolean connectToLtc;
 
@@ -41,6 +42,7 @@ public class Database {
 	private static String USERNAME = "username";
 	private static String INBOX_CONTENT = "inboxContent";
 	private static String CONNECT_TO_MARI = "connectToMari";
+	private static String CONNECT_TO_TOWA = "connectToTowa";
 	private static String CONNECT_TO_WORKBENCH = "connectToWorkbench";
 	private static String CONNECT_TO_LTC = "connectToLtc";
 	private static String SHORTLIST_ADVANCES = "shortlistAdvances";
@@ -69,6 +71,8 @@ public class Database {
 		this.inboxContent = root.getString(INBOX_CONTENT);
 
 		this.connectToMari = root.getBoolean(CONNECT_TO_MARI);
+
+		this.connectToTowa = root.getBoolean(CONNECT_TO_TOWA);
 
 		this.connectToWorkbench = root.getBoolean(CONNECT_TO_WORKBENCH);
 
@@ -119,6 +123,8 @@ public class Database {
 
 		root.set(CONNECT_TO_MARI, connectToMari);
 
+		root.set(CONNECT_TO_TOWA, connectToTowa);
+
 		root.set(CONNECT_TO_WORKBENCH, connectToWorkbench);
 
 		root.set(CONNECT_TO_LTC, connectToLtc);
@@ -134,6 +140,13 @@ public class Database {
 			return true;
 		}
 		return connectToMari;
+	}
+
+	public boolean connectToTowa() {
+		if (connectToTowa == null) {
+			return true;
+		}
+		return connectToTowa;
 	}
 
 	public boolean connectToWorkbench() {

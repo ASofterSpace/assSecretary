@@ -566,6 +566,21 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 				indexContent = StrUtils.replaceAll(indexContent, "[[VM_STATS]]", vmStatsHtml.toString());
 
 
+				String towaHtml = "";
+
+				if (db.connectToTowa()) {
+
+					String currentAdvice = WebAccessor.get("http://localhost:3016/currentAdvice");
+
+					towaHtml =
+						"<div>" +
+						"<div>Towa says:</div>" +
+						"<div class='line'>" + currentAdvice + "</div>" +
+						"</div>";
+				}
+				indexContent = StrUtils.replaceAll(indexContent, "[[TOWA]]", towaHtml);
+
+
 				List<Task> tasks = taskCtrl.getCurrentTaskInstancesAsTasks();
 
 				sortTasksByPriority(tasks, today, historicalView);
