@@ -572,11 +572,18 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 					String currentAdvice = WebAccessor.get("http://localhost:3016/currentAdvice");
 
-					towaHtml =
-						"<div>" +
-						"<div>Towa says:</div>" +
-						"<div class='line'>" + currentAdvice + "</div>" +
-						"</div>";
+					if ((currentAdvice == null) || "".equals(currentAdvice)) {
+						towaHtml += "<div>";
+						towaHtml += "<div><span class='warning'>I haven't heard anything from Towa recently,</span> maybe he is super busy...</div>";
+						towaHtml += "<div>(He did not react to me sending a web request to him.)</div>";
+						towaHtml += "</div>";
+					} else {
+						towaHtml =
+							"<div>" +
+							"<div>Towa says:</div>" +
+							"<div class='line'>" + currentAdvice + "</div>" +
+							"</div>";
+					}
 				}
 				indexContent = StrUtils.replaceAll(indexContent, "[[TOWA]]", towaHtml);
 
