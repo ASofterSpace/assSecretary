@@ -4,10 +4,12 @@
  */
 package com.asofterspace.assSecretary;
 
+import com.asofterspace.assSecretary.tasks.TaskCtrl;
 import com.asofterspace.toolbox.io.Directory;
 import com.asofterspace.toolbox.io.JSON;
 import com.asofterspace.toolbox.io.JsonFile;
 import com.asofterspace.toolbox.io.JsonParseException;
+import com.asofterspace.toolbox.utils.DateUtils;
 import com.asofterspace.toolbox.utils.Record;
 
 import java.util.HashMap;
@@ -36,7 +38,12 @@ public class Database {
 	private Boolean connectToWorkbench;
 	private Boolean connectToLtc;
 
+	private TaskCtrl taskCtrl;
+
 	private Map<String, List<String>> shortlistAdvances;
+
+	private Map<String, Object> currentTaskInstanceAmounts;
+	private Map<String, Object> doneTaskInstanceAmounts;
 
 	private static String PORT = "port";
 	private static String USERNAME = "username";
@@ -46,6 +53,8 @@ public class Database {
 	private static String CONNECT_TO_WORKBENCH = "connectToWorkbench";
 	private static String CONNECT_TO_LTC = "connectToLtc";
 	private static String SHORTLIST_ADVANCES = "shortlistAdvances";
+	private static String CURRENT_TASK_INSTANCE_AMOUNTS = "currentTaskInstanceAmounts";
+	private static String DONE_TASK_INSTANCE_AMOUNTS = "doneTaskInstanceAmounts";
 
 
 	public Database(Directory dataDir) {
@@ -86,6 +95,11 @@ public class Database {
 		for (Map.Entry<String, Record> entry : shortlistAdvanceMap.entrySet()) {
 			shortlistAdvances.put(entry.getKey(), entry.getValue().getStringValues());
 		}
+
+
+		this.currentTaskInstanceAmounts = root.getObjectMap(CURRENT_TASK_INSTANCE_AMOUNTS);
+
+		this.doneTaskInstanceAmounts = root.getObjectMap(DONE_TASK_INSTANCE_AMOUNTS);
 	}
 
 	public Record getRoot() {
@@ -121,15 +135,24 @@ public class Database {
 
 		root.set(INBOX_CONTENT, inboxContent);
 
-		root.set(CONNECT_TO_MARI, connectToMari);
+		root.set(CONNECT_TO_MARI, connectToMari());
 
-		root.set(CONNECT_TO_TOWA, connectToTowa);
+		root.set(CONNECT_TO_TOWA, connectToTowa());
 
-		root.set(CONNECT_TO_WORKBENCH, connectToWorkbench);
+		root.set(CONNECT_TO_WORKBENCH, connectToWorkbench());
 
-		root.set(CONNECT_TO_LTC, connectToLtc);
+		root.set(CONNECT_TO_LTC, connectToLtc());
 
 		root.set(SHORTLIST_ADVANCES, shortlistAdvances);
+
+		boolean ordered = false;
+		currentTaskInstanceAmounts.put(DateUtils.serializeDate(DateUtils.now()),
+			taskCtrl.getCurrentTaskInstances(ordered).size());
+		root.set(CURRENT_TASK_INSTANCE_AMOUNTS, currentTaskInstanceAmounts);
+
+		doneTaskInstanceAmounts.put(DateUtils.serializeDate(DateUtils.now()),
+			taskCtrl.getDoneTaskInstancesAsTasks().size());
+		root.set(DONE_TASK_INSTANCE_AMOUNTS, doneTaskInstanceAmounts);
 
 		dbFile.setAllContents(root);
 		dbFile.save();
@@ -165,6 +188,10 @@ public class Database {
 
 	public Map<String, List<String>> getShortlistAdvances() {
 		return shortlistAdvances;
+	}
+
+	public void setTaskCtrl(TaskCtrl taskCtrl) {
+		this.taskCtrl = taskCtrl;
 	}
 
 }

@@ -132,6 +132,11 @@ public class AssSecretary {
 			addWebInfo(webInfo, "supervision-earth", "sveApp", "https://supervisionspace.app/", missionControlDatabase);
 			addWebInfo(webInfo, "supervision-earth", "sveLB", "http://svs-backend-loadbalancer-1910963306.eu-central-1.elb.amazonaws.com/", missionControlDatabase);
 
+
+			System.out.println("Saving database directly after startup to save amount of open tasks...");
+
+			database.save();
+
 		} catch (JsonParseException e) {
 
 			System.out.println("Oh no! The input could not be parsed: " + e);

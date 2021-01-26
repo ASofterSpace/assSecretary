@@ -81,6 +81,8 @@ public class TaskCtrl extends TaskCtrlBase {
 
 		// cleanup the shortlist once on startup, again without saving for now
 		cleanupShortlist();
+
+		database.setTaskCtrl(this);
 	}
 
 	@Override
