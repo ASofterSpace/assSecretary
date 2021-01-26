@@ -281,6 +281,10 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 	@Override
 	protected WebServerAnswer answerGet(String location, Map<String, String> arguments) {
 
+		if (location.equals("/exit")) {
+			System.exit(0);
+		}
+
 		if ("/task".equals(location)) {
 			String id = arguments.get("id");
 			if (id != null) {
