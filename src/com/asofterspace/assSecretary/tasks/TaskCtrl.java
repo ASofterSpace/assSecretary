@@ -403,6 +403,7 @@ public class TaskCtrl extends TaskCtrlBase {
 					task.setDone(true);
 					task.setDoneDate(DateUtils.now());
 					task.setDoneLog("");
+					task.setSetToDoneDateTime(DateUtils.now());
 					save();
 					return true;
 				}

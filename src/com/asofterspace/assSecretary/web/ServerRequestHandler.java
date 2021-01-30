@@ -761,7 +761,20 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 						Date aDone = a.getDoneDate();
 						Date bDone = b.getDoneDate();
 						if (DateUtils.isSameDay(aDone, bDone)) {
-							return a.getCurrentPriority(aDone, historicalView) - b.getCurrentPriority(bDone, historicalView);
+							// on tasklog, sort tasks within a day by the datetime at which "done" was set
+							Date aSetToDone = a.getSetToDoneDateTime();
+							Date bSetToDone = a.getSetToDoneDateTime();
+							if (aSetToDone == null) {
+								return 1;
+							}
+							if (bSetToDone == null) {
+								return -1;
+							}
+							if (aSetToDone.before(bSetToDone)) {
+								return 1;
+							}
+							return -1;
+							// return a.getCurrentPriority(aDone, historicalView) - b.getCurrentPriority(bDone, historicalView);
 						}
 						if (aDone.before(bDone)) {
 							return 1;
@@ -1144,6 +1157,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 		} else {
 			task.setDone(true);
 			task.setDoneDate(doneDate);
+			task.setSetToDoneDateTime(DateUtils.now());
 			taskCtrl.removeTaskFromShortListById(task.getId());
 			taskCtrl.save();
 		}
