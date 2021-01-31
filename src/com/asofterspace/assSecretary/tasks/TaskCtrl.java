@@ -157,8 +157,8 @@ public class TaskCtrl extends TaskCtrlBase {
 
 		Task task = new Task();
 
-		task.setTitle(recordTask.getString("title"));
-		String origin = recordTask.getString("origin");
+		task.setTitle(recordTask.getString(TITLE));
+		String origin = recordTask.getString(ORIGIN);
 		if (origin == null) {
 			task.setOrigin("private");
 		} else if (origin.startsWith("recoded")) {
@@ -167,10 +167,11 @@ public class TaskCtrl extends TaskCtrlBase {
 			task.setOrigin(origin);
 		}
 
-		Date date = recordTask.getDate("date");
+		Date date = recordTask.getDate(DATE);
 		task.setReleasedDate(date);
 		task.setDoneDate(date);
 		task.setDone(true);
+		task.setSetToDoneDateTime(recordTask.getDateTime(SET_TO_DONE_DATE_TIME));
 		task.setWorkbenchLink(recordTask.getString("link"));
 
 		return task;
