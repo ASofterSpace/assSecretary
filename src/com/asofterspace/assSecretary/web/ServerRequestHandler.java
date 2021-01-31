@@ -763,18 +763,16 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 						if (DateUtils.isSameDay(aDone, bDone)) {
 							// on tasklog, sort tasks within a day by the datetime at which "done" was set
 							Date aSetToDone = a.getSetToDoneDateTime();
-							Date bSetToDone = a.getSetToDoneDateTime();
-							if (aSetToDone == null) {
-								return 1;
+							Date bSetToDone = b.getSetToDoneDateTime();
+							if ((aSetToDone != null) && (bSetToDone != null)) {
+								if (aSetToDone.before(bSetToDone)) {
+									return 1;
+								}
+								if (bSetToDone.before(aSetToDone)) {
+									return -1;
+								}
 							}
-							if (bSetToDone == null) {
-								return -1;
-							}
-							if (aSetToDone.before(bSetToDone)) {
-								return 1;
-							}
-							return -1;
-							// return a.getCurrentPriority(aDone, historicalView) - b.getCurrentPriority(bDone, historicalView);
+							return a.getCurrentPriority(aDone, historicalView) - b.getCurrentPriority(bDone, historicalView);
 						}
 						if (aDone.before(bDone)) {
 							return 1;
