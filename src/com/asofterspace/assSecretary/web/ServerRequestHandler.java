@@ -133,6 +133,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 								Task newTask = (Task) newGenericTask;
 								// and then switch the release date to today after the fact
 								newTask.setReleasedDate(DateUtils.now());
+								taskCtrl.addTaskToShortListById(newTask.getId());
 								taskCtrl.save();
 								answer = new WebServerAnswerInJson(new JSON("{\"success\": true, \"newId\": \"" + newTask.getId() + "\"}"));
 							} else {
