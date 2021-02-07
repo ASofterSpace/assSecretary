@@ -22,6 +22,7 @@ import com.asofterspace.toolbox.io.JsonParseException;
 import com.asofterspace.toolbox.io.TextFile;
 import com.asofterspace.toolbox.utils.DateUtils;
 import com.asofterspace.toolbox.utils.Record;
+import com.asofterspace.toolbox.utils.SortUtils;
 import com.asofterspace.toolbox.utils.StrUtils;
 import com.asofterspace.toolbox.virtualEmployees.SideBarCtrl;
 import com.asofterspace.toolbox.virtualEmployees.SideBarEntryForEmployee;
@@ -37,8 +38,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 
 public class ServerRequestHandler extends WebServerRequestHandler {
@@ -429,6 +432,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 				tabsHtml += "<a href='/tasklog.htm'>Task Log</a>";
 				tabsHtml += "<a href='/weekly.htm'>Weekly View</a>";
 				tabsHtml += "<a href='/monthly.htm'>Monthly View</a>";
+				tabsHtml += "<a href='/stats.htm'>Statistics</a>";
 				tabsHtml += "</div>";
 
 				indexContent = StrUtils.replaceAll(indexContent, "[[TABS]]", tabsHtml);
@@ -1051,6 +1055,24 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 			}
 
 
+			// answering a request for the stats page
+			if (locEquiv.equals("stats.htm")) {
+
+				System.out.println("Answering stats request...");
+
+				TextFile indexBaseFile = new TextFile(webRoot, locEquiv);
+				String indexContent = indexBaseFile.getContent();
+
+				indexContent = StrUtils.replaceAll(indexContent, "[[STATISTICS]]", getStatsHtml());
+
+				indexContent = StrUtils.replaceAll(indexContent, "[[SIDEBAR]]", SideBarCtrl.getSidebarHtmlStr());
+
+				locEquiv = "_" + locEquiv;
+				TextFile indexFile = new TextFile(webRoot, locEquiv);
+				indexFile.saveContent(indexContent);
+			}
+
+
 			// answering a request for the a softer space mission control center
 			if (locEquiv.equals("missioncontrol.htm")) {
 
@@ -1076,6 +1098,122 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 		// if the file was not found on the whitelist, do not return it
 		// - even if it exists on the server!
 		return null;
+	}
+
+	private String getStatsHtml() {
+
+		StringBuilder html = new StringBuilder();
+
+		Map<String, Object> currentTasks = db.getCurrentTaskInstanceAmounts();
+		Map<String, Object> doneTasks = db.getDoneTaskInstanceAmounts();
+
+		Set<String> combinedDateSet = new HashSet<>();
+		combinedDateSet.addAll(currentTasks.keySet());
+		combinedDateSet.addAll(doneTasks.keySet());
+
+		List<String> dates = new ArrayList<>();
+		dates.addAll(combinedDateSet);
+
+		dates = SortUtils.sortAlphabetically(dates);
+
+
+		if (dates.size() < 1) {
+			return "No stats data available!";
+		}
+
+
+		String startSpan = "<span style='display: inline-block; width: 16%; text-align: center;'>";
+
+		html.append("<div class='line'>");
+		html.append(startSpan);
+		html.append("Date");
+		html.append("</span>");
+		html.append(startSpan);
+		html.append("Tasks Opened This Day");
+		html.append("</span>");
+		html.append(startSpan);
+		html.append("Tasks Done This Day");
+		html.append("</span>");
+		html.append(startSpan);
+		html.append("Total Open Tasks");
+		html.append("</span>");
+		html.append(startSpan);
+		html.append("Total Tasks Done");
+		html.append("</span>");
+		html.append(startSpan);
+		html.append("Total Amount of All Tasks");
+		html.append("</span>");
+		html.append("</div>");
+
+		int tasksDonePrev = 0;
+		int tasksCurPrev = 0;
+
+		boolean firstline = true;
+
+		List<String> lines = new ArrayList<>();
+
+		for (String date : dates) {
+
+			Object tasksDoneObj = doneTasks.get(date);
+			Object tasksCurObj = currentTasks.get(date);
+			int tasksDone = 0;
+			int tasksCur = 0;
+			if (tasksDoneObj != null) {
+				if (tasksDoneObj instanceof Integer) {
+					tasksDone = (Integer) tasksDoneObj;
+				} else {
+					tasksDone = (int) (long) (Long) tasksDoneObj;
+				}
+			}
+			if (tasksCurObj != null) {
+				if (tasksCurObj instanceof Integer) {
+					tasksCur = (Integer) tasksCurObj;
+				} else {
+					tasksCur = (int) (long) (Long) tasksCurObj;
+				}
+			}
+			int tasksTotal = tasksDone + tasksCur;
+
+			StringBuilder line = new StringBuilder();
+			line.append("<div class='line'>");
+			line.append(startSpan);
+			line.append(date);
+			line.append("</span>");
+			line.append(startSpan);
+			if (!firstline) {
+				line.append(tasksCur - (tasksCurPrev - (tasksDone - tasksDonePrev)));
+			}
+			line.append("</span>");
+			line.append(startSpan);
+			if (!firstline) {
+				line.append(tasksDone - tasksDonePrev);
+			}
+			line.append("</span>");
+			line.append(startSpan);
+			line.append(tasksCur);
+			line.append("</span>");
+			line.append(startSpan);
+			line.append(tasksDone);
+			line.append("</span>");
+			line.append(startSpan);
+			line.append(tasksTotal);
+			line.append("</span>");
+			line.append("</div>");
+			lines.add(line.toString());
+
+			tasksDonePrev = tasksDone;
+			tasksCurPrev = tasksCur;
+
+			firstline = false;
+		}
+
+		lines = SortUtils.reverse(lines);
+
+		for (String line : lines) {
+			html.append(line);
+		}
+
+		return html.toString();
 	}
 
 	private String getMissionControlHtml(boolean createLinks) {

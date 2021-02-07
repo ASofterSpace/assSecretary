@@ -194,4 +194,12 @@ public class Database {
 		this.taskCtrl = taskCtrl;
 	}
 
+	public Map<String, Object> getCurrentTaskInstanceAmounts() {
+		return currentTaskInstanceAmounts;
+	}
+
+	public Map<String, Object> getDoneTaskInstanceAmounts() {
+		return doneTaskInstanceAmounts;
+	}
+
 }
