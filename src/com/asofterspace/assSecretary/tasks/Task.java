@@ -463,16 +463,17 @@ public class Task extends GenericTask {
 			mainWidth -= 6.5;
 
 			html.append("<span style='");
-			html.append(btnStyle);
+			html.append("width: 10.5%; ");
+			html.append(miniBtnStyle);
 			html.append("' class='button' onclick='secretary.taskDelete(\"");
 			html.append(id);
 			html.append("\", ");
 			html.append("\"");
 			html.append(HTML.escapeHTMLstr(StrUtils.replaceAll(title, "\"", "")));
 			html.append("\", null)'>");
-			html.append("Delete");
+			html.append("Delete Parent");
 			html.append("</span>");
-			mainWidth -= 6.5;
+			mainWidth -= 11;
 
 		} else {
 

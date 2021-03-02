@@ -467,9 +467,14 @@ window.secretary = {
 				"<br><br>Title: " + title +
 				"<br>Release date: " + releaseDate;
 
+			document.getElementById("deleteTaskModalDeleteButton").innerHTML = "Delete";
+
 			if (releaseDate == null) {
 				html = "Do you really want to delete this repeating task?" +
-					"<br><br>Title: " + title;
+					"<br><br>Title: " + title + "<br><br>Again, and I cannot stress this enough:<br><br>" +
+					"This is a REPEATING PARENT task, not just one instance! Okay?<br>" +
+					"So if you just want to delete a single task instance... then by all means, do cancel! ;)";
+				document.getElementById("deleteTaskModalDeleteButton").innerHTML = "Delete Parent";
 			}
 
 			document.getElementById("deleteTaskModalContent").innerHTML = html;
