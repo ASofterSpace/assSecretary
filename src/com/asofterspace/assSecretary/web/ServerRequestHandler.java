@@ -419,10 +419,15 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 				indexContent = StrUtils.replaceAll(indexContent, "[[USERNAME]]", db.getUsername());
 
 				Date now = new Date();
+				int hour = DateUtils.getHour(now);
+				String sleepStr = "";
+				if ((hour >= 3) && (hour < 7)) {
+					sleepStr = "Time to sleep! ";
+				}
 				// Today is Monday the 23rd of April 2027 and it is 08:37 right now. You are on planet Earth.
 				String generalInfo = "Today is <span id='curdatetime'>" + DateUtils.getDayOfWeekNameEN(now) + " the " +
 					StrUtils.replaceAll(DateUtils.serializeDateTimeLong(now, "<span class='sup'>", "</span>"), ", ", " and it is ") +
-					"</span> right now. You are currently on planet Earth.";
+					"</span> right now. <span id='cursleepstr'>" + sleepStr + "</span>You are currently on planet Earth.";
 				indexContent = StrUtils.replaceAll(indexContent, "[[GENERAL_INFO]]", generalInfo);
 
 

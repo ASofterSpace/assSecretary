@@ -834,6 +834,14 @@ window.setInterval(function() {
 			var now = DateUtils.now();
 			dateTimeEl.innerHTML = DateUtils.getDayOfWeekNameEN(now) + " the " +
 				StrUtils.replaceAll(DateUtils.serializeDateTimeLong(now, "<span class='sup'>", "</span>"), ", ", " and it is ");
+
+			var hour = DateUtils.getHour(now);
+			var sleepStr = "";
+			if ((hour >= 3) && (hour < 7)) {
+				sleepStr = "Time to sleep! ";
+			}
+			var sleepStrEl = document.getElementById("cursleepstr");
+			sleepStrEl.innerHTML = sleepStr;
 		}
 	}
 }, 30000);
