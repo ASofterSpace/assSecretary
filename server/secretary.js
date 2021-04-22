@@ -627,11 +627,26 @@ window.secretary = {
 		var filterTaskFuture = document.getElementById("filterTaskFuture");
 		if (filterTaskFuture) {
 			if (filterTaskFuture.className == "button unchecked") {
-				var filteredTasks = document.getElementsByClassName("future-task");
-				for (var i = 0; i < filteredTasks.length; i++) {
-					filteredTasks[i].style.display = "none";
-				}
+				this.hideTasksWithClassName("future-task");
 			}
+		}
+
+		var sortTasks = document.getElementById("sortTasks");
+		if (sortTasks) {
+			if (sortTasks.innerHTML.indexOf("Date") >= 0) {
+				// hide priority-sorted tasks when date-sorted tasks should be shown
+				this.hideTasksWithClassName("priority-sorted-task");
+			} else {
+				// hide date-sorted tasks when priority-sorted tasks should be shown
+				this.hideTasksWithClassName("date-sorted-task");
+			}
+		}
+	},
+
+	hideTasksWithClassName: function(className) {
+		var filteredTasks = document.getElementsByClassName(className);
+		for (var i = 0; i < filteredTasks.length; i++) {
+			filteredTasks[i].style.display = "none";
 		}
 	},
 
@@ -640,6 +655,18 @@ window.secretary = {
 		for (var i = 0; i < filteredTasks.length; i++) {
 			filteredTasks[i].style.display = "block";
 		}
+	},
+
+	toggleTaskSorting: function() {
+		var sortTasks = document.getElementById("sortTasks");
+		if (sortTasks) {
+			if (sortTasks.innerHTML.indexOf("Date") >= 0) {
+				sortTasks.innerHTML = "Priority Sorting";
+			} else {
+				sortTasks.innerHTML = "Date Sorting";
+			}
+		}
+		this.filterTasks();
 	},
 
 	toggleTaskFutureView: function() {
@@ -827,21 +854,29 @@ window.secretary.filterTasks();
 // every 30 seconds, update the clock time (including the date, as it might have changed!)
 window.setInterval(function() {
 	var dateTimeEl = document.getElementById("curdatetime");
+	var tomorrowEl = document.getElementById("tomorrowdate");
+	var sleepStrEl = document.getElementById("cursleepstr");
 	if (toolbox) {
 		var DateUtils = toolbox.utils.DateUtils;
 		var StrUtils = toolbox.utils.StrUtils;
-		if (dateTimeEl && DateUtils && StrUtils) {
+		if (DateUtils && StrUtils) {
 			var now = DateUtils.now();
-			dateTimeEl.innerHTML = DateUtils.getDayOfWeekNameEN(now) + " the " +
-				StrUtils.replaceAll(DateUtils.serializeDateTimeLong(now, "<span class='sup'>", "</span>"), ", ", " and it is ");
-
-			var hour = DateUtils.getHour(now);
-			var sleepStr = "";
-			if ((hour >= 3) && (hour < 7)) {
-				sleepStr = "Time to sleep! ";
+			if (dateTimeEl) {
+				dateTimeEl.innerHTML = DateUtils.getDayOfWeekNameEN(now) + " the " +
+					StrUtils.replaceAll(DateUtils.serializeDateTimeLong(now, "<span class='sup'>", "</span>"), ", ", " and it is ");
 			}
-			var sleepStrEl = document.getElementById("cursleepstr");
-			sleepStrEl.innerHTML = sleepStr;
+			if (tomorrowEl && StrUtils) {
+				dateTimeEl.innerHTML = DateUtils.getDayOfWeekNameEN(now) + " the " +
+					DateUtils.serializeDateLong(now, "<span class='sup'>", "</span>");
+			}
+			if (sleepStrEl) {
+				var hour = DateUtils.getHour(now);
+				var sleepStr = "";
+				if ((hour >= 3) && (hour < 7)) {
+					sleepStr = "Time to sleep! ";
+				}
+				sleepStrEl.innerHTML = sleepStr;
+			}
 		}
 	}
 }, 30000);

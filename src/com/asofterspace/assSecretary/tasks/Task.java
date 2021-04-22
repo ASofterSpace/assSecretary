@@ -286,17 +286,15 @@ public class Task extends GenericTask {
 	}
 
 	public void appendHtmlTo(StringBuilder html, boolean historicalView, boolean reducedView,
-		boolean onShortlist, Date dateForWhichHtmlGetsDisplayed, boolean standalone) {
+		boolean onShortlist, Date dateForWhichHtmlGetsDisplayed, boolean standalone, String additionalClassName) {
 
 		String id = getId();
 
 		// by default, main Width is the full 100%
 		float mainWidth = 100;
 
-		String futureTaskStr = "";
-
 		if (releasedInTheFuture()) {
-			futureTaskStr = " future-task";
+			additionalClassName += " future-task";
 		}
 
 		if (onShortlist) {
@@ -311,7 +309,7 @@ public class Task extends GenericTask {
 			} else {
 				html.append("<div class='line task task-with-origin-");
 				html.append(getOrigin());
-				html.append(futureTaskStr);
+				html.append(additionalClassName);
 				html.append("' id='task-");
 				html.append(id);
 				html.append("'>");
