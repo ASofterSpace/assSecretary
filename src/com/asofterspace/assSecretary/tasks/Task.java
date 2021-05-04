@@ -285,6 +285,11 @@ public class Task extends GenericTask {
 		this.releasedBasedOnId = releasedBasedOnId;
 	}
 
+	/**
+	 * historicalView .. on task log?
+	 * reducedView .. on weekly / monthly view?
+	 * onShortlist .. on main page, but shortlist?
+	 */
 	public void appendHtmlTo(StringBuilder html, boolean historicalView, boolean reducedView,
 		boolean onShortlist, Date dateForWhichHtmlGetsDisplayed, boolean standalone, String additionalClassName) {
 
@@ -469,7 +474,12 @@ public class Task extends GenericTask {
 			html.append("\"");
 			html.append(HTML.escapeHTMLstr(StrUtils.replaceAll(title, "\"", "")));
 			html.append("\", null)'>");
-			html.append("Delete Parent");
+			if (reducedView) {
+				// on the reduced view, there is not enough space for the full button caption
+				html.append("Del.P.");
+			} else {
+				html.append("Delete Parent");
+			}
 			html.append("</span>");
 			mainWidth -= 11;
 
