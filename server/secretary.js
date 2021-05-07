@@ -866,8 +866,9 @@ window.setInterval(function() {
 					StrUtils.replaceAll(DateUtils.serializeDateTimeLong(now, "<span class='sup'>", "</span>"), ", ", " and it is ");
 			}
 			if (tomorrowEl && StrUtils) {
-				dateTimeEl.innerHTML = DateUtils.getDayOfWeekNameEN(now) + " the " +
-					DateUtils.serializeDateLong(now, "<span class='sup'>", "</span>");
+				var tomorrow = DateUtils.addDays(now, 1);
+				tomorrowEl.innerHTML = DateUtils.getDayOfWeekNameEN(tomorrow) + " the " +
+					DateUtils.serializeDateLong(tomorrow, "<span class='sup'>", "</span>");
 			}
 			if (sleepStrEl) {
 				var hour = DateUtils.getHour(now);
