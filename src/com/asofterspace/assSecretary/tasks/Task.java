@@ -391,12 +391,16 @@ public class Task extends GenericTask {
 			}
 		}
 
+		String detailsId = id;
+		if (onShortlist) {
+			detailsId += "-shortlist";
+		}
+		if ((additionalClassName != null) && (!"".equals(additionalClassName))) {
+			detailsId += "-" + StrUtils.replaceAll(additionalClassName, " ", "");
+		}
+
 		if (!reducedView) {
 			if (hasDetails) {
-				String detailsId = id;
-				if (onShortlist) {
-					detailsId += "-shortlist";
-				}
 				html.append("<span style='");
 				html.append(btnStyle);
 				html.append("' class='button' onclick='secretary.taskDetails(\"");
@@ -566,10 +570,7 @@ public class Task extends GenericTask {
 
 		if (hasDetails) {
 			html.append("<div style='display: none' class='details' id='task-details-");
-			html.append(id);
-			if (onShortlist) {
-				html.append("-shortlist");
-			}
+			html.append(detailsId);
 			html.append("'>");
 			if (details != null) {
 				int lastDetail = details.size() - 1;
