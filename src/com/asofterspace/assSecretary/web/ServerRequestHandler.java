@@ -524,10 +524,20 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 								mariHtml += "<div>She also ";
 							}
 							mariHtml += "mentioned that these things should be done today:</div>";
+
+							StringBuilder mariHtmlBuilder = new StringBuilder();
 							for (GenericTask task : tasks) {
-								mariHtml += "<div class='line'><span class='warning'>" + task.getReleasedDateStr() + " " + task.getTitle() + "</span></div>";
+								Task taskTask = new Task(task);
+								taskTask.setPriority(200000);
+								taskTask.setOrigin(TaskCtrl.FINANCE_ORIGIN);
+								boolean reducedView = false;
+								boolean onShortlist = false;
+								boolean standalone = false;
+								String additionalClassName = "-mari";
+								taskTask.appendHtmlTo(mariHtmlBuilder, historicalView, reducedView, onShortlist,
+									today, standalone, additionalClassName);
 							}
-							mariHtml += "</div>";
+							mariHtml += mariHtmlBuilder.toString() + "</div>";
 							talkedToMari = true;
 						}
 
