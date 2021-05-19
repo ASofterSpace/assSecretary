@@ -67,7 +67,7 @@ div.buttonBar {
 	text-align: center;
 }
 
-span.button {
+span.button, a.button {
 	color: #AACCFF;
 	padding: 0pt 4pt;
 	border-radius: 5pt;
@@ -90,7 +90,7 @@ div.buttonBar > span.button {
 	margin: 0pt 10pt;
 }
 
-span.button:hover {
+span.button:hover, a.button:hover {
 	background: rgba(150, 200, 250, 0.5);
 }
 

@@ -36,11 +36,12 @@ public class AssSecretary {
 	public final static String WEB_ROOT_DIR = "deployed";
 
 	public final static String PROGRAM_TITLE = "assSecretary (Hugo)";
-	public final static String VERSION_NUMBER = "0.0.2.3(" + Utils.TOOLBOX_VERSION_NUMBER + ")";
-	public final static String VERSION_DATE = "21. October 2020 - 12. May 2021";
+	public final static String VERSION_NUMBER = "0.0.2.4(" + Utils.TOOLBOX_VERSION_NUMBER + ")";
+	public final static String VERSION_DATE = "21. October 2020 - 19. May 2021";
 
 	private static Database database;
 
+	private static MissionControlDatabase missionControlDatabase;
 	private static VmInfo vmInfo;
 	private static WebInfo webInfo;
 
@@ -76,7 +77,7 @@ public class AssSecretary {
 
 		database = new Database(dataDir);
 
-		MissionControlDatabase missionControlDatabase = new MissionControlDatabase(dataDir, "mission_control");
+		missionControlDatabase = new MissionControlDatabase(dataDir, "mission_control");
 
 		// this one can be static, as it does not ever really change anymore :)
 		LtcDatabase.init(dataDir);
@@ -114,23 +115,7 @@ public class AssSecretary {
 
 			System.out.println("Performing startup tasks...");
 
-			webInfo = new WebInfo();
-			vmInfo = new VmInfo();
-
-			addWebInfo(webInfo, "asofterspace", "assEn", "https://www.asofterspace.com/", missionControlDatabase);
-			addWebInfo(webInfo, "asofterspace", "assDe", "https://www.asofterspace.de/", missionControlDatabase);
-
-			addVmInfo(vmInfo, "skyhook", "db", missionControlDatabase);
-			addVmInfo(vmInfo, "skyhook", "f1", missionControlDatabase);
-			addVmInfo(vmInfo, "skyhook", "f2", missionControlDatabase);
-			addWebInfo(webInfo, "skyhook", "skyWeb", "https://skyhook.is/", missionControlDatabase);
-			addWebInfo(webInfo, "skyhook", "skyApp", "https://app.skyhook.is/", missionControlDatabase);
-			addWebInfo(webInfo, "skyhook", "skyDb", "http://skyhookdb.skyhook.is/phpmyadmin/", missionControlDatabase);
-
-			addVmInfo(vmInfo, "supervision-earth", "svs-backend", missionControlDatabase);
-			addWebInfo(webInfo, "supervision-earth", "sveWeb", "https://supervision.earth/", missionControlDatabase);
-			addWebInfo(webInfo, "supervision-earth", "sveApp", "https://supervisionspace.app/", missionControlDatabase);
-			addWebInfo(webInfo, "supervision-earth", "sveLB", "http://svs-backend-loadbalancer-1910963306.eu-central-1.elb.amazonaws.com/", missionControlDatabase);
+			runStartupTasks();
 
 
 			System.out.println("Saving database directly after startup to save amount of open tasks...");
@@ -153,6 +138,27 @@ public class AssSecretary {
 
 	public static WebInfo getWebInfo() {
 		return webInfo;
+	}
+
+	public static void runStartupTasks() {
+
+		webInfo = new WebInfo();
+		vmInfo = new VmInfo();
+
+		addWebInfo(webInfo, "asofterspace", "assEn", "https://www.asofterspace.com/", missionControlDatabase);
+		addWebInfo(webInfo, "asofterspace", "assDe", "https://www.asofterspace.de/", missionControlDatabase);
+
+		addVmInfo(vmInfo, "skyhook", "db", missionControlDatabase);
+		addVmInfo(vmInfo, "skyhook", "f1", missionControlDatabase);
+		addVmInfo(vmInfo, "skyhook", "f2", missionControlDatabase);
+		addWebInfo(webInfo, "skyhook", "skyWeb", "https://skyhook.is/", missionControlDatabase);
+		addWebInfo(webInfo, "skyhook", "skyApp", "https://app.skyhook.is/", missionControlDatabase);
+		addWebInfo(webInfo, "skyhook", "skyDb", "http://skyhookdb.skyhook.is/phpmyadmin/", missionControlDatabase);
+
+		addVmInfo(vmInfo, "supervision-earth", "svs-backend", missionControlDatabase);
+		addWebInfo(webInfo, "supervision-earth", "sveWeb", "https://supervision.earth/", missionControlDatabase);
+		addWebInfo(webInfo, "supervision-earth", "sveApp", "https://supervisionspace.app/", missionControlDatabase);
+		addWebInfo(webInfo, "supervision-earth", "sveLB", "http://svs-backend-loadbalancer-1910963306.eu-central-1.elb.amazonaws.com/", missionControlDatabase);
 	}
 
 	private static void addVmInfo(VmInfo vmInfo, String origin, String which,

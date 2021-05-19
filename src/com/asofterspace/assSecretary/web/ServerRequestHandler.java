@@ -561,6 +561,13 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 				}
 				indexContent = StrUtils.replaceAll(indexContent, "[[MARI]]", mariHtml);
 
+				String REFRESH_VM_STATS = "refreshVmStats";
+				if (arguments.length > 0) {
+					if (REFRESH_VM_STATS.equals(arguments[0])) {
+						AssSecretary.runStartupTasks();
+					}
+				}
+
 				VmInfo vmInfo = AssSecretary.getVmInfo();
 				WebInfo webInfo = AssSecretary.getWebInfo();
 				StringBuilder vmStatsHtml = new StringBuilder();
@@ -581,11 +588,14 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 				addLine(vmStatsHtml, "Supervision Earth Webpage", webInfo, "sveWeb");
 
 				if (vmStatsHtml.length() < 1) {
-					vmStatsHtml.insert(0, "<div>I have checked the VM disk statusses and web accessibility - and all is fine.");
+					vmStatsHtml.insert(0, "I have checked the VM disk statusses and web accessibility - and all is fine.");
 				} else {
-					vmStatsHtml.insert(0, "<div>I have checked the VM disk statusses and web accessibility - the status is:");
+					vmStatsHtml.insert(0, "I have checked the VM disk statusses and web accessibility - the status is:");
 				}
+				vmStatsHtml.insert(0, "<div style='position:relative;'>");
 
+				vmStatsHtml.append("<a class='button' href='/?" + REFRESH_VM_STATS + "' " +
+					"style='position: absolute; right: 0; top: 0;'>Refresh</a>");
 				vmStatsHtml.append("</div>");
 				indexContent = StrUtils.replaceAll(indexContent, "[[VM_STATS]]", vmStatsHtml.toString());
 
@@ -1250,6 +1260,10 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 		VmInfo vmInfo = AssSecretary.getVmInfo();
 		WebInfo webInfo = AssSecretary.getWebInfo();
 
+		if ((vmInfo == null) || (webInfo == null)) {
+			return "I am afraid I cannot show the mission control; internal information objects are missing entirely...";
+		}
+
 		String companyStart = "<div class='company_outer'>";
 		String companyEnd = "</div>";
 		String machineStart = "<div class='machine_outer'><div class='machine_inner'>";
@@ -1282,7 +1296,9 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 	}
 
 	private void addLine(StringBuilder vmStatsHtml, String name, McInfo mcInfo, String key) {
-		if (mcInfo.isImportant(key)) {
+		if (mcInfo == null) {
+			vmStatsHtml.append("<div class='line'>" + name + ": Weird, the information object is completely missing</div>");
+		} else if (mcInfo.isImportant(key)) {
 			vmStatsHtml.append("<div class='line'>" + name + ": " + mcInfo.get(key) + "</div>");
 		}
 	}
