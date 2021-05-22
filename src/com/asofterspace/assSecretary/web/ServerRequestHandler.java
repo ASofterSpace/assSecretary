@@ -411,6 +411,32 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 			// answering a request for general information
 			if (locEquiv.equals("index.htm")) {
 
+				String REFRESH_VM_STATS = "refreshVmStats";
+				if (arguments.length > 0) {
+					if (REFRESH_VM_STATS.equals(arguments[0])) {
+						AssSecretary.runStartupTasks();
+
+						String content =
+							"<!DOCTYPE html>\n" +
+							"<html>\n" +
+							"  <head>\n" +
+							"    <meta http-equiv=\"refresh\" content=\"2; url='/'\" />\n" +
+							"  </head>\n" +
+							"  <body style=\"background: #102; color: #88AAFF;\">\n" +
+							"    <a href=\"/\" style=\"height: 99pt; padding-top: 15pt; text-align: center;\">\n" +
+							"    	If automatic refreshing is down, please click to refresh\n" +
+							"    </a>\n" +
+							"  </body>\n" +
+							"</html>";
+
+						locEquiv = "_" + locEquiv;
+						TextFile indexFile = new TextFile(webRoot, locEquiv);
+						indexFile.saveContent(content);
+
+						return webRoot.getFile(locEquiv);
+					}
+				}
+
 				System.out.println("Answering index request...");
 
 				TextFile indexBaseFile = new TextFile(webRoot, locEquiv);
@@ -560,13 +586,6 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 					}
 				}
 				indexContent = StrUtils.replaceAll(indexContent, "[[MARI]]", mariHtml);
-
-				String REFRESH_VM_STATS = "refreshVmStats";
-				if (arguments.length > 0) {
-					if (REFRESH_VM_STATS.equals(arguments[0])) {
-						AssSecretary.runStartupTasks();
-					}
-				}
 
 				VmInfo vmInfo = AssSecretary.getVmInfo();
 				WebInfo webInfo = AssSecretary.getWebInfo();
