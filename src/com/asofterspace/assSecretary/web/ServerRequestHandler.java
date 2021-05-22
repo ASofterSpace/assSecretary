@@ -420,10 +420,10 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 							"<!DOCTYPE html>\n" +
 							"<html>\n" +
 							"  <head>\n" +
-							"    <meta http-equiv=\"refresh\" content=\"2; url='/'\" />\n" +
+							"    <meta http-equiv=\"refresh\" content=\"1; url='/'\" />\n" +
 							"  </head>\n" +
 							"  <body style=\"background: #102; color: #88AAFF;\">\n" +
-							"    <a href=\"/\" style=\"height: 99pt; padding-top: 15pt; text-align: center;\">\n" +
+							"    <a href=\"/\" style=\"height: 99pt; padding-top: 15pt; text-align: center; color: #88AAFF;\">\n" +
 							"    	If automatic refreshing is down, please click to refresh\n" +
 							"    </a>\n" +
 							"  </body>\n" +
