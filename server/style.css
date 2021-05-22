@@ -176,6 +176,10 @@ img.avatar {
 	border-radius: 20pt;
 }
 
+img.avatar:hover {
+	filter: brightness(135%);
+}
+
 a.sidebar, div.sidebar, div.projectbar {
 	position: absolute;
 	right: 10pt;
