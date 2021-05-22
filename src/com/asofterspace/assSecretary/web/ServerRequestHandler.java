@@ -601,7 +601,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 				addLine(vmStatsHtml, "Skyhook App", webInfo, "skyApp");
 				addLine(vmStatsHtml, "Skyhook Webpage", webInfo, "skyWeb");
 
-				addLine(vmStatsHtml, "Supervision Earth svs-backend", vmInfo, "svs-backend");
+				// addLine(vmStatsHtml, "Supervision Earth svs-backend", vmInfo, "svs-backend");
 				addLine(vmStatsHtml, "Supervision Earth App Frontend", webInfo, "sveApp");
 				addLine(vmStatsHtml, "Supervision Earth App Backend", webInfo, "sveLB");
 				addLine(vmStatsHtml, "Supervision Earth Webpage", webInfo, "sveWeb");
@@ -1307,7 +1307,9 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 		mcHtml += companyStart;
 		mcHtml += machineStart + "Webpage<br>" + webInfo.get("sveWeb") + machineEnd;
 		mcHtml += machineStart + "App Frontend<br>" + webInfo.get("sveApp") + machineEnd;
-		mcHtml += machineStart + "App Backend<br>" + webInfo.get("sveLB") + "<br>" + vmInfo.get("svs-backend") + machineEnd;
+		mcHtml += machineStart + "App Backend<br>" + webInfo.get("sveLB") +
+			// "<br>" + vmInfo.get("svs-backend") +
+			machineEnd;
 		mcHtml += "<img class='logo' src='projectlogos/supervisionearth/logo.png' />";
 		mcHtml += companyEnd;
 

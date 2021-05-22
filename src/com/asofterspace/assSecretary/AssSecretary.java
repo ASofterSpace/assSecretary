@@ -155,7 +155,10 @@ public class AssSecretary {
 		addWebInfo(webInfo, "skyhook", "skyApp", "https://app.skyhook.is/", missionControlDatabase);
 		addWebInfo(webInfo, "skyhook", "skyDb", "http://skyhookdb.skyhook.is/phpmyadmin/", missionControlDatabase);
 
-		addVmInfo(vmInfo, "supervision-earth", "svs-backend", missionControlDatabase);
+		// this call was unreliable, sometimes working, often giving nonsense - so we prefer to get rid of it,
+		// such that all calls that are present always work, and when something is not working, it is actually
+		// seen as important rather than as "just one more thing that always fails"
+		// addVmInfo(vmInfo, "supervision-earth", "svs-backend", missionControlDatabase);
 		addWebInfo(webInfo, "supervision-earth", "sveWeb", "https://supervision.earth/", missionControlDatabase);
 		addWebInfo(webInfo, "supervision-earth", "sveApp", "https://supervisionspace.app/", missionControlDatabase);
 		addWebInfo(webInfo, "supervision-earth", "sveLB", "http://svs-backend-loadbalancer-1910963306.eu-central-1.elb.amazonaws.com/", missionControlDatabase);
