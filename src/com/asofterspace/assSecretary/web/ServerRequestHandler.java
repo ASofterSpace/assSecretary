@@ -328,7 +328,6 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 					response.set("priority", task.getPriority());
 					response.set("priorityEscalationAfterDays", task.getPriorityEscalationAfterDays());
 					response.set("duration", task.getDurationStr());
-					response.set("day", task.getScheduledOnDay());
 
 					String weekdaysStr = "";
 					sep = "";
@@ -340,7 +339,11 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 							sep = ", ";
 						}
 					}
-					response.set("weekdays", weekdaysStr);
+					if ("".equals(weekdaysStr)) {
+						response.set("day", task.getScheduledOnDay());
+					} else {
+						response.set("day", weekdaysStr);
+					}
 
 					String monthsStr = "";
 					sep = "";
@@ -1482,16 +1485,18 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 		task.setPriorityEscalationAfterDays(json.getInteger("priorityEscalationAfterDays"));
 		task.setDurationStr(json.getString("duration"));
 
+		// get integer will just return null if there is a problem
 		task.setScheduledOnDay(json.getInteger("day"));
 
-		String[] weekdaysStrs = splitScheduleField(json.getString("weekdays"));
-		List<String> scheduledOnDaysOfWeek = new ArrayList<>();
+		String[] weekdaysStrs = splitScheduleField(json.getString("day"));
+		Set<String> scheduledOnDaysOfWeekSet = new HashSet<>();
 		for (String weekStr : weekdaysStrs) {
 			weekStr = DateUtils.toDayOfWeekNameEN(weekStr);
 			if (weekStr != null) {
-				scheduledOnDaysOfWeek.add(weekStr);
+				scheduledOnDaysOfWeekSet.add(weekStr);
 			}
 		}
+		List<String> scheduledOnDaysOfWeek = new ArrayList<>(scheduledOnDaysOfWeekSet);
 		task.setScheduledOnDaysOfWeek(scheduledOnDaysOfWeek);
 
 		String[] monthsStrs = splitScheduleField(json.getString("months"));

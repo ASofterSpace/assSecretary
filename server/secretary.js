@@ -194,7 +194,6 @@ window.secretary = {
 			priorityEscalationAfterDays: document.getElementById("repeatingTaskPriorityEscalationAfterDays").value,
 			duration: document.getElementById("repeatingTaskDuration").value,
 			day: document.getElementById("repeatingTaskScheduleDay").value,
-			weekdays: document.getElementById("repeatingTaskScheduleWeekdays").value,
 			months: document.getElementById("repeatingTaskScheduleMonths").value,
 			years: document.getElementById("repeatingTaskScheduleYears").value,
 		};
@@ -339,7 +338,6 @@ window.secretary = {
 		document.getElementById("repeatingTaskDuration").value = "00:00";
 
 		document.getElementById("repeatingTaskScheduleDay").value = "";
-		document.getElementById("repeatingTaskScheduleWeekdays").value = "";
 		document.getElementById("repeatingTaskScheduleMonths").value = "";
 		document.getElementById("repeatingTaskScheduleYears").value = "";
 	},
@@ -420,7 +418,6 @@ window.secretary = {
 						}
 						document.getElementById("repeatingTaskDuration").value = result.duration;
 						document.getElementById("repeatingTaskScheduleDay").value = result.day;
-						document.getElementById("repeatingTaskScheduleWeekdays").value = result.weekdays;
 						document.getElementById("repeatingTaskScheduleMonths").value = result.months;
 						document.getElementById("repeatingTaskScheduleYears").value = result.years;
 
