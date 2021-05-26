@@ -58,7 +58,7 @@ window.secretary = {
 		var modal = document.getElementById("addSingleTaskModal");
 		if (modal) {
 			modal.style.display = "block";
-			document.getElementById("singleTaskCurrentMode").innerHTML = "adding new entries";
+			document.getElementById("singleTaskCurrentMode").innerHTML = "adding new single entry";
 
 			this.currentlyEditing = null;
 
@@ -76,7 +76,7 @@ window.secretary = {
 		var modal = document.getElementById("addRepeatingTaskModal");
 		if (modal) {
 			modal.style.display = "block";
-			document.getElementById("repeatingTaskCurrentMode").innerHTML = "adding new entries";
+			document.getElementById("repeatingTaskCurrentMode").innerHTML = "adding new repeating tasks";
 
 			this.currentlyEditingRepeating = null;
 
@@ -221,7 +221,7 @@ window.secretary = {
 							window.secretary.currentlyEditing = result.newId;
 							document.getElementById("singleTaskReleaseDate").value = result.newReleaseDate;
 							document.getElementById("singleTaskDoneDate").value = "";
-							document.getElementById("singleTaskCurrentMode").innerHTML = "editing one entry";
+							document.getElementById("singleTaskCurrentMode").innerHTML = "editing one single entry";
 						}
 					} else {
 						window.location.reload(false);
@@ -355,7 +355,7 @@ window.secretary = {
 					var modal = document.getElementById("addSingleTaskModal");
 					if (modal) {
 						modal.style.display = "block";
-						document.getElementById("singleTaskCurrentMode").innerHTML = "editing one entry";
+						document.getElementById("singleTaskCurrentMode").innerHTML = "editing one single entry";
 
 						document.getElementById("modalBackground").style.display = "block";
 
@@ -402,7 +402,7 @@ window.secretary = {
 					var modal = document.getElementById("addRepeatingTaskModal");
 					if (modal) {
 						modal.style.display = "block";
-						document.getElementById("repeatingTaskCurrentMode").innerHTML = "editing one entry";
+						document.getElementById("repeatingTaskCurrentMode").innerHTML = "editing a repeating task";
 
 						document.getElementById("modalBackground").style.display = "block";
 
