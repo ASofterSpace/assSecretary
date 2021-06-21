@@ -243,8 +243,18 @@ window.secretary = {
 			modal.style.display = "none";
 		}
 
-		// reload, as data might have changed while the modal was open...
-		window.location.reload(false);
+		// if we are on the inbox page, and the inbox is dirty, then save it before refreshing the page!
+		if (window.saveDirtyInbox && window.inboxDirty) {
+			window.saveDirtyInbox();
+
+			// reload after saving, as data might have changed while the modal was open...
+			window.setInterval(function() {
+				window.location.reload(false);
+			}, 1000);
+		} else {
+			// reload, as data might have changed while the modal was open...
+			window.location.reload(false);
+		}
 	},
 
 	closeRepeatingTaskModal: function() {
