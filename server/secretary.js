@@ -324,7 +324,7 @@ window.secretary = {
 
 	resetSingleTaskModal: function() {
 
-		document.getElementById("singleTaskTitle").value = "";
+		document.getElementById("singleTaskTitle").value = "00:00 ";
 		document.getElementById("singleTaskDetails").value = "";
 		var DateUtils = toolbox.utils.DateUtils;
 		document.getElementById("singleTaskReleaseDate").value = DateUtils.serializeDate(DateUtils.now());
@@ -339,7 +339,7 @@ window.secretary = {
 
 	resetRepeatingTaskModal: function() {
 
-		document.getElementById("repeatingTaskTitle").value = "";
+		document.getElementById("repeatingTaskTitle").value = "00:00 ";
 		document.getElementById("repeatingTaskDetails").value = "";
 		document.getElementById("repeatingTaskOrigin").value = "private";
 		document.getElementById("repeatingTaskPriority").value = 500000;
