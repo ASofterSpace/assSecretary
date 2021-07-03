@@ -364,6 +364,16 @@ public class Task extends GenericTask {
 		String escTitle = HTML.escapeHTMLstr(title);
 		html.append(" title='");
 		html.append(escTitle);
+		html.append("\n");
+		if (isInstance()) {
+			if (getReleasedBasedOnId() == null) {
+				html.append("(plain single task)");
+			} else {
+				html.append("(instance of a repeating task)");
+			}
+		} else {
+			html.append("(abstract repeating task, not an instance at all)");
+		}
 		html.append("'>");
 		if (reducedView) {
 			html.append("&nbsp;");

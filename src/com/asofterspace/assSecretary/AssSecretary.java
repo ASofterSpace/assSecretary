@@ -36,8 +36,8 @@ public class AssSecretary {
 	public final static String WEB_ROOT_DIR = "deployed";
 
 	public final static String PROGRAM_TITLE = "assSecretary (Hugo)";
-	public final static String VERSION_NUMBER = "0.0.2.5(" + Utils.TOOLBOX_VERSION_NUMBER + ")";
-	public final static String VERSION_DATE = "21. October 2020 - 26. May 2021";
+	public final static String VERSION_NUMBER = "0.0.2.6(" + Utils.TOOLBOX_VERSION_NUMBER + ")";
+	public final static String VERSION_DATE = "21. October 2020 - 3. July 2021";
 
 	private static Database database;
 
