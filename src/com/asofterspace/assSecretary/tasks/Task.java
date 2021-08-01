@@ -361,9 +361,8 @@ public class Task extends GenericTask {
 		} else if (prio < WARNING_CUTOFF) {
 			html.append(" class='warning'");
 		}
-		String escTitle = HTML.escapeHTMLstr(title);
 		html.append(" title='");
-		html.append(escTitle);
+		html.append(HTML.escapeHTMLstr(title));
 		html.append("\n");
 		if (isInstance()) {
 			if (getReleasedBasedOnId() == null) {
@@ -378,7 +377,7 @@ public class Task extends GenericTask {
 		if (reducedView) {
 			html.append("&nbsp;");
 		}
-		html.append(escTitle);
+		html.append(makePlainTextLineInteractive(title));
 		html.append("</span>");
 
 		boolean hasDetails = false;
@@ -592,10 +591,7 @@ public class Task extends GenericTask {
 				}
 				for (int i = 0; i <= lastDetail; i++) {
 					String detail = details.get(i);
-					detail = StrUtils.replaceAll(detail, "<", "&lt;");
-					detail = StrUtils.replaceAll(detail, ">", "&gt;");
-					detail = addHtmlLinkToStringContent(detail, "http://");
-					detail = addHtmlLinkToStringContent(detail, "https://");
+					detail = makePlainTextLineInteractive(detail);
 					html.append(detail);
 					html.append("<br>");
 				}
@@ -606,6 +602,16 @@ public class Task extends GenericTask {
 		html.append("</div>");
 
 		html.insert(charsBeforeWidth, mainWidth + "%");
+	}
+
+	public static String makePlainTextLineInteractive(String text) {
+
+		text = HTML.escapeHTMLstr(text);
+
+		text = addHtmlLinkToStringContent(text, "http://");
+		text = addHtmlLinkToStringContent(text, "https://");
+
+		return text;
 	}
 
 	public static String addHtmlLinkToStringContent(String contentStr, String prefix) {
