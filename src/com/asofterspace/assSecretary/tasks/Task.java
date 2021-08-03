@@ -364,9 +364,11 @@ public class Task extends GenericTask {
 		html.append(" title='");
 		html.append(HTML.escapeHTMLstr(title));
 		html.append("\n");
+		boolean plainSingle = false;
 		if (isInstance()) {
 			if (getReleasedBasedOnId() == null) {
 				html.append("(plain single task)");
+				plainSingle = true;
 			} else {
 				html.append("(instance of a repeating task)");
 			}
@@ -376,6 +378,15 @@ public class Task extends GenericTask {
 		html.append("'>");
 		if (reducedView) {
 			html.append("&nbsp;");
+		}
+		// on main page...
+		if ((!historicalView) && (!reducedView)) {
+			// ... add a dot in front of single entries, a pipe in front of all others
+			if (plainSingle) {
+				html.append("· ");
+			} else {
+				html.append("| ");
+			}
 		}
 		html.append(makePlainTextLineInteractive(title));
 		html.append("</span>");
