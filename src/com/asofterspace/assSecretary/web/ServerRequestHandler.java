@@ -178,16 +178,18 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 					}
 					break;
 
-				case "/taskPutOnShortListTomorrow":
+				case "/tasksPutOnShortListTomorrow":
 
-					editingId = json.getString("id");
+					List<String> editingIds = json.getArrayAsStringList("ids");
 
-					if (editingId == null) {
+					if (editingIds == null) {
 						respond(404);
 						return;
 					} else {
-						taskCtrl.removeTaskFromShortListById(editingId);
-						taskCtrl.addTaskToShortListTomorrowById(editingId);
+						for (String id : editingIds) {
+							taskCtrl.removeTaskFromShortListById(id);
+							taskCtrl.addTaskToShortListTomorrowById(id);
+						}
 						taskCtrl.save();
 						answer = new WebServerAnswerInJson(new JSON("{\"success\": true}"));
 					}

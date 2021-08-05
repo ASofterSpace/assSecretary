@@ -575,8 +575,13 @@ window.secretary = {
 
 	taskPutOnShortListTomorrow: function(id) {
 
+		this.tasksPutOnShortListTomorrow([id]);
+	},
+
+	tasksPutOnShortListTomorrow: function(ids) {
+
 		var request = new XMLHttpRequest();
-		request.open("POST", "taskPutOnShortListTomorrow", true);
+		request.open("POST", "tasksPutOnShortListTomorrow", true);
 		request.setRequestHeader("Content-Type", "application/json");
 
 		request.onreadystatechange = function() {
@@ -584,18 +589,20 @@ window.secretary = {
 				var result = JSON.parse(request.response);
 				if (result.success) {
 					// just hiding the task div is actually perfectly enough, a full refresh is not necessary
-					var taskDiv = document.getElementById("task-" + id + "-on-shortlist");
-					if (taskDiv) {
-						taskDiv.style.display = 'none';
-					} else {
-						window.location.reload(false);
+					for (var i = 0; i < ids.length; i++) {
+						var taskDiv = document.getElementById("task-" + ids[i] + "-on-shortlist");
+						if (taskDiv) {
+							taskDiv.style.display = 'none';
+						} else {
+							window.location.reload(false);
+						}
 					}
 				}
 			}
 		}
 
 		var data = {
-			id: id,
+			ids: ids,
 		};
 
 		request.send(JSON.stringify(data));

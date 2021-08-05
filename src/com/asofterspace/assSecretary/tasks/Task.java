@@ -571,6 +571,25 @@ public class Task extends GenericTask {
 					html.append("&#x2B6F;");
 					html.append("</span>");
 					mainWidth -= 3;
+
+					String tla = getOriginTLA();
+
+					html.append("<span style='width: 2.5%; ");
+					html.append(miniBtnStyle);
+					html.append("' class='button' onclick='secretary.tasksPutOnShortListTomorrow(window.shortlistTLAs." + tla + ")'>");
+					html.append("&#x21F6;");
+					html.append("</span>");
+					mainWidth -= 3;
+
+					html.append("<script>\n");
+					html.append("if (!window.shortlistTLAs) {\n");
+					html.append("  window.shortlistTLAs = {};\n");
+					html.append("}\n");
+					html.append("if (!window.shortlistTLAs." + tla + ") {\n");
+					html.append("  window.shortlistTLAs." + tla + " = [];\n");
+					html.append("}\n");
+					html.append("window.shortlistTLAs." + tla + ".push(\"" + id + "\");\n");
+					html.append("</script>\n");
 				} else {
 					html.append("<span style='width: 2.5%; ");
 					html.append(miniBtnStyle);
