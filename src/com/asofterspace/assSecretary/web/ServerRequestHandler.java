@@ -370,6 +370,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 						}
 					}
 					response.set("years", yearsStr);
+					response.set("showAsScheduled", task.getShowAsScheduled());
 
 					return new WebServerAnswerInJson(response);
 				}
@@ -682,7 +683,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 				List<Task> baseTasksForSchedule = getHugoAndMariTasks();
 
 				for (Task task : baseTasksForSchedule) {
-					if (task.isScheduledOn(tomorrow)) {
+					if (task.isScheduledOn(tomorrow) && task.getShowAsScheduled()) {
 						tasks.add(task);
 					}
 				}
@@ -950,7 +951,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 					// as there we would expect real instances to have been created instead!
 					if (day.after(actualToday)) {
 						for (Task task : baseTasksForSchedule) {
-							if (task.isScheduledOn(day)) {
+							if (task.isScheduledOn(day) && task.getShowAsScheduled()) {
 								tasksToday.add(task);
 							}
 						}
@@ -1075,7 +1076,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 						// as there we would expect real instances to have been created instead!
 						if (day.after(actualToday)) {
 							for (Task task : baseTasksForSchedule) {
-								if (task.isScheduledOn(day)) {
+								if (task.isScheduledOn(day) && task.getShowAsScheduled()) {
 									tasksToday.add(task);
 								}
 							}
@@ -1520,6 +1521,8 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 			}
 		}
 		task.setScheduledInYears(scheduledInYears);
+
+		task.setShowAsScheduled(json.getBoolean("showAsScheduled"));
 	}
 
 	private String[] splitScheduleField(String weekdaysStr) {

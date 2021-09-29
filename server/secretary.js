@@ -196,6 +196,7 @@ window.secretary = {
 			day: document.getElementById("repeatingTaskScheduleDay").value,
 			months: document.getElementById("repeatingTaskScheduleMonths").value,
 			years: document.getElementById("repeatingTaskScheduleYears").value,
+			showAsScheduled: document.getElementById("repeatingTaskShowAsScheduled").checked,
 		};
 	},
 
@@ -350,6 +351,7 @@ window.secretary = {
 		document.getElementById("repeatingTaskScheduleDay").value = "";
 		document.getElementById("repeatingTaskScheduleMonths").value = "";
 		document.getElementById("repeatingTaskScheduleYears").value = "";
+		document.getElementById("repeatingTaskShowAsScheduled").checked = true;
 	},
 
 	taskEdit: function(id) {
@@ -430,6 +432,10 @@ window.secretary = {
 						document.getElementById("repeatingTaskScheduleDay").value = result.day;
 						document.getElementById("repeatingTaskScheduleMonths").value = result.months;
 						document.getElementById("repeatingTaskScheduleYears").value = result.years;
+						if (result.showAsScheduled == null) {
+							result.showAsScheduled = true;
+						}
+						document.getElementById("repeatingTaskShowAsScheduled").checked = result.showAsScheduled;
 
 						window.secretary.currentlyEditingRepeating = id;
 					}

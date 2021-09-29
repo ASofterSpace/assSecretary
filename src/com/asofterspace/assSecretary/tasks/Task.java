@@ -54,6 +54,9 @@ public class Task extends GenericTask {
 	// for a generic external source (like the LTC), this contains the display name of that source
 	private String externalSource;
 
+	// for a repeating task: should we show this one as scheduled in future days?
+	private Boolean showAsScheduled;
+
 
 	public Task() {
 		super(null, null, null, null, null, null, null);
@@ -81,6 +84,7 @@ public class Task extends GenericTask {
 			this.releasedBasedOnId = otherTask.releasedBasedOnId;
 			this.workbenchLink = otherTask.workbenchLink;
 			this.externalSource = otherTask.externalSource;
+			this.showAsScheduled = otherTask.showAsScheduled;
 
 			// never copy another entry's id, but instead, generate a new one!
 			this.id = null;
@@ -703,6 +707,17 @@ public class Task extends GenericTask {
 
 	public void setExternalSource(String externalSource) {
 		this.externalSource = externalSource;
+	}
+
+	public boolean getShowAsScheduled() {
+		if (showAsScheduled == null) {
+			return true;
+		}
+		return showAsScheduled;
+	}
+
+	public void setShowAsScheduled(Boolean showAsScheduled) {
+		this.showAsScheduled = showAsScheduled;
 	}
 
 }

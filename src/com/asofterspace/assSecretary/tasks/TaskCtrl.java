@@ -53,6 +53,9 @@ public class TaskCtrl extends TaskCtrlBase {
 	// the origin for tasks coming from Mari
 	public final static String FINANCE_ORIGIN = "finances";
 
+	// for a repeating task: should we show this one as scheduled in future days?
+	public final static String SHOW_AS_SCHEDULED = "showAsScheduled";
+
 	// a list of ids of the tasks on the shortlist
 	private List<String> shortlistIds = new ArrayList<>();
 
@@ -123,6 +126,7 @@ public class TaskCtrl extends TaskCtrlBase {
 		result.setDuration(recordTask.getInteger(DURATION));
 		result.setId(recordTask.getString(ID));
 		result.setReleasedBasedOnId(recordTask.getString(RELEASED_BASED_ON_ID));
+		result.setShowAsScheduled(recordTask.getBoolean(SHOW_AS_SCHEDULED));
 
 		return result;
 	}
@@ -190,6 +194,11 @@ public class TaskCtrl extends TaskCtrlBase {
 				taskRecord.set(ID, ourTask.getId());
 			}
 			taskRecord.setOrRemove(RELEASED_BASED_ON_ID, ourTask.getReleasedBasedOnId());
+			if (ourTask.getShowAsScheduled()) {
+				taskRecord.remove(SHOW_AS_SCHEDULED);
+			} else {
+				taskRecord.set(SHOW_AS_SCHEDULED, false);
+			}
 		}
 		return taskRecord;
 	}
