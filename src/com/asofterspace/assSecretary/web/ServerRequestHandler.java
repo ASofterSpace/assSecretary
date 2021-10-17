@@ -854,12 +854,14 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 				boolean standalone = false;
 				if (tasks.size() > 0) {
 					Date prevDate = tasks.get(0).getDoneDate();
+					appendDateToHtml(taskHtml, prevDate);
 					for (Task task : tasks) {
 						Date curDate = task.getDoneDate();
 						if (!DateUtils.isSameDay(curDate, prevDate)) {
 							prevDate = curDate;
 							taskHtml.append("<div class='separator_top'>&nbsp;</div>");
 							taskHtml.append("<div class='separator_bottom'>&nbsp;</div>");
+							appendDateToHtml(taskHtml, curDate);
 						}
 						task.appendHtmlTo(taskHtml, historicalView, reducedView, onShortlist, curDate, standalone, "");
 					}
@@ -1726,6 +1728,11 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 				return a.getCurrentPriority(today, historicalView) - b.getCurrentPriority(today, historicalView);
 			}
 		});
+	}
+
+	private void appendDateToHtml(StringBuilder taskHtml, Date curDate) {
+		taskHtml.append("<div style='text-align:center;'>" + DateUtils.getDayOfWeekNameEN(curDate) + " the " +
+			DateUtils.serializeDateLong(curDate, "<span class=\"sup\">", "</span>") + "</div>");
 	}
 
 }
