@@ -197,6 +197,7 @@ window.secretary = {
 			months: document.getElementById("repeatingTaskScheduleMonths").value,
 			years: document.getElementById("repeatingTaskScheduleYears").value,
 			showAsScheduled: document.getElementById("repeatingTaskShowAsScheduled").checked,
+			autoCleanTask: document.getElementById("repeatingTaskAutoCleanTask").checked,
 		};
 	},
 
@@ -352,6 +353,7 @@ window.secretary = {
 		document.getElementById("repeatingTaskScheduleMonths").value = "";
 		document.getElementById("repeatingTaskScheduleYears").value = "";
 		document.getElementById("repeatingTaskShowAsScheduled").checked = true;
+		document.getElementById("repeatingTaskAutoCleanTask").checked = false;
 	},
 
 	taskEdit: function(id) {
@@ -436,6 +438,10 @@ window.secretary = {
 							result.showAsScheduled = true;
 						}
 						document.getElementById("repeatingTaskShowAsScheduled").checked = result.showAsScheduled;
+						if (result.autoCleanTask == null) {
+							result.autoCleanTask = false;
+						}
+						document.getElementById("repeatingTaskAutoCleanTask").checked = result.autoCleanTask;
 
 						window.secretary.currentlyEditingRepeating = id;
 					}

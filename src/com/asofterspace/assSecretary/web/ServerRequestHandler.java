@@ -370,7 +370,8 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 						}
 					}
 					response.set("years", yearsStr);
-					response.set("showAsScheduled", task.getShowAsScheduled());
+					response.set(TaskCtrl.SHOW_AS_SCHEDULED, task.getShowAsScheduled());
+					response.set(TaskCtrl.AUTO_CLEAN_TASK, task.getAutoCleanTask());
 
 					return new WebServerAnswerInJson(response);
 				}
@@ -1524,7 +1525,8 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 		}
 		task.setScheduledInYears(scheduledInYears);
 
-		task.setShowAsScheduled(json.getBoolean("showAsScheduled"));
+		task.setShowAsScheduled(json.getBoolean(TaskCtrl.SHOW_AS_SCHEDULED));
+		task.setAutoCleanTask(json.getBoolean(TaskCtrl.AUTO_CLEAN_TASK));
 	}
 
 	private String[] splitScheduleField(String weekdaysStr) {

@@ -57,6 +57,9 @@ public class Task extends GenericTask {
 	// for a repeating task: should we show this one as scheduled in future days?
 	private Boolean showAsScheduled;
 
+	// for a repeating task: is this task cleaned up automatically after a week?
+	private Boolean autoCleanTask;
+
 
 	public Task() {
 		super(null, null, null, null, null, null, null);
@@ -85,6 +88,7 @@ public class Task extends GenericTask {
 			this.workbenchLink = otherTask.workbenchLink;
 			this.externalSource = otherTask.externalSource;
 			this.showAsScheduled = otherTask.showAsScheduled;
+			this.autoCleanTask = otherTask.autoCleanTask;
 
 			// never copy another entry's id, but instead, generate a new one!
 			this.id = null;
@@ -718,6 +722,17 @@ public class Task extends GenericTask {
 
 	public void setShowAsScheduled(Boolean showAsScheduled) {
 		this.showAsScheduled = showAsScheduled;
+	}
+
+	public boolean getAutoCleanTask() {
+		if (autoCleanTask == null) {
+			return false;
+		}
+		return autoCleanTask;
+	}
+
+	public void setAutoCleanTask(Boolean autoCleanTask) {
+		this.autoCleanTask = autoCleanTask;
 	}
 
 }

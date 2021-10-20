@@ -56,6 +56,9 @@ public class TaskCtrl extends TaskCtrlBase {
 	// for a repeating task: should we show this one as scheduled in future days?
 	public final static String SHOW_AS_SCHEDULED = "showAsScheduled";
 
+	// for a repeating task: is this task cleaned up automatically after a week?
+	public final static String AUTO_CLEAN_TASK = "autoCleanTask";
+
 	// a list of ids of the tasks on the shortlist
 	private List<String> shortlistIds = new ArrayList<>();
 
@@ -84,6 +87,9 @@ public class TaskCtrl extends TaskCtrlBase {
 
 		// cleanup the shortlist once on startup, again without saving for now
 		cleanupShortlist();
+
+		// remove all autoclean tasks that are older than seven days
+		removeAutoCleanTasks(DateUtils.addDays(DateUtils.now(), -7));
 
 		database.setTaskCtrl(this);
 	}
@@ -127,6 +133,7 @@ public class TaskCtrl extends TaskCtrlBase {
 		result.setId(recordTask.getString(ID));
 		result.setReleasedBasedOnId(recordTask.getString(RELEASED_BASED_ON_ID));
 		result.setShowAsScheduled(recordTask.getBoolean(SHOW_AS_SCHEDULED));
+		result.setAutoCleanTask(recordTask.getBoolean(AUTO_CLEAN_TASK));
 
 		return result;
 	}
@@ -194,10 +201,19 @@ public class TaskCtrl extends TaskCtrlBase {
 				taskRecord.set(ID, ourTask.getId());
 			}
 			taskRecord.setOrRemove(RELEASED_BASED_ON_ID, ourTask.getReleasedBasedOnId());
+
 			if (ourTask.getShowAsScheduled()) {
+				// true is default
 				taskRecord.remove(SHOW_AS_SCHEDULED);
 			} else {
 				taskRecord.set(SHOW_AS_SCHEDULED, false);
+			}
+
+			if (ourTask.getAutoCleanTask()) {
+				taskRecord.set(AUTO_CLEAN_TASK, true);
+			} else {
+				// false is default
+				taskRecord.remove(AUTO_CLEAN_TASK);
 			}
 		}
 		return taskRecord;
@@ -263,6 +279,27 @@ public class TaskCtrl extends TaskCtrlBase {
 			}
 			futureShortlistIds.remove(0);
 		}
+	}
+
+	private void removeAutoCleanTasks(Date removeBeforeDate) {
+		int removed = 0;
+		for (int i = taskInstances.size() - 1; i >= 0; i--) {
+			GenericTask genericTask = taskInstances.get(i);
+			if (genericTask instanceof Task) {
+				Task task = (Task) genericTask;
+				if (!task.getAutoCleanTask()) {
+					continue;
+				}
+				Date doneDate = task.getDoneDate();
+				if (doneDate != null) {
+					if (doneDate.before(removeBeforeDate)) {
+						taskInstances.remove(i);
+						removed++;
+					}
+				}
+			}
+		}
+		System.out.println("Removed " + removed + " task instances that were set to auto-clean.");
 	}
 
 	public List<Task> getAllTaskInstancesAsTasks() {
