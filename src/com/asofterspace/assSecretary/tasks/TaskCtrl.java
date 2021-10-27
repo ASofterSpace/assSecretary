@@ -362,6 +362,12 @@ public class TaskCtrl extends TaskCtrlBase {
 		return null;
 	}
 
+	public void deleteTasksByIds(List<String> ids) {
+		for (String id : ids) {
+			deleteTaskById(id);
+		}
+	}
+
 	public boolean deleteTaskById(String id) {
 
 		boolean result = false;

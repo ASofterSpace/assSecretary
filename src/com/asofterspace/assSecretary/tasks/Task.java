@@ -310,11 +310,28 @@ public class Task extends GenericTask {
 			additionalClassName += " future-task";
 		}
 
+		String miniBtnStyle = "margin-left: 0.5%; box-sizing: border-box; ";
+		String btnStyle = "width: 6%; " + miniBtnStyle;
+
 		if (onShortlist) {
 			// tasks on the shortlist are not affected by such mundane things as filtering etc.
 			html.append("<div class='line' id='task-");
 			html.append(id);
 			html.append("-on-shortlist'>");
+
+			html.append("<span style='width: 2.5%; ");
+			String leftButtonStyle = miniBtnStyle;
+			leftButtonStyle = StrUtils.replaceAll(leftButtonStyle, "margin-left", "margin-right");
+			html.append(leftButtonStyle);
+			html.append("' class='button' id='select-task-");
+			html.append(id);
+			html.append("-on-shortlist' onclick='secretary.taskSelect(\"");
+			html.append(id);
+			html.append("\")'>");
+			html.append("[ ]");
+			html.append("</span>");
+			mainWidth -= 3;
+
 		} else {
 			if (standalone) {
 				// standalone tasks are not affected by such mundane things as filtering etc. either
@@ -400,9 +417,6 @@ public class Task extends GenericTask {
 		html.append("</span>");
 
 		boolean hasDetails = false;
-
-		String miniBtnStyle = "margin-left: 0.5%; box-sizing: border-box; ";
-		String btnStyle = "width: 6%; " + miniBtnStyle;
 
 		if (reducedView) {
 			html.append("</div>");

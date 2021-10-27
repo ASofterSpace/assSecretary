@@ -197,17 +197,15 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 				case "/taskDelete":
 
-					editingId = json.getString("id");
+					List<String> deletingIds = json.getArrayAsStringList("id");
 
-					if (editingId == null) {
+					if (deletingIds == null) {
 						respond(404);
 						return;
 					} else {
-						boolean done = taskCtrl.deleteTaskById(editingId);
-						if (done) {
-							taskCtrl.save();
-						}
-						answer = new WebServerAnswerInJson(new JSON("{\"success\": " + done + "}"));
+						taskCtrl.deleteTasksByIds(deletingIds);
+						taskCtrl.save();
+						answer = new WebServerAnswerInJson(new JSON("{\"success\": true}"));
 					}
 					break;
 

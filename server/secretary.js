@@ -12,6 +12,9 @@ window.secretary = {
 	// id of the repeating parent task of the single task we are currently editing
 	currentlyRepeatingParent: null,
 
+	// array of ids of selected tasks
+	selection: [],
+
 
 	onResize: function() {
 
@@ -480,7 +483,7 @@ window.secretary = {
 		if (modal) {
 			modal.style.display = "block";
 
-			this.currentlyDeleting = id;
+			this.currentlyDeleting = [id];
 
 			var html = "Do you really want to delete this single task instance?" +
 				"<br><br>Title: " + title +
@@ -495,6 +498,23 @@ window.secretary = {
 					"So if you just want to delete a single task instance... then by all means, do cancel! ;)";
 				document.getElementById("deleteTaskModalDeleteButton").innerHTML = "Delete Parent";
 			}
+
+			document.getElementById("deleteTaskModalContent").innerHTML = html;
+
+			document.getElementById("modalBackground").style.display = "block";
+		}
+	},
+
+	showMultiDeleteModal: function(id, title, releaseDate) {
+		var modal = document.getElementById("deleteTaskModal");
+		if (modal) {
+			modal.style.display = "block";
+
+			this.currentlyDeleting = this.selection;
+
+			var html = "Do you really want to delete ALL the selected tasks?";
+
+			document.getElementById("deleteTaskModalDeleteButton").innerHTML = "Delete All";
 
 			document.getElementById("deleteTaskModalContent").innerHTML = html;
 
@@ -789,6 +809,20 @@ window.secretary = {
 		}
 
 		window.dirtify();
+	},
+
+	taskSelect: function(id) {
+		var index = this.selection.indexOf(id);
+		var el = document.getElementById("select-task-" + id + "-on-shortlist");
+		if (index < 0) {
+			this.selection.push(id);
+			el.innerHTML = "[X]";
+			el.parentElement.className = "line highlight";
+		} else {
+			this.selection.pop(index);
+			el.innerHTML = "[ ]";
+			el.parentElement.className = "line";
+		}
 	},
 
 	insertDateTimeStampIntoTextarea: function(textareaEl) {
