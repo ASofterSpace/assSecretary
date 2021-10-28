@@ -26,36 +26,43 @@
 				If you are confused and have no idea what to do next, then eat, sleep, or just pick any item off this list that you feel like doing.
 			</div>
 
-			[[TASK_SHORTLIST]]
+			[[FACTS]]
 
-			[[MARI]]
+			<div id='hiddenMainContent' [[FACTS_HIDING_STYLE]]>
 
-			[[VM_STATS]]
+				[[TASK_SHORTLIST]]
 
-			[[TOWA]]
+				[[MARI]]
 
-			[[TASKS_TOMORROW]]
+				[[VM_STATS]]
 
-			<div style="position: relative">
-				<span id="sortTasks" class="button checked" onclick="secretary.toggleTaskSorting();" style="position: absolute; top: -3pt; right: 265pt;">
-					Priority Sorting
-				</span>
+				[[TOWA]]
 
-				<span id="filterTaskFuture" class="button unchecked" onclick="secretary.toggleTaskFutureView();" style="position: absolute; top: -3pt; right: 220pt;">
-					Future
-				</span>
+				[[TASKS_TOMORROW]]
 
-				@include(inc_taskfilter.htm)
+				<div style="position: relative">
+					<span id="sortTasks" class="button checked" onclick="secretary.toggleTaskSorting();" style="position: absolute; top: -3pt; right: 265pt;">
+						Priority Sorting
+					</span>
 
-				<div>These tasks would like to be done:</div>
-				<div id="taskContainer">
-					[[TASKS]]
+					<span id="filterTaskFuture" class="button unchecked" onclick="secretary.toggleTaskFutureView();" style="position: absolute; top: -3pt; right: 220pt;">
+						Future
+					</span>
+
+					@include(inc_taskfilter.htm)
+
+					<div>These tasks would like to be done:</div>
+					<div id="taskContainer">
+						[[TASKS]]
+					</div>
 				</div>
+
+				<div class="footer">&nbsp;</div>
+
+				@include(inc_task_buttonbar.htm)
+
 			</div>
 
-			<div class="footer">&nbsp;</div>
-
-			@include(inc_task_buttonbar.htm)
 		</div>
 
 		<img class="avatar" id="hugoAvatar"

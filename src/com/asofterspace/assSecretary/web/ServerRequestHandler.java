@@ -8,6 +8,8 @@ import com.asofterspace.assSecretary.accountant.MariDatabase;
 import com.asofterspace.assSecretary.accountant.MariTaskCtrl;
 import com.asofterspace.assSecretary.AssSecretary;
 import com.asofterspace.assSecretary.Database;
+import com.asofterspace.assSecretary.facts.Fact;
+import com.asofterspace.assSecretary.facts.FactDatabase;
 import com.asofterspace.assSecretary.ltc.LtcDatabase;
 import com.asofterspace.assSecretary.missionControl.McInfo;
 import com.asofterspace.assSecretary.missionControl.VmInfo;
@@ -17,6 +19,7 @@ import com.asofterspace.assSecretary.tasks.TaskCtrl;
 import com.asofterspace.toolbox.calendar.GenericTask;
 import com.asofterspace.toolbox.io.Directory;
 import com.asofterspace.toolbox.io.File;
+import com.asofterspace.toolbox.io.HTML;
 import com.asofterspace.toolbox.io.JSON;
 import com.asofterspace.toolbox.io.JsonParseException;
 import com.asofterspace.toolbox.io.TextFile;
@@ -52,17 +55,23 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 	private TaskCtrl taskCtrl;
 
+	private FactDatabase factDatabase;
+
 	private Directory serverDir;
+
+	private static boolean firstIndexCall = true;
 
 
 	public ServerRequestHandler(WebServer server, Socket request, Directory webRoot, Directory serverDir,
-		Database db, TaskCtrl taskCtrl) {
+		Database db, TaskCtrl taskCtrl, FactDatabase factDatabase) {
 
 		super(server, request, webRoot);
 
 		this.db = db;
 
 		this.taskCtrl = taskCtrl;
+
+		this.factDatabase = factDatabase;
 
 		this.serverDir = serverDir;
 	}
@@ -448,6 +457,25 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 				String indexContent = indexBaseFile.getContent();
 
 				indexContent = StrUtils.replaceAll(indexContent, "[[USERNAME]]", db.getUsername());
+
+				String factsDiv = "";
+				String factsHidingStyle = "";
+				if (firstIndexCall) {
+					firstIndexCall = false;
+					Fact fact = factDatabase.getRandomFact();
+					if (fact != null) {
+						String answerHtml = HTML.escapeHTMLstr(fact.getAnswer());
+						answerHtml = StrUtils.replaceAll(answerHtml, "&#10;", "<br>");
+						factsDiv = "<div id='factsDiv' " +
+							"onclick='document.getElementById(\"factsDiv\").style.display = \"none\"; " +
+							"document.getElementById(\"hiddenMainContent\").style.display = \"block\";' " +
+							"style='padding-top: 45pt;padding-bottom: 1555pt;'>" +
+							answerHtml + "</div>";
+						factsHidingStyle = " style='display:none;' ";
+					}
+				}
+				indexContent = StrUtils.replaceAll(indexContent, "[[FACTS]]", factsDiv);
+				indexContent = StrUtils.replaceAll(indexContent, "[[FACTS_HIDING_STYLE]]", factsHidingStyle);
 
 				Date now = new Date();
 				int hour = DateUtils.getHour(now);

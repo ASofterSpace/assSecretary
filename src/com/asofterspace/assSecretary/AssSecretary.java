@@ -4,6 +4,7 @@
  */
 package com.asofterspace.assSecretary;
 
+import com.asofterspace.assSecretary.facts.FactDatabase;
 import com.asofterspace.assSecretary.ltc.LtcDatabase;
 import com.asofterspace.assSecretary.missionControl.MissionControlDatabase;
 import com.asofterspace.assSecretary.missionControl.VmInfo;
@@ -34,10 +35,11 @@ public class AssSecretary {
 	public final static String SERVER_DIR = "server";
 	public final static String SCRIPTS_DIR = "scripts";
 	public final static String WEB_ROOT_DIR = "deployed";
+	public final static String FACT_DIR = "../assTrainer/config";
 
 	public final static String PROGRAM_TITLE = "assSecretary (Hugo)";
-	public final static String VERSION_NUMBER = "0.0.3.1(" + Utils.TOOLBOX_VERSION_NUMBER + ")";
-	public final static String VERSION_DATE = "21. October 2020 - 27. October 2021";
+	public final static String VERSION_NUMBER = "0.0.3.2(" + Utils.TOOLBOX_VERSION_NUMBER + ")";
+	public final static String VERSION_DATE = "21. October 2020 - 28. October 2021";
 
 	private static Database database;
 
@@ -72,6 +74,7 @@ public class AssSecretary {
 		Directory dataDir = new Directory(DATA_DIR);
 		Directory serverDir = new Directory(SERVER_DIR);
 		Directory webRoot = new Directory(WEB_ROOT_DIR);
+		Directory factDir = new Directory(FACT_DIR);
 
 		System.out.println("Loading database...");
 
@@ -83,6 +86,7 @@ public class AssSecretary {
 		LtcDatabase.init(dataDir);
 
 		TaskDatabase taskDatabase = new TaskDatabase(dataDir);
+		FactDatabase factDatabase = new FactDatabase(factDir);
 		TaskCtrl taskCtrl = new TaskCtrl(database, taskDatabase);
 
 
@@ -104,7 +108,7 @@ public class AssSecretary {
 
 			System.out.println("Starting the server on port " + database.getPort() + "...");
 
-			Server server = new Server(webRoot, serverDir, database, taskCtrl);
+			Server server = new Server(webRoot, serverDir, database, taskCtrl, factDatabase);
 
 			server.setWhitelist(whitelist);
 

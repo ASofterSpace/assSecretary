@@ -5,6 +5,7 @@
 package com.asofterspace.assSecretary.web;
 
 import com.asofterspace.assSecretary.Database;
+import com.asofterspace.assSecretary.facts.FactDatabase;
 import com.asofterspace.assSecretary.tasks.TaskCtrl;
 import com.asofterspace.toolbox.io.Directory;
 import com.asofterspace.toolbox.web.WebServer;
@@ -19,10 +20,13 @@ public class Server extends WebServer {
 
 	private TaskCtrl taskCtrl;
 
+	private FactDatabase factDatabase;
+
 	private Directory serverDir;
 
 
-	public Server(Directory webRoot, Directory serverDir, Database db, TaskCtrl taskCtrl) {
+	public Server(Directory webRoot, Directory serverDir, Database db, TaskCtrl taskCtrl,
+		FactDatabase factDatabase) {
 
 		super(webRoot, db.getPort());
 
@@ -30,12 +34,14 @@ public class Server extends WebServer {
 
 		this.taskCtrl = taskCtrl;
 
+		this.factDatabase = factDatabase;
+
 		this.serverDir = serverDir;
 	}
 
 	@Override
 	protected WebServerRequestHandler getHandler(Socket request) {
-		return new ServerRequestHandler(this, request, webRoot, serverDir, db, taskCtrl);
+		return new ServerRequestHandler(this, request, webRoot, serverDir, db, taskCtrl, factDatabase);
 	}
 
 }

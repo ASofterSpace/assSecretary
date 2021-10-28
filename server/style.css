@@ -15,7 +15,7 @@ a {
 	text-decoration: none;
 }
 
-body > div, div#mainContent > div {
+body > div, div#mainContent > div, div#hiddenMainContent > div {
 	color: #88AAFF;
 	padding-bottom: 10pt;
 }
