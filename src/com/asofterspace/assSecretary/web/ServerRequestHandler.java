@@ -278,6 +278,60 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 					answer = new WebServerAnswerInJson(new JSON("{\"success\": true}"));
 					break;
 
+				case "/taskUpDown":
+					List<Task> tasks = getDoneTaskInstancesSortedByDoneDateTime();
+					String id = json.getString("id");
+					Integer direction = json.getInteger("direction");
+					Task curTask = null;
+					Date curDate = null;
+					for (Task task : tasks) {
+						if (task.hasId(id)) {
+							curTask = task;
+							curDate = task.getDoneDate();
+						}
+					}
+					if (curTask == null) {
+						answer = new WebServerAnswerInJson(new JSON("{\"success\": false}"));
+						break;
+					}
+
+					// get all tasks of this day
+					List<Task> tasksOfThisDay = new ArrayList<>();
+					for (Task task : tasks) {
+						if (DateUtils.isSameDay(curDate, task.getDoneDate())) {
+							tasksOfThisDay.add(task);
+						}
+					}
+
+					boolean success = false;
+
+					for (int i = 0; i < tasksOfThisDay.size(); i++) {
+						if (curTask.getId().equals(tasksOfThisDay.get(i).getId())) {
+							if (direction > 0) {
+								if (i > 0) {
+									Date newDate = tasksOfThisDay.get(i-1).getSetToDoneDateTime();
+									newDate = DateUtils.addSeconds(newDate, 1);
+									curTask.setSetToDoneDateTime(newDate);
+									success = true;
+								}
+							}
+							if (direction < 0) {
+								if (i < tasksOfThisDay.size() - 1) {
+									Date newDate = tasksOfThisDay.get(i+1).getSetToDoneDateTime();
+									newDate = DateUtils.addSeconds(newDate, -1);
+									curTask.setSetToDoneDateTime(newDate);
+									success = true;
+								}
+							}
+						}
+					}
+
+					if (success) {
+						taskCtrl.save();
+					}
+					answer = new WebServerAnswerInJson(new JSON("{\"success\": " + success + "}"));
+					break;
+
 				default:
 					respond(404);
 					return;
@@ -843,37 +897,9 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 				indexContent = StrUtils.replaceAll(indexContent, "[[SIDEBAR]]", SideBarCtrl.getSidebarHtmlStr());
 
-				List<Task> tasks = taskCtrl.getDoneTaskInstancesAsTasks();
-
-				boolean onlyGetDone = true;
-				tasks = addExternalTaskInstances(tasks, null, null, onlyGetDone);
+				List<Task> tasks = getDoneTaskInstancesSortedByDoneDateTime();
 
 				boolean historicalView = true;
-
-				Collections.sort(tasks, new Comparator<Task>() {
-					public int compare(Task a, Task b) {
-						Date aDone = a.getDoneDate();
-						Date bDone = b.getDoneDate();
-						if (DateUtils.isSameDay(aDone, bDone)) {
-							// on tasklog, sort tasks within a day by the datetime at which "done" was set
-							Date aSetToDone = a.getSetToDoneDateTime();
-							Date bSetToDone = b.getSetToDoneDateTime();
-							if ((aSetToDone != null) && (bSetToDone != null)) {
-								if (aSetToDone.before(bSetToDone)) {
-									return 1;
-								}
-								if (bSetToDone.before(aSetToDone)) {
-									return -1;
-								}
-							}
-							return a.getCurrentPriority(aDone, historicalView) - b.getCurrentPriority(bDone, historicalView);
-						}
-						if (aDone.before(bDone)) {
-							return 1;
-						}
-						return -1;
-					}
-				});
 
 				StringBuilder taskHtml = new StringBuilder();
 				boolean reducedView = false;
@@ -1761,6 +1787,43 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 	private void appendDateToHtml(StringBuilder taskHtml, Date curDate) {
 		taskHtml.append("<div style='text-align:center;'>" + DateUtils.getDayOfWeekNameEN(curDate) + " the " +
 			DateUtils.serializeDateLong(curDate, "<span class=\"sup\">", "</span>") + "</div>");
+	}
+
+	private List<Task> getDoneTaskInstancesSortedByDoneDateTime() {
+
+		List<Task> tasks = taskCtrl.getDoneTaskInstancesAsTasks();
+
+		boolean onlyGetDone = true;
+		tasks = addExternalTaskInstances(tasks, null, null, onlyGetDone);
+
+		boolean historicalView = true;
+
+		Collections.sort(tasks, new Comparator<Task>() {
+			public int compare(Task a, Task b) {
+				Date aDone = a.getDoneDate();
+				Date bDone = b.getDoneDate();
+				if (DateUtils.isSameDay(aDone, bDone)) {
+					// on tasklog, sort tasks within a day by the datetime at which "done" was set
+					Date aSetToDone = a.getSetToDoneDateTime();
+					Date bSetToDone = b.getSetToDoneDateTime();
+					if ((aSetToDone != null) && (bSetToDone != null)) {
+						if (aSetToDone.before(bSetToDone)) {
+							return 1;
+						}
+						if (bSetToDone.before(aSetToDone)) {
+							return -1;
+						}
+					}
+					return a.getCurrentPriority(aDone, historicalView) - b.getCurrentPriority(bDone, historicalView);
+				}
+				if (aDone.before(bDone)) {
+					return 1;
+				}
+				return -1;
+			}
+		});
+
+		return tasks;
 	}
 
 }

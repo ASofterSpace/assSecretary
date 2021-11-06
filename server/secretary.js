@@ -15,6 +15,9 @@ window.secretary = {
 	// array of ids of selected tasks
 	selection: [],
 
+	// cache of how far up / down a task has been moved
+	taskUpDownCache: {},
+
 
 	onResize: function() {
 
@@ -811,6 +814,7 @@ window.secretary = {
 		window.dirtify();
 	},
 
+	// select a task on the shortlist
 	taskSelect: function(id) {
 		var index = this.selection.indexOf(id);
 		var el = document.getElementById("select-task-" + id + "-on-shortlist");
@@ -823,6 +827,55 @@ window.secretary = {
 			el.innerHTML = "[ ]";
 			el.parentElement.className = "line";
 		}
+	},
+
+	// move a done task up in the task log
+	taskUp: function(id) {
+		this.taskUpDown(id, 1);
+	},
+
+	// move a done task down in the task log
+	taskDown: function(id) {
+		this.taskUpDown(id, -1);
+	},
+
+	taskUpDown: function(id, direction) {
+
+		var request = new XMLHttpRequest();
+		request.open("POST", "taskUpDown", true);
+		request.setRequestHeader("Content-Type", "application/json");
+
+		var outer = this;
+		request.onreadystatechange = function() {
+			if (request.readyState == 4 && request.status == 200) {
+				var result = JSON.parse(request.response);
+				if (result.success) {
+					if (!outer.taskUpDownCache[id]) {
+						outer.taskUpDownCache[id] = 0;
+					}
+					outer.taskUpDownCache[id] = outer.taskUpDownCache[id] + direction;
+
+					if (outer.taskUpDownCache[id] > 0) {
+						document.getElementById("task-up-" + id).innerHTML = "" + outer.taskUpDownCache[id];
+					} else {
+						document.getElementById("task-up-" + id).innerHTML = "/\\";
+					}
+
+					if (outer.taskUpDownCache[id] < 0) {
+						document.getElementById("task-down-" + id).innerHTML = "" + (-outer.taskUpDownCache[id]);
+					} else {
+						document.getElementById("task-down-" + id).innerHTML = "\\/";
+					}
+				}
+			}
+		}
+
+		var data = {
+			id: id,
+			direction: direction,
+		};
+
+		request.send(JSON.stringify(data));
 	},
 
 	insertDateTimeStampIntoTextarea: function(textareaEl) {

@@ -465,12 +465,12 @@ public class Task extends GenericTask {
 
 		} else if (workbenchLink != null) {
 
-			html.append("<span style='width: 10%; " + miniBtnStyle + "' class='button' onclick='secretary.openInNewTab(\"");
+			html.append("<span style='width: 11%; " + miniBtnStyle + "' class='button' onclick='secretary.openInNewTab(\"");
 			html.append(workbenchLink);
 			html.append("\")'>");
 			html.append("(from Workbench)");
 			html.append("</span>");
-			mainWidth -= 10.5;
+			mainWidth -= 11.5;
 
 		} else if (TaskCtrl.FINANCE_ORIGIN.equals(origin)) {
 
@@ -532,6 +532,28 @@ public class Task extends GenericTask {
 		} else {
 
 			if (hasBeenDone()) {
+				if (historicalView) {
+					html.append("<span style='");
+					html.append("width: 2%; ");
+					html.append(miniBtnStyle);
+					html.append("' class='button' onclick='secretary.taskUp(\"");
+					html.append(id);
+					html.append("\")' id='task-up-" + id + "'>");
+					html.append("/\\");
+					html.append("</span>");
+					mainWidth -= 2.5;
+
+					html.append("<span style='");
+					html.append("width: 2%; ");
+					html.append(miniBtnStyle);
+					html.append("' class='button' onclick='secretary.taskDown(\"");
+					html.append(id);
+					html.append("\")' id='task-down-" + id + "'>");
+					html.append("\\/");
+					html.append("</span>");
+					mainWidth -= 2.5;
+				}
+
 				html.append("<span style='");
 				html.append(btnStyle);
 				html.append("' class='button' onclick='secretary.taskUnDone(\"");
