@@ -61,6 +61,8 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 	private static boolean firstIndexCall = true;
 
+	private final static SideBarEntryForEmployee EMPLOYEE_HUGO = new SideBarEntryForEmployee("Hugo");
+
 
 	public ServerRequestHandler(WebServer server, Socket request, Directory webRoot, Directory serverDir,
 		Database db, TaskCtrl taskCtrl, FactDatabase factDatabase) {
@@ -555,6 +557,8 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 				indexContent = StrUtils.replaceAll(indexContent, "[[TABS]]", tabsHtml);
 
+				indexContent = StrUtils.replaceAll(indexContent, "[[AVATAR_DESCRIPTION]]", SideBarCtrl.getAvatarDescription(EMPLOYEE_HUGO));
+
 
 				StringBuilder taskShortlistHtml = new StringBuilder();
 
@@ -812,7 +816,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 				indexContent = StrUtils.replaceAll(indexContent, "[[MINI_CALENDAR]]", getMiniCalendarHtml());
 
-				indexContent = StrUtils.replaceAll(indexContent, "[[SIDEBAR]]", SideBarCtrl.getSidebarHtmlStr(new SideBarEntryForEmployee("Hugo")));
+				indexContent = StrUtils.replaceAll(indexContent, "[[SIDEBAR]]", SideBarCtrl.getSidebarHtmlStr(EMPLOYEE_HUGO));
 
 				locEquiv = "_" + locEquiv;
 				TextFile indexFile = new TextFile(webRoot, locEquiv);
