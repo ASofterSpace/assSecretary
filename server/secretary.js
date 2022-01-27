@@ -806,6 +806,11 @@ window.secretary = {
 				newTitle = sel.substring(0, sel.indexOf("\n"));
 				newDetails = sel.substring(sel.indexOf("\n") + 1);
 			}
+			newTitle = newTitle.trim();
+			while (newTitle.indexOf("*") == 0) {
+				newTitle = newTitle.substring(1);
+			}
+			newTitle = newTitle.trim();
 			document.getElementById("singleTaskTitle").value = newTitle;
 			document.getElementById("singleTaskDetails").value = newDetails;
 			inboxArea.value = val.substring(0, start) + val.substring(end);
