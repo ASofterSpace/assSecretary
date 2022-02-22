@@ -156,6 +156,8 @@ window.secretary = {
 			priorityEscalationAfterDays: document.getElementById("singleTaskPriorityEscalationAfterDays").value,
 			duration: document.getElementById("singleTaskDuration").value,
 			releaseUntil: document.getElementById("singleTaskReleaseUntil").value,
+			showAsScheduled: document.getElementById("singleTaskShowAsScheduled").checked,
+			autoCleanTask: document.getElementById("singleTaskAutoCleanTask").checked,
 		};
 	},
 
@@ -343,6 +345,8 @@ window.secretary = {
 		document.getElementById("singleTaskPriorityEscalationAfterDays").value = "never";
 		document.getElementById("singleTaskDuration").value = "00:00";
 		document.getElementById("singleTaskReleaseUntil").value = "";
+		document.getElementById("singleTaskShowAsScheduled").checked = true;
+		document.getElementById("singleTaskAutoCleanTask").checked = false;
 	},
 
 	resetRepeatingTaskModal: function() {
@@ -400,6 +404,14 @@ window.secretary = {
 						} else {
 							document.getElementById("singleTaskBasedOnRepeating").style.display="none";
 						}
+						if (result.showAsScheduled == null) {
+							result.showAsScheduled = true;
+						}
+						document.getElementById("singleTaskShowAsScheduled").checked = result.showAsScheduled;
+						if (result.autoCleanTask == null) {
+							result.autoCleanTask = false;
+						}
+						document.getElementById("singleTaskAutoCleanTask").checked = result.autoCleanTask;
 
 						window.secretary.currentlyEditing = id;
 					}
