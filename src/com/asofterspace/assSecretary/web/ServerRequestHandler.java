@@ -17,6 +17,7 @@ import com.asofterspace.assSecretary.missionControl.WebInfo;
 import com.asofterspace.assSecretary.tasks.Task;
 import com.asofterspace.assSecretary.tasks.TaskCtrl;
 import com.asofterspace.toolbox.calendar.GenericTask;
+import com.asofterspace.toolbox.calendar.TaskCtrlBase;
 import com.asofterspace.toolbox.io.Directory;
 import com.asofterspace.toolbox.io.File;
 import com.asofterspace.toolbox.io.HTML;
@@ -252,7 +253,9 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 						json.getString("origin"),
 						json.getInteger("priority"),
 						json.getInteger("priorityEscalationAfterDays"),
-						json.getString("duration")
+						json.getString("duration"),
+						json.getBoolean(TaskCtrl.SHOW_AS_SCHEDULED),
+						json.getBoolean(TaskCtrl.AUTO_CLEAN_TASK)
 					);
 					answer = new WebServerAnswerInJson(new JSON("{\"success\": " + (newTask != null) + ", " +
 						"\"newId\": \"" + newTask.getId() + "\", \"newReleaseDate\": \"" +
@@ -373,7 +376,10 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 					response.set("priority", task.getPriority());
 					response.set("priorityEscalationAfterDays", task.getPriorityEscalationAfterDays());
 					response.set("duration", task.getDurationStr());
+					response.set(TaskCtrl.SHOW_AS_SCHEDULED, task.getShowAsScheduled());
+					response.set(TaskCtrl.AUTO_CLEAN_TASK, task.getAutoCleanTask());
 					response.set("releasedBasedOnId", task.getReleasedBasedOnId());
+
 					return new WebServerAnswerInJson(response);
 				}
 			}
@@ -435,6 +441,8 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 					response.set("years", yearsStr);
 					response.set(TaskCtrl.SHOW_AS_SCHEDULED, task.getShowAsScheduled());
 					response.set(TaskCtrl.AUTO_CLEAN_TASK, task.getAutoCleanTask());
+					response.set(TaskCtrlBase.BIWEEKLY_EVEN, task.getBiweeklyEven());
+					response.set(TaskCtrlBase.BIWEEKLY_ODD, task.getBiweeklyOdd());
 
 					return new WebServerAnswerInJson(response);
 				}
@@ -1450,7 +1458,9 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 				json.getString("origin"),
 				json.getInteger("priority"),
 				json.getInteger("priorityEscalationAfterDays"),
-				json.getString("duration")
+				json.getString("duration"),
+				json.getBoolean(TaskCtrl.SHOW_AS_SCHEDULED),
+				json.getBoolean(TaskCtrl.AUTO_CLEAN_TASK)
 			);
 			setDoneDateBasedOnJson(newTask, json);
 			result = newTask;
@@ -1477,6 +1487,8 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 				task.setPriority(json.getInteger("priority"));
 				task.setPriorityEscalationAfterDays(json.getInteger("priorityEscalationAfterDays"));
 				task.setDurationStr(json.getString("duration"));
+				task.setShowAsScheduled(json.getBoolean(TaskCtrl.SHOW_AS_SCHEDULED));
+				task.setAutoCleanTask(json.getBoolean(TaskCtrl.AUTO_CLEAN_TASK));
 				taskCtrl.save();
 				result = task;
 			} else {
@@ -1499,7 +1511,9 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 					json.getString("origin"),
 					json.getInteger("priority"),
 					json.getInteger("priorityEscalationAfterDays"),
-					json.getString("duration")
+					json.getString("duration"),
+					json.getBoolean(TaskCtrl.SHOW_AS_SCHEDULED),
+					json.getBoolean(TaskCtrl.AUTO_CLEAN_TASK)
 				);
 				setDoneDateBasedOnJson(newTask, json);
 			}
@@ -1583,6 +1597,8 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 		task.setShowAsScheduled(json.getBoolean(TaskCtrl.SHOW_AS_SCHEDULED));
 		task.setAutoCleanTask(json.getBoolean(TaskCtrl.AUTO_CLEAN_TASK));
+		task.setBiweeklyEven(json.getBoolean(TaskCtrlBase.BIWEEKLY_EVEN));
+		task.setBiweeklyOdd(json.getBoolean(TaskCtrlBase.BIWEEKLY_ODD));
 	}
 
 	private String[] splitScheduleField(String weekdaysStr) {

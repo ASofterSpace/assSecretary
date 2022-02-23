@@ -193,7 +193,7 @@ window.secretary = {
 
 	gatherDataForRepeatingTaskSubmit: function() {
 
-		return {
+		var result = {
 			editingId: window.secretary.currentlyEditingRepeating,
 			title: document.getElementById("repeatingTaskTitle").value,
 			details: document.getElementById("repeatingTaskDetails").value,
@@ -206,7 +206,15 @@ window.secretary = {
 			years: document.getElementById("repeatingTaskScheduleYears").value,
 			showAsScheduled: document.getElementById("repeatingTaskShowAsScheduled").checked,
 			autoCleanTask: document.getElementById("repeatingTaskAutoCleanTask").checked,
+			biweeklyEven: document.getElementById("repeatingTaskBiweeklyEven").checked,
+			biweeklyOdd: document.getElementById("repeatingTaskBiweeklyOdd").checked,
 		};
+
+		if (result.biweeklyEven && result.biweeklyOdd) {
+			alert("Both biweekly even and biweekly odd selected - please do decide for one of them, or neither. ;)")
+		}
+
+		return result;
 	},
 
 	doneSingleTaskModal: function(copyAfterwards) {
@@ -358,12 +366,13 @@ window.secretary = {
 		window.secretary.taskPriorityChange("repeating");
 		document.getElementById("repeatingTaskPriorityEscalationAfterDays").value = "never";
 		document.getElementById("repeatingTaskDuration").value = "00:00";
-
 		document.getElementById("repeatingTaskScheduleDay").value = "";
 		document.getElementById("repeatingTaskScheduleMonths").value = "";
 		document.getElementById("repeatingTaskScheduleYears").value = "";
 		document.getElementById("repeatingTaskShowAsScheduled").checked = true;
 		document.getElementById("repeatingTaskAutoCleanTask").checked = false;
+		document.getElementById("repeatingTaskBiweeklyEven").checked = false;
+		document.getElementById("repeatingTaskBiweeklyOdd").checked = false;
 	},
 
 	taskEdit: function(id) {
@@ -460,6 +469,14 @@ window.secretary = {
 							result.autoCleanTask = false;
 						}
 						document.getElementById("repeatingTaskAutoCleanTask").checked = result.autoCleanTask;
+						if (result.biweeklyEven == null) {
+							result.biweeklyEven = false;
+						}
+						document.getElementById("repeatingTaskBiweeklyEven").checked = result.biweeklyEven;
+						if (result.biweeklyOdd == null) {
+							result.biweeklyOdd = false;
+						}
+						document.getElementById("repeatingTaskBiweeklyOdd").checked = result.biweeklyOdd;
 
 						window.secretary.currentlyEditingRepeating = id;
 					}

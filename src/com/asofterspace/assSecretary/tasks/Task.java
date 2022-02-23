@@ -54,21 +54,22 @@ public class Task extends GenericTask {
 	// for a generic external source (like the LTC), this contains the display name of that source
 	private String externalSource;
 
-	// for a repeating task: should we show this one as scheduled in future days?
+	// should we show this one as scheduled in future days?
 	private Boolean showAsScheduled;
 
-	// for a repeating task: is this task cleaned up automatically after a week?
+	// is this task cleaned up automatically after a week?
 	private Boolean autoCleanTask;
 
 
 	public Task() {
-		super(null, null, null, null, null, null, null);
+		super(null, null, null, null, null, null, null, null, null);
 	}
 
 	public Task(String title, Integer scheduledOnDay, List<String> scheduledOnDaysOfWeek,
 		List<Integer> scheduledInMonths, List<Integer> scheduledInYears, List<String> details,
-		List<String> onDone) {
-		super(title, scheduledOnDay, scheduledOnDaysOfWeek, scheduledInMonths, scheduledInYears, details, onDone);
+		List<String> onDone, Boolean biweeklyEven, Boolean biweeklyOdd) {
+		super(title, scheduledOnDay, scheduledOnDaysOfWeek, scheduledInMonths, scheduledInYears, details, onDone,
+			biweeklyEven, biweeklyOdd);
 	}
 
 	/**

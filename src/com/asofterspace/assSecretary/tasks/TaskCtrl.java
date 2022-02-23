@@ -53,10 +53,10 @@ public class TaskCtrl extends TaskCtrlBase {
 	// the origin for tasks coming from Mari
 	public final static String FINANCE_ORIGIN = "finances";
 
-	// for a repeating task: should we show this one as scheduled in future days?
+	// should we show this one as scheduled in future days?
 	public final static String SHOW_AS_SCHEDULED = "showAsScheduled";
 
-	// for a repeating task: is this task cleaned up automatically after a week?
+	// is this task cleaned up automatically after a week?
 	public final static String AUTO_CLEAN_TASK = "autoCleanTask";
 
 	// a list of ids of the tasks on the shortlist
@@ -113,10 +113,11 @@ public class TaskCtrl extends TaskCtrlBase {
 
 	@Override
 	protected GenericTask createTask(String title, Integer scheduledOnDay, List<String> scheduledOnDaysOfWeek,
-		List<Integer> scheduledInMonths, List<Integer> scheduledInYears, List<String> details, List<String> onDone) {
+		List<Integer> scheduledInMonths, List<Integer> scheduledInYears, List<String> details, List<String> onDone,
+		Boolean biweeklyEven, Boolean biweeklyOdd) {
 
 		return new Task(title, scheduledOnDay, scheduledOnDaysOfWeek, scheduledInMonths,
-			scheduledInYears, details, onDone);
+			scheduledInYears, details, onDone, biweeklyEven, biweeklyOdd);
 	}
 
 	@Override
@@ -409,7 +410,7 @@ public class TaskCtrl extends TaskCtrlBase {
 	 * Returns a Task if it worked and an ad hoc task was created, and false otherwise
 	 */
 	public Task addAdHocTask(String title, String details, Date scheduleDate, String origin, Integer priority,
-		Integer priorityEscalationAfterDays, String duration) {
+		Integer priorityEscalationAfterDays, String duration, Boolean showAsScheduled, Boolean autoCleanTask) {
 
 		GenericTask addedTask = super.addAdHocTask(title, details, scheduleDate);
 
@@ -423,6 +424,8 @@ public class TaskCtrl extends TaskCtrlBase {
 			ourTask.setPriority(priority);
 			ourTask.setPriorityEscalationAfterDays(priorityEscalationAfterDays);
 			ourTask.setDurationStr(duration);
+			ourTask.setShowAsScheduled(showAsScheduled);
+			ourTask.setAutoCleanTask(autoCleanTask);
 
 			// add newly generated task to the shortlist if it is generated for today
 			// or for an earlier date...
