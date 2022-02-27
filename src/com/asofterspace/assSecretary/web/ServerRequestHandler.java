@@ -558,6 +558,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 				tabsHtml += "<a href='/inbox.htm'>Inbox</a>";
 				tabsHtml += "<a href='/repeating.htm'>Repeating Tasks</a>";
 				tabsHtml += "<a href='/tasklog.htm'>Task Log</a>";
+				tabsHtml += "<a href='/currenttasklog.htm'>Current Task Log</a>";
 				tabsHtml += "<a href='/weekly.htm'>Weekly View</a>";
 				tabsHtml += "<a href='/monthly.htm'>Monthly View</a>";
 				tabsHtml += "<a href='/stats.htm'>Statistics</a>";
@@ -896,7 +897,8 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 
 			// answering a request for the task log tab
-			if (locEquiv.equals("tasklog.htm")) {
+			if (locEquiv.equals("tasklog.htm") ||
+				locEquiv.equals("currenttasklog.htm")) {
 
 				System.out.println("Answering task log request...");
 
@@ -920,9 +922,22 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 				if (tasks.size() > 0) {
 					Date prevDate = tasks.get(0).getDoneDate();
 					appendDateToHtml(taskHtml, prevDate);
+
+					boolean useCutoffDate = false;
+					Date cutoffDate = null;
+					if (locEquiv.equals("currenttasklog.htm")) {
+						useCutoffDate = true;
+						cutoffDate = DateUtils.addDays(DateUtils.now(), -7);
+					}
+
 					for (Task task : tasks) {
 						Date curDate = task.getDoneDate();
 						if (!DateUtils.isSameDay(curDate, prevDate)) {
+							if (useCutoffDate) {
+								if (curDate.before(cutoffDate)) {
+									break;
+								}
+							}
 							prevDate = curDate;
 							taskHtml.append("<div class='separator_top'>&nbsp;</div>");
 							taskHtml.append("<div class='separator_bottom'>&nbsp;</div>");
