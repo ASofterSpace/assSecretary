@@ -125,6 +125,8 @@ public class Task extends GenericTask {
 				return "SVE";
 			case "firefighting":
 				return "FF";
+			case "seebruecke":
+				return "SB";
 		}
 		tla = tla.substring(0, 3).toUpperCase();
 		return tla;

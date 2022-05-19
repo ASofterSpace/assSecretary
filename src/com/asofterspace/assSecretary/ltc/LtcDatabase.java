@@ -64,6 +64,8 @@ public class LtcDatabase {
 						task.setExternalSource("LTC");
 
 						tags = ";" + StrUtils.replaceAll(tags, "; ", ";").toLowerCase() + ";";
+
+						// LABEL :: TO ADD ORIGIN, LOOK HERE (import of LTC entries - not necessary for new origins)
 						task.setOrigin("private");
 						if (tags.contains(";house hunting;")) {
 							task.setOrigin("behemoth");

@@ -171,6 +171,8 @@ public class TaskCtrl extends TaskCtrlBase {
 
 		task.setTitle(recordTask.getString(TITLE));
 		String origin = recordTask.getString(ORIGIN);
+
+		// LABEL :: TO ADD ORIGIN, LOOK HERE (import of workbench entries - just use same origin string! ^^)
 		if (origin == null) {
 			task.setOrigin("private");
 		} else if (origin.startsWith("recoded")) {
