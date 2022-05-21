@@ -598,6 +598,31 @@ public class TaskCtrl extends TaskCtrlBase {
 		}
 	}
 
+	public Integer getMinutesSleptLastNight() {
+
+		Date now = DateUtils.now();
+
+		// if this is started at 13:00 or later, then it is unlikely that I actually slept this long;
+		// instead, most likely Hugo had already been started earlier and has been restarted for some reason
+		if (DateUtils.getHour(now) > 12) {
+			return null;
+		}
+
+		Date latestTaskDoneTimeAtLoad = getLatestTaskDoneTimeAtLoad();
+
+		Date yesterday_20_00 = DateUtils.setHour(DateUtils.addDays(now, -1), 20);
+		if (latestTaskDoneTimeAtLoad.before(yesterday_20_00)) {
+			return null;
+		}
+
+		Date today_08_00 = DateUtils.setHour(now, 8);
+		if (latestTaskDoneTimeAtLoad.after(today_08_00)) {
+			return null;
+		}
+
+		return DateUtils.getMinuteDifference(latestTaskDoneTimeAtLoad, now);
+	}
+
 	public void save() {
 		saveIntoRecord(taskDatabase.getLoadedRoot());
 		taskDatabase.save();

@@ -551,6 +551,23 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 				String generalInfo = "Today is <span id='curdatetime'>" + DateUtils.getDayOfWeekNameEN(now) + " the " +
 					StrUtils.replaceAll(DateUtils.serializeDateTimeLong(now, "<span class='sup'>", "</span>"), ", ", " and it is ") +
 					"</span> right now. <span id='cursleepstr'>" + sleepStr + "</span>You are currently on planet Earth.";
+
+				Integer minutesSleptLastNight = taskCtrl.getMinutesSleptLastNight();
+				if (minutesSleptLastNight != null) {
+					generalInfo += "<br>Last night, you seem to have slept for " +
+						(minutesSleptLastNight / 60) + " hours, " + (minutesSleptLastNight % 60) +
+						" minutes.";
+
+					if (minutesSleptLastNight < 6*60) {
+						generalInfo += "<br>After a night with little sleep, in the first half hour " +
+							"you usually don't want to get up.<br>Then there will be several " +
+							"hours of genuine euphoria.<br>Then in the afternoon, a tiny random thing will " +
+							"totally devastate / sadden you - but knowing this about yourself might help " +
+							"with enjoying the euphoria, and brushing off the sadness once it happens.<br>" +
+							"So have a great day! And please do go to sleep earlier tonight.";
+					}
+				}
+
 				indexContent = StrUtils.replaceAll(indexContent, "[[GENERAL_INFO]]", generalInfo);
 
 
