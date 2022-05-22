@@ -610,6 +610,12 @@ public class TaskCtrl extends TaskCtrlBase {
 
 		Date latestTaskDoneTimeAtLoad = getLatestTaskDoneTimeAtLoad();
 
+		// could be null if no tasks at all have been done, or if the computer clock was reset to before
+		// any task has ever been done, so check it!
+		if (latestTaskDoneTimeAtLoad == null) {
+			return null;
+		}
+
 		Date yesterday_20_00 = DateUtils.setHour(DateUtils.addDays(now, -1), 20);
 		if (latestTaskDoneTimeAtLoad.before(yesterday_20_00)) {
 			return null;

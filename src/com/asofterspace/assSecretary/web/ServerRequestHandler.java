@@ -553,6 +553,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 					"</span> right now. <span id='cursleepstr'>" + sleepStr + "</span>You are currently on planet Earth.";
 
 				Integer minutesSleptLastNight = taskCtrl.getMinutesSleptLastNight();
+
 				if (minutesSleptLastNight != null) {
 					generalInfo += "<br>Last night, you seem to have slept for " +
 						(minutesSleptLastNight / 60) + " hours, " + (minutesSleptLastNight % 60) +
