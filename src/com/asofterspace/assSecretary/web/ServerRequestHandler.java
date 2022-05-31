@@ -555,7 +555,9 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 				Integer minutesSleptLastNight = taskCtrl.getMinutesSleptLastNight();
 
 				if (minutesSleptLastNight != null) {
-					generalInfo += "<br>Last night, you seem to have slept for " +
+
+					generalInfo += "<br>Last night, you seem to have gone to sleep at " +
+						DateUtils.serializeTimeShort(taskCtrl.getLatestTaskDoneTimeAtLoad()) + " and slept for " +
 						(minutesSleptLastNight / 60) + " hours, " + (minutesSleptLastNight % 60) +
 						" minutes.";
 
