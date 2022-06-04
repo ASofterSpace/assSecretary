@@ -598,7 +598,11 @@ public class TaskCtrl extends TaskCtrlBase {
 		}
 	}
 
-	public Integer getMinutesSleptLastNight() {
+	/**
+	 * Get the minutes slept last night based on the later of the task-ctrl-internal latest date,
+	 * and the passed in latest date
+	 */
+	public Integer getMinutesSleptLastNight(Date awakeUntilAtLeast) {
 
 		Date now = DateUtils.now();
 
@@ -609,6 +613,12 @@ public class TaskCtrl extends TaskCtrlBase {
 		}
 
 		Date latestTaskDoneTimeAtLoad = getLatestTaskDoneTimeAtLoad();
+
+		if (awakeUntilAtLeast != null) {
+			if ((latestTaskDoneTimeAtLoad == null) || awakeUntilAtLeast.after(latestTaskDoneTimeAtLoad)) {
+				latestTaskDoneTimeAtLoad = awakeUntilAtLeast;
+			}
+		}
 
 		// could be null if no tasks at all have been done, or if the computer clock was reset to before
 		// any task has ever been done, so check it!

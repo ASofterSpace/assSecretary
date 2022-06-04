@@ -79,6 +79,7 @@ public class AssSecretary {
 		System.out.println("Loading database...");
 
 		database = new Database(dataDir);
+		QuickDatabase quickDB = new QuickDatabase(dataDir);
 
 		missionControlDatabase = new MissionControlDatabase(dataDir, "mission_control");
 
@@ -108,7 +109,7 @@ public class AssSecretary {
 
 			System.out.println("Starting the server on port " + database.getPort() + "...");
 
-			Server server = new Server(webRoot, serverDir, database, taskCtrl, factDatabase);
+			Server server = new Server(webRoot, serverDir, database, taskCtrl, factDatabase, quickDB);
 
 			server.setWhitelist(whitelist);
 

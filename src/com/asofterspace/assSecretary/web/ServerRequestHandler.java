@@ -14,6 +14,7 @@ import com.asofterspace.assSecretary.ltc.LtcDatabase;
 import com.asofterspace.assSecretary.missionControl.McInfo;
 import com.asofterspace.assSecretary.missionControl.VmInfo;
 import com.asofterspace.assSecretary.missionControl.WebInfo;
+import com.asofterspace.assSecretary.QuickDatabase;
 import com.asofterspace.assSecretary.tasks.Task;
 import com.asofterspace.assSecretary.tasks.TaskCtrl;
 import com.asofterspace.toolbox.calendar.GenericTask;
@@ -58,6 +59,8 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 	private FactDatabase factDatabase;
 
+	private QuickDatabase quickDB;
+
 	private Directory serverDir;
 
 	private static boolean firstIndexCall = true;
@@ -66,7 +69,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 
 	public ServerRequestHandler(WebServer server, Socket request, Directory webRoot, Directory serverDir,
-		Database db, TaskCtrl taskCtrl, FactDatabase factDatabase) {
+		Database db, TaskCtrl taskCtrl, FactDatabase factDatabase, QuickDatabase quickDB) {
 
 		super(server, request, webRoot);
 
@@ -76,11 +79,15 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 		this.factDatabase = factDatabase;
 
+		this.quickDB = quickDB;
+
 		this.serverDir = serverDir;
 	}
 
 	@Override
 	protected void handlePost(String fileLocation) throws IOException {
+
+		quickDB.access();
 
 		String jsonData = receiveJsonContent();
 
@@ -357,6 +364,8 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 			System.exit(0);
 		}
 
+		quickDB.access();
+
 		if ("/task".equals(location)) {
 			String id = arguments.get("id");
 			if (id != null) {
@@ -552,7 +561,8 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 					StrUtils.replaceAll(DateUtils.serializeDateTimeLong(now, "<span class='sup'>", "</span>"), ", ", " and it is ") +
 					"</span> right now. <span id='cursleepstr'>" + sleepStr + "</span>You are currently on planet Earth.";
 
-				Integer minutesSleptLastNight = taskCtrl.getMinutesSleptLastNight();
+				Date awakeUntilAtLeast = quickDB.getPreviousStartLastAccessDate();
+				Integer minutesSleptLastNight = taskCtrl.getMinutesSleptLastNight(awakeUntilAtLeast);
 
 				if (minutesSleptLastNight != null) {
 
