@@ -10,6 +10,7 @@ import com.asofterspace.assSecretary.missionControl.MissionControlDatabase;
 import com.asofterspace.assSecretary.missionControl.VmInfo;
 import com.asofterspace.assSecretary.missionControl.WebInfo;
 import com.asofterspace.assSecretary.missionControl.WebInfoCallback;
+import com.asofterspace.assSecretary.tasks.Task;
 import com.asofterspace.assSecretary.tasks.TaskCtrl;
 import com.asofterspace.assSecretary.tasks.TaskDatabase;
 import com.asofterspace.assSecretary.web.Server;
@@ -35,6 +36,7 @@ public class AssSecretary {
 	public final static String SERVER_DIR = "server";
 	public final static String SCRIPTS_DIR = "scripts";
 	public final static String WEB_ROOT_DIR = "deployed";
+	public final static String UPLOAD_DIR = "upload";
 	public final static String FACT_DIR = "../assTrainer/config";
 
 	public final static String PROGRAM_TITLE = "assSecretary (Hugo)";
@@ -75,6 +77,7 @@ public class AssSecretary {
 		Directory serverDir = new Directory(SERVER_DIR);
 		Directory webRoot = new Directory(WEB_ROOT_DIR);
 		Directory factDir = new Directory(FACT_DIR);
+		Directory uploadDir = new Directory(UPLOAD_DIR);
 
 		System.out.println("Loading database...");
 
@@ -88,7 +91,7 @@ public class AssSecretary {
 
 		TaskDatabase taskDatabase = new TaskDatabase(dataDir);
 		FactDatabase factDatabase = new FactDatabase(factDir);
-		TaskCtrl taskCtrl = new TaskCtrl(database, taskDatabase);
+		TaskCtrl taskCtrl = new TaskCtrl(database, taskDatabase, webRoot, uploadDir);
 
 
 		try {

@@ -5,12 +5,23 @@
 package com.asofterspace.assSecretary.tasks;
 
 import com.asofterspace.assSecretary.Database;
+import com.asofterspace.assSecretary.ltc.LtcDatabase;
 import com.asofterspace.toolbox.calendar.GenericTask;
 import com.asofterspace.toolbox.calendar.TaskCtrlBase;
+import com.asofterspace.toolbox.io.Directory;
+import com.asofterspace.toolbox.io.IoUtils;
+import com.asofterspace.toolbox.io.JSON;
+import com.asofterspace.toolbox.io.JsonParseException;
+import com.asofterspace.toolbox.io.TextFile;
 import com.asofterspace.toolbox.utils.DateUtils;
 import com.asofterspace.toolbox.utils.Record;
+import com.asofterspace.toolbox.utils.StrUtils;
+import com.asofterspace.toolbox.Utils;
+import com.asofterspace.toolbox.web.WebAccessor;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -70,12 +81,22 @@ public class TaskCtrl extends TaskCtrlBase {
 
 	private TaskDatabase taskDatabase;
 
+	private Directory webRoot;
 
-	public TaskCtrl(Database database, TaskDatabase taskDatabase) {
+	private Directory uploadDir;
+
+	private Long lastUploadRequestTime = null;
+
+
+	public TaskCtrl(Database database, TaskDatabase taskDatabase, Directory webRoot, Directory uploadDir) {
 
 		this.database = database;
 
 		this.taskDatabase = taskDatabase;
+
+		this.webRoot = webRoot;
+
+		this.uploadDir = uploadDir;
 
 		Record root = taskDatabase.getLoadedRoot();
 
@@ -92,6 +113,42 @@ public class TaskCtrl extends TaskCtrlBase {
 		removeAutoCleanTasks(DateUtils.addDays(DateUtils.now(), -7));
 
 		database.setTaskCtrl(this);
+
+		TaskCtrl taskCtrl = this;
+
+		Thread t = new Thread(new Runnable() { public void run() {
+
+			while (true) {
+
+				// this does not need to be exactly synchronized, as the upload calendar just works on
+				// a best-effort basis anyway; it will not always be 100% up-to-date
+				if (taskCtrl.lastUploadRequestTime != null) {
+
+					long curTime = System.currentTimeMillis();
+
+					// System.out.println("Comparing upload request: " + (curTime - taskCtrl.lastUploadRequestTime));
+
+					// if more than a minute ago an upload was requested, then do it now!
+					if (curTime - taskCtrl.lastUploadRequestTime > 60*1000) {
+
+						taskCtrl.lastUploadRequestTime = null;
+
+						taskCtrl.uploadPreviewCalendar();
+					}
+				}
+
+				try {
+					// check every two seconds
+					Thread.sleep(2000);
+
+				} catch (InterruptedException e) {
+					System.out.println("Interrupted upload thread, returning...");
+					return;
+				}
+			}
+		}});
+
+		t.start();
 	}
 
 	@Override
@@ -642,6 +699,9 @@ public class TaskCtrl extends TaskCtrlBase {
 	public void save() {
 		saveIntoRecord(taskDatabase.getLoadedRoot());
 		taskDatabase.save();
+
+		// whenever the taskCtrl is saved, something really changed - so then upload the calendar!
+		uploadPreviewCalendarSoon();
 	}
 
 	@Override
@@ -649,6 +709,212 @@ public class TaskCtrl extends TaskCtrlBase {
 		super.saveIntoRecord(root);
 		root.set(TASK_SHORTLIST, shortlistIds);
 		root.set(FUTURE_TASK_SHORTLIST, futureShortlistIds);
+	}
+
+	public List<Task> getHugoAndMariTasks() {
+
+		List<GenericTask> baseTasksForSchedule = getTasks();
+
+		if (database.connectToMari()) {
+			try {
+				// get scheduled tasks from Mari
+				JSON mariTasks = new JSON(WebAccessor.get("http://localhost:3011/tasks"));
+
+				// copy the task list we are currently looking at
+				baseTasksForSchedule = new ArrayList<>(baseTasksForSchedule);
+
+				// generate tasks locally based on the data we got from Mari
+				List<Record> mariRecs = mariTasks.getValues();
+				for (Record mariRec : mariRecs) {
+					Task localTask = taskFromMariRecord(mariRec);
+					baseTasksForSchedule.add(localTask);
+				}
+
+			} catch (JsonParseException e) {
+				System.out.println("Mari responded with nonsense for a tasks request!");
+			}
+		}
+
+		List<Task> result = new ArrayList<>();
+		for (GenericTask task : baseTasksForSchedule) {
+			if (task instanceof Task) {
+				result.add((Task) task);
+			}
+		}
+		return result;
+	}
+
+	/**
+	 * To the list of tasks add task instances from Mari, from the assWorkbench and from the legacy LTC
+	 */
+	public List<Task> addExternalTaskInstances(List<Task> tasks, Date from, Date to, boolean onlyGetDone) {
+
+		String dateStr = "";
+
+		if (from != null) {
+			dateStr += "?from=" + DateUtils.serializeDate(from);
+		}
+		if (to != null) {
+			if ("".equals(dateStr)) {
+				dateStr += "?";
+			} else {
+				dateStr += "&";
+			}
+			dateStr += "to=" + DateUtils.serializeDate(to);
+		}
+
+		if (database.connectToMari()) {
+			try {
+				// get task instances from Mari
+				JSON mariTasks = new JSON(WebAccessor.get("http://localhost:3011/taskInstances" + dateStr));
+
+				// copy the task list we are currently looking at
+				tasks = new ArrayList<>(tasks);
+
+				// generate tasks locally based on the data we got from Mari
+				List<Record> mariRecs = mariTasks.getValues();
+				for (Record mariRec : mariRecs) {
+					Task localTask = taskFromMariRecord(mariRec);
+					boolean addTask = false;
+					if (onlyGetDone) {
+						if (localTask.hasBeenDone()) {
+							addTask = true;
+						}
+					} else {
+						addTask = true;
+					}
+					if (addTask) {
+						tasks.add(localTask);
+					}
+				}
+
+			} catch (JsonParseException e) {
+				System.out.println("Mari responded with nonsense for a task instances request!");
+			}
+		}
+
+		if (database.connectToWorkbench()) {
+			try {
+				// get task instances from assWorkbench
+				JSON workbenchTasks = new JSON(WebAccessor.get("http://localhost:3010/taskInstances" + dateStr));
+
+				// copy the task list we are currently looking at
+				tasks = new ArrayList<>(tasks);
+
+				// generate tasks locally based on the data we got from Workbench
+				List<Record> workbenchRecs = workbenchTasks.getValues();
+				for (Record workbenchRec : workbenchRecs) {
+					Task localTask = taskFromWorkbenchRecord(workbenchRec);
+					boolean addTask = false;
+					if (onlyGetDone) {
+						if (localTask.hasBeenDone()) {
+							addTask = true;
+						}
+					} else {
+						addTask = true;
+					}
+					if (addTask) {
+						tasks.add(localTask);
+					}
+				}
+
+			} catch (JsonParseException e) {
+				System.out.println("assWorkbench responded with nonsense for a task instances request!");
+			}
+		}
+
+		if (database.connectToLtc()) {
+			// ignore onlyGetDone, as all LTC tasks are done ;)
+			List<Task> ltcTasks = LtcDatabase.getTaskInstances(from, to);
+			tasks.addAll(ltcTasks);
+		}
+
+		return tasks;
+	}
+
+	public void uploadPreviewCalendarSoon() {
+		System.out.println("Requesting to upload calendar...");
+
+		this.lastUploadRequestTime = System.currentTimeMillis();
+	}
+
+	public void uploadPreviewCalendar() {
+
+		System.out.println("Uploading calendar...");
+
+
+		// create calendar file to be uploaded
+		uploadDir.clear();
+
+		TextFile baseFile = new TextFile(webRoot, "upload.htm");
+		String baseContent = baseFile.getContent();
+
+		// list out roughly four months - a nice round number: 128 days :)
+		Date from = DateUtils.now();
+		Date until = DateUtils.addDays(from, 128);
+
+		List<Date> days = DateUtils.listDaysFromTo(from, until);
+
+		List<Task> tasks = getAllTaskInstancesAsTasks();
+
+		boolean onlyGetDone = false;
+		tasks = addExternalTaskInstances(tasks, from, until, onlyGetDone);
+
+		List<Task> baseTasksForSchedule = getHugoAndMariTasks();
+
+		StringBuilder taskHtml = new StringBuilder();
+
+		for (Date day : days) {
+			taskHtml.append("<div class='separator_top'>&nbsp;</div>");
+			taskHtml.append("<div class='separator_bottom'>&nbsp;</div>");
+			appendDateToHtml(taskHtml, day);
+
+			List<Task> tasksToday = new ArrayList<>();
+
+			// add scheduled single task instances
+			for (Task task : tasks) {
+				if (task.appliesTo(day)) {
+					tasksToday.add(task);
+				}
+			}
+
+			// add scheduled base task instances
+			for (Task task : baseTasksForSchedule) {
+				if (task.isScheduledOn(day) && task.getShowAsScheduled()) {
+					tasksToday.add(task);
+				}
+			}
+
+			boolean historicalView = true;
+			boolean reducedView = false;
+			boolean onShortlist = false;
+			boolean standalone = false;
+			boolean showButtons = false;
+
+			Collections.sort(tasksToday, new Comparator<Task>() {
+				public int compare(Task a, Task b) {
+					return a.getCurrentPriority(day, historicalView) - b.getCurrentPriority(day, historicalView);
+				}
+			});
+
+			for (Task task : tasksToday) {
+				task.appendHtmlTo(taskHtml, historicalView, reducedView, onShortlist, day, standalone, showButtons, "");
+			}
+		}
+
+		baseContent = StrUtils.replaceAll(baseContent, "[[TASKS]]", taskHtml.toString());
+
+		TextFile calendarFile = new TextFile(uploadDir, "calendar.htm");
+		calendarFile.saveContent(baseContent);
+
+
+		// upload the file
+		IoUtils.execute("upload.bat");
+	}
+
+	public void appendDateToHtml(StringBuilder taskHtml, Date curDate) {
+		taskHtml.append("<div style='text-align:center;'>" + DateUtils.getDayOfWeekNameEN(curDate) + " the " +
+			DateUtils.serializeDateLong(curDate, "<span class=\"sup\">", "</span>") + "</div>");
 	}
 
 }

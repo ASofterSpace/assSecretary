@@ -48,3 +48,8 @@ src/com/asofterspace/toolbox
 
 # toolbox-js
 /server/toolbox
+
+# upload-related files
+upload/
+upload.bat
+upload_file.bat

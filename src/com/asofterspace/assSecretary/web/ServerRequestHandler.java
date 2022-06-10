@@ -10,7 +10,6 @@ import com.asofterspace.assSecretary.AssSecretary;
 import com.asofterspace.assSecretary.Database;
 import com.asofterspace.assSecretary.facts.Fact;
 import com.asofterspace.assSecretary.facts.FactDatabase;
-import com.asofterspace.assSecretary.ltc.LtcDatabase;
 import com.asofterspace.assSecretary.missionControl.McInfo;
 import com.asofterspace.assSecretary.missionControl.VmInfo;
 import com.asofterspace.assSecretary.missionControl.WebInfo;
@@ -66,6 +65,8 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 	private static boolean firstIndexCall = true;
 
 	private final static SideBarEntryForEmployee EMPLOYEE_HUGO = new SideBarEntryForEmployee("Hugo");
+
+	private final static boolean SHOW_BUTTONS = true;
 
 
 	public ServerRequestHandler(WebServer server, Socket request, Directory webRoot, Directory serverDir,
@@ -622,7 +623,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 					boolean onShortlist = true;
 					boolean standalone = false;
 					for (Task shortlistTask : shortlistTasks) {
-						shortlistTask.appendHtmlTo(taskShortlistHtml, historicalView, reducedView, onShortlist, today, standalone, "");
+						shortlistTask.appendHtmlTo(taskShortlistHtml, historicalView, reducedView, onShortlist, today, standalone, SHOW_BUTTONS, "");
 					}
 					taskShortlistHtml.append("</div>");
 				}
@@ -691,7 +692,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 								boolean standalone = false;
 								String additionalClassName = "-mari";
 								taskTask.appendHtmlTo(mariHtmlBuilder, historicalView, reducedView, onShortlist,
-									today, standalone, additionalClassName);
+									today, standalone, SHOW_BUTTONS, additionalClassName);
 							}
 							mariHtml += mariHtmlBuilder.toString() + "</div>";
 							talkedToMari = true;
@@ -781,13 +782,13 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 				sortTasksByDate(tasks);
 
 				for (Task task : tasks) {
-					task.appendHtmlTo(taskHtml, historicalView, reducedView, onShortlist, today, standalone, " date-sorted-task");
+					task.appendHtmlTo(taskHtml, historicalView, reducedView, onShortlist, today, standalone, SHOW_BUTTONS, " date-sorted-task");
 				}
 
 				sortTasksByPriority(tasks, today, historicalView);
 
 				for (Task task : tasks) {
-					task.appendHtmlTo(taskHtml, historicalView, reducedView, onShortlist, today, standalone, " priority-sorted-task");
+					task.appendHtmlTo(taskHtml, historicalView, reducedView, onShortlist, today, standalone, SHOW_BUTTONS, " priority-sorted-task");
 				}
 
 				indexContent = StrUtils.replaceAll(indexContent, "[[TASKS]]", taskHtml.toString());
@@ -804,7 +805,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 					}
 				}
 
-				List<Task> baseTasksForSchedule = getHugoAndMariTasks();
+				List<Task> baseTasksForSchedule = taskCtrl.getHugoAndMariTasks();
 
 				for (Task task : baseTasksForSchedule) {
 					if (task.isScheduledOn(tomorrow) && task.getShowAsScheduled()) {
@@ -831,7 +832,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 				if (tasks.size() > 0) {
 					for (Task task : tasks) {
-						task.appendHtmlTo(taskHtml, historicalView, reducedView, onShortlist, today, standalone, "");
+						task.appendHtmlTo(taskHtml, historicalView, reducedView, onShortlist, today, standalone, SHOW_BUTTONS, "");
 						appendedOne = true;
 					}
 				}
@@ -893,7 +894,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 				TextFile indexBaseFile = new TextFile(webRoot, locEquiv);
 				String indexContent = indexBaseFile.getContent();
 
-				List<Task> tasks = getHugoAndMariTasks();
+				List<Task> tasks = taskCtrl.getHugoAndMariTasks();
 
 				Collections.sort(tasks, new Comparator<Task>() {
 					public int compare(Task a, Task b) {
@@ -909,7 +910,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 				Date curDate = DateUtils.now();
 				if (tasks.size() > 0) {
 					for (Task task : tasks) {
-						task.appendHtmlTo(taskHtml, historicalView, reducedView, onShortlist, curDate, standalone, "");
+						task.appendHtmlTo(taskHtml, historicalView, reducedView, onShortlist, curDate, standalone, SHOW_BUTTONS, "");
 					}
 				}
 
@@ -951,7 +952,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 				boolean standalone = false;
 				if (tasks.size() > 0) {
 					Date prevDate = tasks.get(0).getDoneDate();
-					appendDateToHtml(taskHtml, prevDate);
+					taskCtrl.appendDateToHtml(taskHtml, prevDate);
 
 					boolean useCutoffDate = false;
 					Date cutoffDate = null;
@@ -971,9 +972,9 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 							prevDate = curDate;
 							taskHtml.append("<div class='separator_top'>&nbsp;</div>");
 							taskHtml.append("<div class='separator_bottom'>&nbsp;</div>");
-							appendDateToHtml(taskHtml, curDate);
+							taskCtrl.appendDateToHtml(taskHtml, curDate);
 						}
-						task.appendHtmlTo(taskHtml, historicalView, reducedView, onShortlist, curDate, standalone, "");
+						task.appendHtmlTo(taskHtml, historicalView, reducedView, onShortlist, curDate, standalone, SHOW_BUTTONS, "");
 					}
 				}
 
@@ -1026,9 +1027,9 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 				List<Task> tasks = taskCtrl.getAllTaskInstancesAsTasks();
 
 				boolean onlyGetDone = false;
-				tasks = addExternalTaskInstances(tasks, weekDays.get(0), weekDays.get(6), onlyGetDone);
+				tasks = taskCtrl.addExternalTaskInstances(tasks, weekDays.get(0), weekDays.get(6), onlyGetDone);
 
-				List<Task> baseTasksForSchedule = getHugoAndMariTasks();
+				List<Task> baseTasksForSchedule = taskCtrl.getHugoAndMariTasks();
 
 				for (Date day : weekDays) {
 					boolean isToday = DateUtils.isSameDay(actualToday, day);
@@ -1082,7 +1083,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 					boolean standalone = false;
 
 					for (Task task : tasksToday) {
-						task.appendHtmlTo(weeklyHtmlStr, historicalView, reducedView, onShortlist, day, standalone, "");
+						task.appendHtmlTo(weeklyHtmlStr, historicalView, reducedView, onShortlist, day, standalone, SHOW_BUTTONS, "");
 					}
 
 					weeklyHtmlStr.append("</div>");
@@ -1135,7 +1136,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 				today = DateUtils.parseDateNumbers(dayNum, month, year);
 
-				List<Task> baseTasksForSchedule = getHugoAndMariTasks();
+				List<Task> baseTasksForSchedule = taskCtrl.getHugoAndMariTasks();
 
 				while (DateUtils.getMonth(today) == month) {
 
@@ -1148,7 +1149,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 					List<Task> tasks = taskCtrl.getAllTaskInstancesAsTasks();
 
 					boolean onlyGetDone = false;
-					tasks = addExternalTaskInstances(tasks, weekDays.get(0), weekDays.get(6), onlyGetDone);
+					tasks = taskCtrl.addExternalTaskInstances(tasks, weekDays.get(0), weekDays.get(6), onlyGetDone);
 
 					for (Date day : weekDays) {
 						boolean isToday = DateUtils.isSameDay(actualToday, day);
@@ -1207,7 +1208,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 						boolean standalone = false;
 
 						for (Task task : tasksToday) {
-							task.appendHtmlTo(weeklyHtmlStr, historicalView, reducedView, onShortlist, day, standalone, "");
+							task.appendHtmlTo(weeklyHtmlStr, historicalView, reducedView, onShortlist, day, standalone, SHOW_BUTTONS, "");
 						}
 
 						weeklyHtmlStr.append("</div>");
@@ -1658,127 +1659,6 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 		return weekdaysStr.split(" ");
 	}
 
-	public List<Task> getHugoAndMariTasks() {
-
-		List<GenericTask> baseTasksForSchedule = taskCtrl.getTasks();
-
-		if (db.connectToMari()) {
-			try {
-				// get scheduled tasks from Mari
-				JSON mariTasks = new JSON(WebAccessor.get("http://localhost:3011/tasks"));
-
-				// copy the task list we are currently looking at
-				baseTasksForSchedule = new ArrayList<>(baseTasksForSchedule);
-
-				// generate tasks locally based on the data we got from Mari
-				List<Record> mariRecs = mariTasks.getValues();
-				for (Record mariRec : mariRecs) {
-					Task localTask = taskCtrl.taskFromMariRecord(mariRec);
-					baseTasksForSchedule.add(localTask);
-				}
-
-			} catch (JsonParseException e) {
-				System.out.println("Mari responded with nonsense for a tasks request!");
-			}
-		}
-
-		List<Task> result = new ArrayList<>();
-		for (GenericTask task : baseTasksForSchedule) {
-			if (task instanceof Task) {
-				result.add((Task) task);
-			}
-		}
-		return result;
-	}
-
-	/**
-	 * To the list of tasks add task instances from Mari, from the assWorkbench and from the legacy LTC
-	 */
-	private List<Task> addExternalTaskInstances(List<Task> tasks, Date from, Date to, boolean onlyGetDone) {
-
-		String dateStr = "";
-
-		if (from != null) {
-			dateStr += "?from=" + DateUtils.serializeDate(from);
-		}
-		if (to != null) {
-			if ("".equals(dateStr)) {
-				dateStr += "?";
-			} else {
-				dateStr += "&";
-			}
-			dateStr += "to=" + DateUtils.serializeDate(to);
-		}
-
-		if (db.connectToMari()) {
-			try {
-				// get task instances from Mari
-				JSON mariTasks = new JSON(WebAccessor.get("http://localhost:3011/taskInstances" + dateStr));
-
-				// copy the task list we are currently looking at
-				tasks = new ArrayList<>(tasks);
-
-				// generate tasks locally based on the data we got from Mari
-				List<Record> mariRecs = mariTasks.getValues();
-				for (Record mariRec : mariRecs) {
-					Task localTask = taskCtrl.taskFromMariRecord(mariRec);
-					boolean addTask = false;
-					if (onlyGetDone) {
-						if (localTask.hasBeenDone()) {
-							addTask = true;
-						}
-					} else {
-						addTask = true;
-					}
-					if (addTask) {
-						tasks.add(localTask);
-					}
-				}
-
-			} catch (JsonParseException e) {
-				System.out.println("Mari responded with nonsense for a task instances request!");
-			}
-		}
-
-		if (db.connectToWorkbench()) {
-			try {
-				// get task instances from assWorkbench
-				JSON workbenchTasks = new JSON(WebAccessor.get("http://localhost:3010/taskInstances" + dateStr));
-
-				// copy the task list we are currently looking at
-				tasks = new ArrayList<>(tasks);
-
-				// generate tasks locally based on the data we got from Workbench
-				List<Record> workbenchRecs = workbenchTasks.getValues();
-				for (Record workbenchRec : workbenchRecs) {
-					Task localTask = taskCtrl.taskFromWorkbenchRecord(workbenchRec);
-					boolean addTask = false;
-					if (onlyGetDone) {
-						if (localTask.hasBeenDone()) {
-							addTask = true;
-						}
-					} else {
-						addTask = true;
-					}
-					if (addTask) {
-						tasks.add(localTask);
-					}
-				}
-
-			} catch (JsonParseException e) {
-				System.out.println("assWorkbench responded with nonsense for a task instances request!");
-			}
-		}
-
-		if (db.connectToLtc()) {
-			// ignore onlyGetDone, as all LTC tasks are done ;)
-			List<Task> ltcTasks = LtcDatabase.getTaskInstances(from, to);
-			tasks.addAll(ltcTasks);
-		}
-
-		return tasks;
-	}
-
 	private int getScheduleSortValue(Task task) {
 
 		int result = 0;
@@ -1849,17 +1729,12 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 		});
 	}
 
-	private void appendDateToHtml(StringBuilder taskHtml, Date curDate) {
-		taskHtml.append("<div style='text-align:center;'>" + DateUtils.getDayOfWeekNameEN(curDate) + " the " +
-			DateUtils.serializeDateLong(curDate, "<span class=\"sup\">", "</span>") + "</div>");
-	}
-
 	private List<Task> getDoneTaskInstancesSortedByDoneDateTime() {
 
 		List<Task> tasks = taskCtrl.getDoneTaskInstancesAsTasks();
 
 		boolean onlyGetDone = true;
-		tasks = addExternalTaskInstances(tasks, null, null, onlyGetDone);
+		tasks = taskCtrl.addExternalTaskInstances(tasks, null, null, onlyGetDone);
 
 		boolean historicalView = true;
 
