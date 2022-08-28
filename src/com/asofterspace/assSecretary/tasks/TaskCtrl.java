@@ -663,6 +663,12 @@ public class TaskCtrl extends TaskCtrlBase {
 
 		Date now = DateUtils.now();
 
+		// if this is started at 04:00 or earlier, then it is unlikely that I actually got up this early;
+		// instead, most likely I am just still awake and no sleep time should be reported at all
+		if (DateUtils.getHour(now) < 4) {
+			return null;
+		}
+
 		// if this is started at 13:00 or later, then it is unlikely that I actually slept this long;
 		// instead, most likely Hugo had already been started earlier and has been restarted for some reason
 		if (DateUtils.getHour(now) > 12) {
