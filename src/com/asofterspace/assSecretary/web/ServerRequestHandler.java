@@ -126,7 +126,8 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 					if (addedOrEditedTask == null) {
 						return;
 					}
-					answer = new WebServerAnswerInJson(new JSON("{\"success\": true}"));
+					answer = new WebServerAnswerInJson(new JSON("{\"success\": true, \"id\": \"" +
+						addedOrEditedTask.getId() + "\"}"));
 					break;
 
 				case "/addRepeatingTask":
@@ -135,7 +136,8 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 					if (addedOrEditedTask == null) {
 						return;
 					}
-					answer = new WebServerAnswerInJson(new JSON("{\"success\": true}"));
+					answer = new WebServerAnswerInJson(new JSON("{\"success\": true, \"id\": \"" +
+						addedOrEditedTask.getId() + "\"}"));
 					break;
 
 				case "/taskPreRelease":
@@ -158,7 +160,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 								newTask.setReleasedDate(DateUtils.now());
 								taskCtrl.addTaskToShortListById(newTask.getId());
 								taskCtrl.save();
-								answer = new WebServerAnswerInJson(new JSON("{\"success\": true, \"newId\": \"" + newTask.getId() + "\"}"));
+								answer = new WebServerAnswerInJson(new JSON("{\"success\": true, \"id\": \"" + newTask.getId() + "\"}"));
 							} else {
 								respond(400);
 								return;
@@ -266,7 +268,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 						json.getBoolean(TaskCtrl.AUTO_CLEAN_TASK)
 					);
 					answer = new WebServerAnswerInJson(new JSON("{\"success\": " + (newTask != null) + ", " +
-						"\"newId\": \"" + newTask.getId() + "\", \"newReleaseDate\": \"" +
+						"\"id\": \"" + newTask.getId() + "\", \"newReleaseDate\": \"" +
 						DateUtils.serializeDate(newReleaseDate) + "\"}"));
 
 					break;

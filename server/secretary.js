@@ -130,6 +130,7 @@ window.secretary = {
 							singleTaskSavedLabel.style.display = "none";
 						}, 3000);
 					}
+					window.secretary.currentlyEditing = result.id;
 					document.getElementById("singleTaskReleaseUntil").value = "";
 					if (closeOnSubmit) {
 						window.secretary.closeSingleTaskModal();
@@ -179,6 +180,7 @@ window.secretary = {
 							repeatingTaskSavedLabel.style.display = "none";
 						}, 3000);
 					}
+					window.secretary.currentlyEditingRepeating = result.id;
 					if (closeOnSubmit) {
 						window.secretary.closeRepeatingTaskModal();
 					}
@@ -236,7 +238,7 @@ window.secretary = {
 							window.setTimeout(function () {
 								singleTaskSavedLabel.style.display = "none";
 							}, 3000);
-							window.secretary.currentlyEditing = result.newId;
+							window.secretary.currentlyEditing = result.id;
 							document.getElementById("singleTaskReleaseDate").value = result.newReleaseDate;
 							document.getElementById("singleTaskDoneDate").value = "";
 							document.getElementById("singleTaskCurrentMode").innerHTML = "editing one single entry";
@@ -497,7 +499,7 @@ window.secretary = {
 			if (request.readyState == 4 && request.status == 200) {
 				var result = JSON.parse(request.response);
 				if (result.success) {
-					window.secretary.taskEdit(result.newId);
+					window.secretary.taskEdit(result.id);
 				}
 			}
 		}
