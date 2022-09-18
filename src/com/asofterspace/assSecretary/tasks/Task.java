@@ -109,10 +109,14 @@ public class Task extends GenericTask {
 	 * get three letter abbreviation of the origin
 	 */
 	public String getOriginTLA() {
+
 		String tla = getOrigin();
+
+		// LABEL :: TO ADD ORIGIN, LOOK HERE (mapping origins to three-letter abbreviations / TLAs)
 		if (tla == null) {
 			return "N/A";
 		}
+
 		switch (tla) {
 			case "private":
 				tla = AssSecretary.getDatabase().getUsername();
@@ -128,7 +132,9 @@ public class Task extends GenericTask {
 			case "seebruecke":
 				return "SB";
 		}
+
 		tla = tla.substring(0, 3).toUpperCase();
+
 		return tla;
 	}
 
