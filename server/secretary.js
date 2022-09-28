@@ -130,7 +130,15 @@ window.secretary = {
 							singleTaskSavedLabel.style.display = "none";
 						}, 3000);
 					}
-					window.secretary.currentlyEditing = result.id;
+
+					// if we were editing before, then we continue editing - but now we are editing
+					// the newly saved task
+					// if we were NOT editing before, but just saving... then we are still not in
+					// editing mode!
+					if (window.secretary.currentlyEditing) {
+						window.secretary.currentlyEditing = result.id;
+					}
+
 					document.getElementById("singleTaskReleaseUntil").value = "";
 					if (closeOnSubmit) {
 						window.secretary.closeSingleTaskModal();
@@ -180,7 +188,15 @@ window.secretary = {
 							repeatingTaskSavedLabel.style.display = "none";
 						}, 3000);
 					}
-					window.secretary.currentlyEditingRepeating = result.id;
+
+					// if we were editing before, then we continue editing - but now we are editing
+					// the newly saved task
+					// if we were NOT editing before, but just saving... then we are still not in
+					// editing mode!
+					if (window.secretary.currentlyEditingRepeating) {
+						window.secretary.currentlyEditingRepeating = result.id;
+					}
+
 					if (closeOnSubmit) {
 						window.secretary.closeRepeatingTaskModal();
 					}
