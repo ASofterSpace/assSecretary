@@ -578,7 +578,7 @@ public class Task extends GenericTask {
 					html.append("' class='button' onclick='secretary.taskUnDone(\"");
 					html.append(id);
 					html.append("\")'>");
-					html.append("Un-done");
+					html.append("Un-Do");
 					html.append("</span>");
 					mainWidth -= 6.5;
 				} else {
