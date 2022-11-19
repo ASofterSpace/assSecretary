@@ -62,14 +62,14 @@ public class Task extends GenericTask {
 
 
 	public Task() {
-		super(null, null, null, null, null, null, null, null, null);
+		super(null, null, null, null, null, null, null, null, null, null);
 	}
 
-	public Task(String title, Integer scheduledOnDay, List<String> scheduledOnDaysOfWeek,
+	public Task(String title, Integer scheduledOnXDayOfMonth, Integer scheduledOnDay, List<String> scheduledOnDaysOfWeek,
 		List<Integer> scheduledInMonths, List<Integer> scheduledInYears, List<String> details,
 		List<String> onDone, Boolean biweeklyEven, Boolean biweeklyOdd) {
-		super(title, scheduledOnDay, scheduledOnDaysOfWeek, scheduledInMonths, scheduledInYears, details, onDone,
-			biweeklyEven, biweeklyOdd);
+		super(title, scheduledOnXDayOfMonth, scheduledOnDay, scheduledOnDaysOfWeek, scheduledInMonths, scheduledInYears,
+			details, onDone, biweeklyEven, biweeklyOdd);
 	}
 
 	/**

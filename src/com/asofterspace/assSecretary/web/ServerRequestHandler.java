@@ -411,6 +411,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 					response.set("priority", task.getPriority());
 					response.set("priorityEscalationAfterDays", task.getPriorityEscalationAfterDays());
 					response.set("duration", task.getDurationStr());
+					response.set("xDayOfMonth", task.getScheduledOnXDayOfMonthStr());
 
 					String weekdaysStr = "";
 					sep = "";
@@ -583,6 +584,8 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 							"So have a great day! And please do go to sleep earlier tonight.";
 					}
 				}
+
+				generalInfo += "<br>All that said - here is the ever-shifting plan:";
 
 				indexContent = StrUtils.replaceAll(indexContent, "[[GENERAL_INFO]]", generalInfo);
 
@@ -1631,6 +1634,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 		task.setPriority(json.getInteger("priority"));
 		task.setPriorityEscalationAfterDays(json.getInteger("priorityEscalationAfterDays"));
 		task.setDurationStr(json.getString("duration"));
+		task.setScheduledOnXDayOfMonth(json.getInteger("xDayOfMonth"));
 
 		// get integer will just return null if there is a problem
 		task.setScheduledOnDay(json.getInteger("day"));

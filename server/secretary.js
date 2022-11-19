@@ -219,6 +219,7 @@ window.secretary = {
 			priority: document.getElementById("repeatingTaskPriority").value,
 			priorityEscalationAfterDays: document.getElementById("repeatingTaskPriorityEscalationAfterDays").value,
 			duration: document.getElementById("repeatingTaskDuration").value,
+			xDayOfMonth: document.getElementById("repeatingTaskScheduleXDayOfMonth").value,
 			day: document.getElementById("repeatingTaskScheduleDay").value,
 			months: document.getElementById("repeatingTaskScheduleMonths").value,
 			years: document.getElementById("repeatingTaskScheduleYears").value,
@@ -384,6 +385,7 @@ window.secretary = {
 		window.secretary.taskPriorityChange("repeating");
 		document.getElementById("repeatingTaskPriorityEscalationAfterDays").value = "never";
 		document.getElementById("repeatingTaskDuration").value = "00:00";
+		document.getElementById("repeatingTaskScheduleXDayOfMonth").value = "";
 		document.getElementById("repeatingTaskScheduleDay").value = "";
 		document.getElementById("repeatingTaskScheduleMonths").value = "";
 		document.getElementById("repeatingTaskScheduleYears").value = "";
@@ -476,6 +478,7 @@ window.secretary = {
 							document.getElementById("repeatingTaskPriorityEscalationAfterDays").value = result.priorityEscalationAfterDays;
 						}
 						document.getElementById("repeatingTaskDuration").value = result.duration;
+						document.getElementById("repeatingTaskScheduleXDayOfMonth").value = result.xDayOfMonth;
 						document.getElementById("repeatingTaskScheduleDay").value = result.day;
 						document.getElementById("repeatingTaskScheduleMonths").value = result.months;
 						document.getElementById("repeatingTaskScheduleYears").value = result.years;
