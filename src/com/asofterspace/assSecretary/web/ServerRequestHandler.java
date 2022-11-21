@@ -585,7 +585,8 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 					}
 				}
 
-				generalInfo += "<br>All that said - here is the ever-shifting plan:";
+				generalInfo += "<br>If you are confused and have no idea what to do next, then eat, sleep, or just pick any item off this list that you feel like doing." +
+								"<br>All that said - here is the ever-shifting plan:";
 
 				indexContent = StrUtils.replaceAll(indexContent, "[[GENERAL_INFO]]", generalInfo);
 
