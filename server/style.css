@@ -300,9 +300,7 @@ div.company_outer > img.logo {
 	padding: 10pt 20pt;
 }
 
-div.machine_outer {
-	border-radius: 10pt;
-	background: rgba(155, 215, 255, 0.6);
+div.machine_separator, div.machine_outer {
 	width: 150pt;
 	height: 100pt;
 	text-align: center;
@@ -310,6 +308,15 @@ div.machine_outer {
 	display: inline-block;
 	vertical-align: bottom;
 	margin-right: 20pt;
+}
+
+div.machine_separator {
+	transform: translateY(40pt);
+}
+
+div.machine_outer {
+	border-radius: 10pt;
+	background: rgba(155, 215, 255, 0.6);
 }
 
 div.machine_inner {
