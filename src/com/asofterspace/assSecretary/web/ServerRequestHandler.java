@@ -62,6 +62,9 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 	private Directory serverDir;
 
+	// only calculate this once at startup, not again and again for performance reasons
+	private List<GenericTask> doneDateProblematicTaskInstances;
+
 	private static boolean firstIndexCall = true;
 
 	private final static SideBarEntryForEmployee EMPLOYEE_HUGO = new SideBarEntryForEmployee("Hugo");
@@ -565,10 +568,25 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 					StrUtils.replaceAll(DateUtils.serializeDateTimeLong(now, "<span class='sup'>", "</span>"), ", ", " and it is ") +
 					"</span> right now. <span id='cursleepstr'>" + sleepStr + "</span>You are currently on planet Earth.";
 
+				if (doneDateProblematicTaskInstances == null) {
+					doneDateProblematicTaskInstances = taskCtrl.getDoneDateProblematicTaskInstances();
+				}
+				if (doneDateProblematicTaskInstances.size() > 0) {
+					StringBuilder probStr = new StringBuilder();
+					probStr.append("<br><span class='error'>My database seems slightly corrupted - there are tasks with problematic done dates or set to done dates (either could be wrong)!</span> They are:<br>");
+					for (GenericTask task : doneDateProblematicTaskInstances) {
+						probStr.append("Done Date: " + DateUtils.serializeDateTime(task.getDoneDate()) +
+							"Set to Done Date: " + DateUtils.serializeDateTime(task.getSetToDoneDateTime()) +
+							"<br>");
+					}
+					generalInfo = probStr.toString() + "<br>" + generalInfo;
+				}
+
 				Date latestTaskDoneTimeAtLoad = taskCtrl.getLatestTaskDoneTimeAtLoad();
 				if (latestTaskDoneTimeAtLoad != null) {
 					if (latestTaskDoneTimeAtLoad.after(now)) {
-						generalInfo = "<span class='error'>My database seems slightly corrupted - there are tasks done in the future!</span><br>" +
+						generalInfo = "<br><span class='error'>My database seems slightly corrupted - there are tasks done in the future, e.g. at " +
+							DateUtils.serializeDateTime(latestTaskDoneTimeAtLoad) + "!</span><br>" +
 							"Please look at the current task log and re-set the done dates to useful ones if you have a moment. Thanks. :)<br><br>" +
 							generalInfo;
 					}
