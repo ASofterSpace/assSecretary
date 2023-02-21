@@ -575,8 +575,8 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 					StringBuilder probStr = new StringBuilder();
 					probStr.append("<br><span class='error'>My database seems slightly corrupted - there are tasks with problematic done dates or set to done dates (either could be wrong)!</span> They are:<br>");
 					for (GenericTask task : doneDateProblematicTaskInstances) {
-						probStr.append("Done Date: " + DateUtils.serializeDateTime(task.getDoneDate()) +
-							"Set to Done Date: " + DateUtils.serializeDateTime(task.getSetToDoneDateTime()) +
+						probStr.append("Done Date: " + DateUtils.serializeDate(task.getDoneDate()) +
+							" Set to Done Date: " + DateUtils.serializeDateTime(task.getSetToDoneDateTime()) +
 							"<br>");
 					}
 					generalInfo = probStr.toString() + "<br>" + generalInfo;
