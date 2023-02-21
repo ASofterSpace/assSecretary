@@ -565,23 +565,32 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 					StrUtils.replaceAll(DateUtils.serializeDateTimeLong(now, "<span class='sup'>", "</span>"), ", ", " and it is ") +
 					"</span> right now. <span id='cursleepstr'>" + sleepStr + "</span>You are currently on planet Earth.";
 
-				Date awakeUntilAtLeast = quickDB.getPreviousStartLastAccessDate();
-				Integer minutesSleptLastNight = taskCtrl.getMinutesSleptLastNight(awakeUntilAtLeast);
+				Date latestTaskDoneTimeAtLoad = taskCtrl.getLatestTaskDoneTimeAtLoad();
+				if (latestTaskDoneTimeAtLoad != null) {
+					if (latestTaskDoneTimeAtLoad.after(now)) {
+						generalInfo = "<span class='error'>My database seems slightly corrupted - there are tasks done in the future!</span><br>" +
+							"Please look at the current task log and re-set the done dates to useful ones if you have a moment. Thanks. :)<br><br>" +
+							generalInfo;
+					}
 
-				if (minutesSleptLastNight != null) {
+					Date awakeUntilAtLeast = quickDB.getPreviousStartLastAccessDate();
+					Integer minutesSleptLastNight = taskCtrl.getMinutesSleptLastNight(awakeUntilAtLeast);
 
-					generalInfo += "<br>Last night, you seem to have gone to sleep at " +
-						DateUtils.serializeTimeShort(taskCtrl.getLatestTaskDoneTimeAtLoad()) + " and slept for " +
-						(minutesSleptLastNight / 60) + " hours, " + (minutesSleptLastNight % 60) +
-						" minutes.";
+					if (minutesSleptLastNight != null) {
 
-					if (minutesSleptLastNight < 6*60) {
-						generalInfo += "<br>After a night with little sleep, in the first half hour " +
-							"you usually don't want to get up.<br>Then there will be several " +
-							"hours of genuine euphoria.<br>Then in the afternoon, a tiny random thing will " +
-							"totally devastate / sadden you - but knowing this about yourself might help " +
-							"with enjoying the euphoria, and brushing off the sadness once it happens.<br>" +
-							"So have a great day! And please do go to sleep earlier tonight.";
+						generalInfo += "<br>Last night, you seem to have gone to sleep at " +
+							DateUtils.serializeTimeShort(latestTaskDoneTimeAtLoad) + " and slept for " +
+							(minutesSleptLastNight / 60) + " hours, " + (minutesSleptLastNight % 60) +
+							" minutes.";
+
+						if (minutesSleptLastNight < 6*60) {
+							generalInfo += "<br>After a night with little sleep, in the first half hour " +
+								"you usually don't want to get up.<br>Then there will be several " +
+								"hours of genuine euphoria.<br>Then in the afternoon, a tiny random thing will " +
+								"totally devastate / sadden you - but knowing this about yourself might help " +
+								"with enjoying the euphoria, and brushing off the sadness once it happens.<br>" +
+								"So have a great day! And please do go to sleep earlier tonight.";
+						}
 					}
 				}
 
