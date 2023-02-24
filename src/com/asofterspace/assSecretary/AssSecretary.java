@@ -14,18 +14,24 @@ import com.asofterspace.assSecretary.tasks.Task;
 import com.asofterspace.assSecretary.tasks.TaskCtrl;
 import com.asofterspace.assSecretary.tasks.TaskDatabase;
 import com.asofterspace.assSecretary.web.Server;
+import com.asofterspace.toolbox.calendar.TaskCtrlBase;
 import com.asofterspace.toolbox.io.Directory;
+import com.asofterspace.toolbox.io.File;
 import com.asofterspace.toolbox.io.IoUtils;
 import com.asofterspace.toolbox.io.JSON;
 import com.asofterspace.toolbox.io.JsonFile;
 import com.asofterspace.toolbox.io.JsonParseException;
 import com.asofterspace.toolbox.io.SimpleFile;
+import com.asofterspace.toolbox.utils.DateHolder;
+import com.asofterspace.toolbox.utils.DateUtils;
+import com.asofterspace.toolbox.utils.Record;
 import com.asofterspace.toolbox.utils.StrUtils;
 import com.asofterspace.toolbox.Utils;
 import com.asofterspace.toolbox.web.WebAccessedCallback;
 import com.asofterspace.toolbox.web.WebAccessor;
 import com.asofterspace.toolbox.web.WebTemplateEngine;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -57,6 +63,8 @@ public class AssSecretary {
 		Utils.setVersionNumber(VERSION_NUMBER);
 		Utils.setVersionDate(VERSION_DATE);
 
+		boolean fix_data_mode = false;
+
 		if (args.length > 0) {
 			if (args[0].equals("--version")) {
 				System.out.println(Utils.getFullProgramIdentifierWithDate());
@@ -66,6 +74,10 @@ public class AssSecretary {
 			if (args[0].equals("--version_for_zip")) {
 				System.out.println("version " + Utils.getVersionNumber());
 				return;
+			}
+
+			if (args[0].equals("fix_data")) {
+				fix_data_mode = true;
 			}
 		}
 
@@ -92,6 +104,104 @@ public class AssSecretary {
 		TaskDatabase taskDatabase = new TaskDatabase(dataDir);
 		FactDatabase factDatabase = new FactDatabase(factDir);
 		TaskCtrl taskCtrl = new TaskCtrl(database, taskDatabase, webRoot, uploadDir);
+
+
+		if (fix_data_mode) {
+			System.out.println("Performing a fix data run, then exiting...");
+
+			// sooo let's:
+			// * get all the task backup files, in creation order
+			// * load them, one by one, but in random order (they are randomly named anyway...)
+			// * iterate over all tasks in the old file:
+			//   if tasks with the same id exist in the current task file, for both doneDate and setToDoneDate:
+			//     if they are not null, set their values to the ones from the old file in the current task file
+			//     (if the value was actually changed, store this fact, and don't change it again!)
+			// * after each iteration, if anything was changed, save the task file...
+
+			boolean recursively = false;
+			List<File> taskFiles = dataDir.getAllFilesStartingAndEndingWith("tasks-", ".json", recursively);
+			System.out.println("Found " + taskFiles.size() + " task files, going through them one by one...");
+
+			List<String> changedDoneDateIds = new ArrayList<>();
+			List<String> changedSetToDoneDateIds = new ArrayList<>();
+			List<Task> allTasks = taskCtrl.getAllTaskInstancesAsTasks();
+
+			for (File taskFile : taskFiles) {
+				System.out.println("Consolidating with " + taskFile.getAbsoluteFilename() + "...");
+				int changedTasks = 0;
+				JsonFile curDbFile = new JsonFile(taskFile);
+				Record curRoot = null;
+				try {
+					curRoot = curDbFile.getAllContents();
+				} catch (JsonParseException e) {
+					System.out.println("Could not load the task file...");
+					continue;
+				}
+
+				List<Record> curTaskInstances = curRoot.getArray("taskInstances");
+				for (Record cur : curTaskInstances) {
+					String curId = cur.getString("id");
+					if (curId == null) {
+						continue;
+					}
+					boolean changedDoneDateIdsContains = changedDoneDateIds.contains(curId);
+					boolean changedSetToDoneDateIdsContains = changedSetToDoneDateIds.contains(curId);
+					if (changedDoneDateIdsContains && changedSetToDoneDateIdsContains) {
+						continue;
+					}
+
+					for (Task task : allTasks) {
+						if (curId.equals(task.getId())) {
+							if (!changedDoneDateIdsContains) {
+								DateHolder curDoneDate = cur.getDateHolder(TaskCtrlBase.DONE_DATE);
+								if (curDoneDate.getDate() != null) {
+									DateHolder oldDoneDate = DateUtils.createDateHolder(task.getDoneDate());
+									if (!curDoneDate.equals(oldDoneDate)) {
+										task.setDoneDate(curDoneDate.getDate());
+										changedDoneDateIds.add(curId);
+										changedTasks++;
+									}
+								}
+							}
+
+							if (!changedSetToDoneDateIdsContains) {
+								DateHolder curSetToDoneDate = cur.getDateHolder(TaskCtrlBase.SET_TO_DONE_DATE_TIME);
+								if (curSetToDoneDate.getDate() != null) {
+									DateHolder oldSetToDoneDate = DateUtils.createDateHolder(task.getSetToDoneDateTime());
+									if (!curSetToDoneDate.equals(oldSetToDoneDate)) {
+										task.setSetToDoneDateTime(curSetToDoneDate.getDate());
+										changedSetToDoneDateIds.add(curId);
+										changedTasks++;
+									}
+								}
+							}
+
+							break;
+						}
+					}
+				}
+
+				if (changedTasks > 0) {
+					System.out.println("Changed " + changedTasks + " task values, now saving...");
+					taskCtrl.save();
+				} else {
+					System.out.println("With this file, nothing was changed...");
+				}
+			}
+
+			System.out.println("Finally, going over all Tasks, and if they have a done date, setting a setToDoneDate if it is null...");
+			for (Task cur : allTasks) {
+				if (cur.getSetToDoneDateTime() == null) {
+					cur.setSetToDoneDateTimeHolder(cur.getDoneDateHolder());
+				}
+			}
+			taskCtrl.save();
+
+			System.out.println("Ran the fix algorithm on all task backup files found. " +
+				"Maybe longtime-archive them now - re-running on them shouuuld not break things, but just in case...");
+
+			return;
+		}
 
 
 		try {

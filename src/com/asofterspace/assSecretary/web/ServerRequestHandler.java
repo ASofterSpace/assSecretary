@@ -577,7 +577,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 					for (GenericTask task : doneDateProblematicTaskInstances) {
 						probStr.append("Done Date: " + DateUtils.serializeDate(task.getDoneDate()) +
 							" Set to Done Date: " + DateUtils.serializeDateTime(task.getSetToDoneDateTime()) +
-							"<br>");
+							" " + HTML.escapeHTMLstr(task.getTitle()) + "<br>");
 					}
 					generalInfo = probStr.toString() + "<br>" + generalInfo;
 				}
