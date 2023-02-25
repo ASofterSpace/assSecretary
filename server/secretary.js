@@ -644,6 +644,8 @@ window.secretary = {
 					var taskDiv = document.getElementById("task-" + id + "-on-shortlist");
 					if (taskDiv) {
 						taskDiv.style.display = 'none';
+						window.shortlistAmount--;
+						window.reevaluateShortlistAmount();
 					} else {
 						window.location.reload(false);
 					}
@@ -678,6 +680,8 @@ window.secretary = {
 						var taskDiv = document.getElementById("task-" + ids[i] + "-on-shortlist");
 						if (taskDiv) {
 							taskDiv.style.display = 'none';
+							window.shortlistAmount--;
+							window.reevaluateShortlistAmount();
 						} else {
 							window.location.reload(false);
 						}

@@ -648,19 +648,41 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 					}
 				});
 
+				taskShortlistHtml.append("<div id='shortlist'>");
 				if (shortlistTasks.size() == 0) {
 					taskShortlistHtml.append("<div>The task shortlist is empty - well done!</div>");
 				} else {
-					taskShortlistHtml.append("<div style='padding-bottom:0;'>Here is the task shortlist for today:</div>");
-					taskShortlistHtml.append("<div>");
+					taskShortlistHtml.append("<div>Here is the task shortlist for today:</div>");
+					taskShortlistHtml.append("<div id='shortlist-full-label' style='display: none;'><span class='error'>" +
+						"The task shortlist is very full - please reschedule, do or outright delete some tasks!</span></div>");
 					boolean reducedView = false;
 					boolean onShortlist = true;
 					boolean standalone = false;
 					for (Task shortlistTask : shortlistTasks) {
 						shortlistTask.appendHtmlTo(taskShortlistHtml, historicalView, reducedView, onShortlist, today, standalone, SHOW_BUTTONS, "");
 					}
-					taskShortlistHtml.append("</div>");
 				}
+				taskShortlistHtml.append("</div>\n");
+				taskShortlistHtml.append("<script>\n");
+				taskShortlistHtml.append("window.shortlistAmount = " + shortlistTasks.size() + ";\n");
+				taskShortlistHtml.append("window.reevaluateShortlistAmount = function() {\n");
+				taskShortlistHtml.append("  var shortlistDiv = document.getElementById('shortlist');\n");
+				taskShortlistHtml.append("  var shortlistFullLabel = document.getElementById('shortlist-full-label');\n");
+				taskShortlistHtml.append("  if (shortlistDiv && shortlistFullLabel) {\n");
+				taskShortlistHtml.append("    if (shortlistAmount > 36) {\n");
+				taskShortlistHtml.append("      shortlistDiv.className = 'pulsating_alarm';\n");
+				taskShortlistHtml.append("      shortlistFullLabel.style.display = 'block';\n");
+				taskShortlistHtml.append("    } else {\n");
+				taskShortlistHtml.append("      shortlistDiv.className = '';\n");
+				taskShortlistHtml.append("      shortlistFullLabel.style.display = 'none';\n");
+				taskShortlistHtml.append("    }\n");
+				taskShortlistHtml.append("  }\n");
+				taskShortlistHtml.append("}\n");
+				// evaluate on startup of the page
+				taskShortlistHtml.append("window.setTimeout(window.reevaluateShortlistAmount, 100);\n");
+				taskShortlistHtml.append("window.setTimeout(window.reevaluateShortlistAmount, 1000);\n");
+				taskShortlistHtml.append("window.setTimeout(window.reevaluateShortlistAmount, 2000);\n");
+				taskShortlistHtml.append("</script>\n");
 
 				indexContent = StrUtils.replaceAll(indexContent, "[[TASK_SHORTLIST]]", taskShortlistHtml.toString());
 

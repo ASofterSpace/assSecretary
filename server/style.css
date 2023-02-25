@@ -327,6 +327,38 @@ div.machine_inner {
 	padding: 10pt 0pt 0pt 0pt;
 }
 
+div#hiddenMainContent > div#shortlist {
+	margin-bottom: 10pt;
+	padding-bottom: 0;
+	border-radius: 10pt;
+}
+
+
+@keyframes pulsating_alarm {
+  0% {
+	background: rgba(50, 0, 0, 0);
+  }
+
+  25% {
+	background: rgba(200, 0, 20, 0.25);
+  }
+
+  50% {
+	background: rgba(200, 0, 20, 1);
+  }
+
+  75% {
+	background: rgba(200, 0, 20, 0.25);
+  }
+
+  100% {
+	background: rgba(50, 0, 0, 0);
+  }
+}
+
+.pulsating_alarm {
+  animation: pulsating_alarm 2s linear infinite;
+}
 
 @keyframes wobbling_left {
   0% {
