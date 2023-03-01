@@ -936,7 +936,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 				indexContent = StrUtils.replaceAll(indexContent, "[[MINI_CALENDAR]]", getMiniCalendarHtml());
 
-				indexContent = StrUtils.replaceAll(indexContent, "[[SIDEBAR]]", SideBarCtrl.getSidebarHtmlStr());
+				indexContent = StrUtils.replaceAll(indexContent, "[[SIDEBAR]]", getSidebarHtmlWithHugo());
 
 				locEquiv = "_" + locEquiv;
 				TextFile indexFile = new TextFile(webRoot, locEquiv);
@@ -977,7 +977,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 				// mini-calendar is needed in case a task is pre-released which opens the single task entry modal
 				indexContent = StrUtils.replaceAll(indexContent, "[[MINI_CALENDAR]]", getMiniCalendarHtml());
 
-				indexContent = StrUtils.replaceAll(indexContent, "[[SIDEBAR]]", SideBarCtrl.getSidebarHtmlStr());
+				indexContent = StrUtils.replaceAll(indexContent, "[[SIDEBAR]]", getSidebarHtmlWithHugo());
 
 				locEquiv = "_" + locEquiv;
 				TextFile indexFile = new TextFile(webRoot, locEquiv);
@@ -998,7 +998,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 				indexContent = StrUtils.replaceAll(indexContent, "[[MINI_CALENDAR]]", getMiniCalendarHtml());
 
-				indexContent = StrUtils.replaceAll(indexContent, "[[SIDEBAR]]", SideBarCtrl.getSidebarHtmlStr());
+				indexContent = StrUtils.replaceAll(indexContent, "[[SIDEBAR]]", getSidebarHtmlWithHugo());
 
 				List<Task> tasks = getDoneTaskInstancesSortedByDoneDateTime();
 
@@ -1076,7 +1076,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 				indexContent = StrUtils.replaceAll(indexContent, "[[MINI_CALENDAR]]", getMiniCalendarHtml());
 
-				indexContent = StrUtils.replaceAll(indexContent, "[[SIDEBAR]]", SideBarCtrl.getSidebarHtmlStr());
+				indexContent = StrUtils.replaceAll(indexContent, "[[SIDEBAR]]", getSidebarHtmlWithHugo());
 
 				StringBuilder weeklyHtmlStr = new StringBuilder();
 
@@ -1197,7 +1197,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 				indexContent = StrUtils.replaceAll(indexContent, "[[MINI_CALENDAR]]", getMiniCalendarHtml());
 
-				indexContent = StrUtils.replaceAll(indexContent, "[[SIDEBAR]]", SideBarCtrl.getSidebarHtmlStr());
+				indexContent = StrUtils.replaceAll(indexContent, "[[SIDEBAR]]", getSidebarHtmlWithHugo());
 
 				indexContent = StrUtils.replaceAll(indexContent, "[[EMPTY_VIEW]]", ""+emptyView);
 
@@ -1320,7 +1320,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 				indexContent = StrUtils.replaceAll(indexContent, "[[STATISTICS]]", getStatsHtml());
 
-				indexContent = StrUtils.replaceAll(indexContent, "[[SIDEBAR]]", SideBarCtrl.getSidebarHtmlStr());
+				indexContent = StrUtils.replaceAll(indexContent, "[[SIDEBAR]]", getSidebarHtmlWithHugo());
 
 				locEquiv = "_" + locEquiv;
 				TextFile indexFile = new TextFile(webRoot, locEquiv);
@@ -1338,7 +1338,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 				indexContent = StrUtils.replaceAll(indexContent, "[[MISSION_CONTROL]]", getMissionControlHtml(true));
 
-				indexContent = StrUtils.replaceAll(indexContent, "[[SIDEBAR]]", SideBarCtrl.getSidebarHtmlStr());
+				indexContent = StrUtils.replaceAll(indexContent, "[[SIDEBAR]]", getSidebarHtmlWithHugo());
 
 				locEquiv = "_" + locEquiv;
 				TextFile indexFile = new TextFile(webRoot, locEquiv);
@@ -1848,6 +1848,14 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 		});
 
 		return tasks;
+	}
+
+	private String getSidebarHtmlWithHugo() {
+		String result = SideBarCtrl.getSidebarHtmlStr();
+		// do not actually open links to Hugo in a new tab while looking at Hugo (e.g. when in the inbox)
+		result = StrUtils.replaceAll(result, "href=\"http://localhost:3012/\" target=\"_blank\"",
+			"href=\"http://localhost:3012/\"");
+		return result;
 	}
 
 }
