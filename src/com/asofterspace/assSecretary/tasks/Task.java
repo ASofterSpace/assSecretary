@@ -406,16 +406,24 @@ public class Task extends GenericTask {
 		html.append(" title='");
 		html.append(HTML.escapeHTMLstr(title));
 		html.append("\n");
+
+		String content = makePlainTextLineInteractive(title);
+		String autoCleanStr = "persisted";
+		if (getAutoCleanTask()) {
+			content = "<i>" + content + "</i>";
+			autoCleanStr = "will-be-auto-cleaned";
+		}
+
 		boolean plainSingle = false;
 		if (isInstance()) {
 			if (getReleasedBasedOnId() == null) {
-				html.append("(plain single task)");
+				html.append("(plain single " + autoCleanStr + " task)");
 				plainSingle = true;
 			} else {
-				html.append("(instance of a repeating task)");
+				html.append("(instance of a repeating " + autoCleanStr + " task)");
 			}
 		} else {
-			html.append("(abstract repeating task, not an instance at all)");
+			html.append("(abstract repeating " + autoCleanStr + " task, not an instance at all)");
 		}
 		html.append("'>");
 		if (reducedView) {
@@ -430,7 +438,7 @@ public class Task extends GenericTask {
 				html.append("| ");
 			}
 		}
-		html.append(makePlainTextLineInteractive(title));
+		html.append(content);
 		html.append("</span>");
 
 		boolean hasDetails = false;

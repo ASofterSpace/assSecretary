@@ -1061,6 +1061,9 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 						String key = arg.substring(0, arg.indexOf("="));
 						if ("date".equals(key)) {
 							today = DateUtils.parseDate(arg.substring(arg.indexOf("=") + 1));
+							if (today == null) {
+								today = actualToday;
+							}
 						}
 					}
 				}
@@ -1072,7 +1075,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 				indexContent = StrUtils.replaceAll(indexContent, "[[NEXT_DATE_MONTH]]", DateUtils.serializeDate(DateUtils.addDays(today, 30)));
 				indexContent = StrUtils.replaceAll(indexContent, "[[NEXT_DATE_YEAR]]", DateUtils.serializeDate(DateUtils.addDays(today, 365)));
 
-				indexContent = StrUtils.replaceAll(indexContent, "[[CURDATE]]", DateUtils.serializeDate(DateUtils.now()));
+				indexContent = StrUtils.replaceAll(indexContent, "[[CURDATE]]", DateUtils.serializeDate(actualToday));
 
 				indexContent = StrUtils.replaceAll(indexContent, "[[MINI_CALENDAR]]", getMiniCalendarHtml());
 
