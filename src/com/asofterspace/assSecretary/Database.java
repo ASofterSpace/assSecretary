@@ -31,6 +31,8 @@ public class Database {
 
 	private String username;
 
+	private String memePath;
+
 	private String inboxContent;
 
 	private Boolean connectToMari;
@@ -55,6 +57,7 @@ public class Database {
 	private static String SHORTLIST_ADVANCES = "shortlistAdvances";
 	private static String CURRENT_TASK_INSTANCE_AMOUNTS = "currentTaskInstanceAmounts";
 	private static String DONE_TASK_INSTANCE_AMOUNTS = "doneTaskInstanceAmounts";
+	private static String MEME_PATH = "memepath";
 
 
 	public Database(Directory dataDir) {
@@ -76,6 +79,8 @@ public class Database {
 		this.port = root.getInteger(PORT);
 
 		this.username = root.getString(USERNAME);
+
+		this.memePath = root.getString(MEME_PATH);
 
 		this.inboxContent = root.getString(INBOX_CONTENT);
 
@@ -132,6 +137,8 @@ public class Database {
 		root.set(PORT, port);
 
 		root.set(USERNAME, username);
+
+		root.set(MEME_PATH, memePath);
 
 		root.set(INBOX_CONTENT, inboxContent);
 
@@ -200,6 +207,10 @@ public class Database {
 
 	public Map<String, Object> getDoneTaskInstanceAmounts() {
 		return doneTaskInstanceAmounts;
+	}
+
+	public String getMemePath() {
+		return memePath;
 	}
 
 }

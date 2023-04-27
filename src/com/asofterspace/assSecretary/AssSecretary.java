@@ -54,6 +54,8 @@ public class AssSecretary {
 	private static MissionControlDatabase missionControlDatabase;
 	private static VmInfo vmInfo;
 	private static WebInfo webInfo;
+	private static String memeInfo = "";
+	private static String memeInfoShort = "<span class='awesome'>Memes all different</span>";
 
 
 	public static void main(String[] args) {
@@ -282,6 +284,45 @@ public class AssSecretary {
 		addWebInfo(webInfo, "supervision-earth", "sveWeb", "https://supervision.earth/", missionControlDatabase);
 		addWebInfo(webInfo, "supervision-earth", "sveApp", "https://supervisionspace.app/", missionControlDatabase);
 		addWebInfo(webInfo, "supervision-earth", "sveLB", "http://svs-backend-loadbalancer-1910963306.eu-central-1.elb.amazonaws.com/", missionControlDatabase);
+
+		checkMemeFolder();
+	}
+
+	private static void checkMemeFolder() {
+
+		StringBuilder result = new StringBuilder();
+		result.append("<div>");
+		result.append("<div class='line'>");
+		result.append("Several memes in the meme folder seem to have the same size, ");
+		result.append("indicating they might be the same file!<br>");
+		result.append("They are:");
+		result.append("</div>");
+
+		Directory parent = new Directory(database.getMemePath());
+
+		boolean foundSome = false;
+		boolean recursively = false;
+		List<File> files = parent.getAllFiles(recursively);
+
+		for (int i = 0; i < files.size(); i++) {
+			long iLen = files.get(i).getSize();
+			for (int j = i+1; j < files.size(); j++) {
+				long jLen = files.get(j).getSize();
+				if (iLen == jLen) {
+					foundSome = true;
+					result.append("<div class='line'>");
+					result.append("<span class='error'>" + files.get(i).getCanonicalFilename() +
+						"</span> and <span class='error'>" + files.get(j).getCanonicalFilename() + "</span>");
+					result.append("</div>");
+				}
+			}
+		}
+		result.append("</div>");
+
+		if (foundSome) {
+			memeInfo = result.toString();
+			memeInfoShort = "<span class='error'>Meme collision!</span>";
+		}
 	}
 
 	private static void addVmInfo(VmInfo vmInfo, String origin, String which,
@@ -360,6 +401,14 @@ public class AssSecretary {
 		WebAccessedCallback callback = new WebInfoCallback(webInfo, origin, which, missionControlDatabase);
 
 		WebAccessor.getAsynch(url, callback);
+	}
+
+	public static String getMemeInfo() {
+		return memeInfo;
+	}
+
+	public static String getMemeInfoShort() {
+		return memeInfoShort;
 	}
 
 }
