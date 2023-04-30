@@ -712,6 +712,7 @@ public class Task extends GenericTask {
 
 		text = addHtmlLinkToStringContent(text, "http://");
 		text = addHtmlLinkToStringContent(text, "https://");
+		text = addHtmlLinkToStringContent(text, "file://");
 
 		return text;
 	}
