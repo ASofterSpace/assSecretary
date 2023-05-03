@@ -652,7 +652,11 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 				if (shortlistTasks.size() == 0) {
 					taskShortlistHtml.append("<div>The task shortlist is empty - well done!</div>");
 				} else {
-					taskShortlistHtml.append("<div>Here is the task shortlist for today:</div>");
+					taskShortlistHtml.append("<div style='position:relative;'>Here is the task shortlist for today:");
+					taskShortlistHtml.append("<span class='button' style='position:absolute;right:0;top:0;padding:2pt 8pt;' ");
+					taskShortlistHtml.append("onclick='secretary.copyShortlistText();'>");
+					taskShortlistHtml.append("Extract Shortlist as Text</span>");
+					taskShortlistHtml.append("</div>");
 					taskShortlistHtml.append("<div id='shortlist-full-label' style='display: none;'><span class='error'>" +
 						"The task shortlist is very full - please reschedule, do or outright delete some tasks!</span></div>");
 					boolean reducedView = false;

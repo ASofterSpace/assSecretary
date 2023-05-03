@@ -321,14 +321,23 @@ public class TaskCtrl extends TaskCtrlBase {
 	 * without saving!
 	 */
 	@Override
-	protected void generateNewInstancesOnDay(Date day) {
+	protected List<GenericTask> generateNewInstancesOnDay(Date day) {
 
-		super.generateNewInstancesOnDay(day);
+		List<GenericTask> result = super.generateNewInstancesOnDay(day);
 
+		// add tasks that were just generated directly
+		for (GenericTask genericTask : result) {
+			if (genericTask instanceof Task) {
+				addTaskToShortListByTask((Task) genericTask);
+			}
+		}
+
+		// add any tasks that are scheduled today - should also catch every task we just had
+		String todayStr = getTodayStrSafely();
 		for (GenericTask genericTask : taskInstances) {
 			if (genericTask instanceof Task) {
-				if (DateUtils.isSameDay(day, genericTask.getReleaseDate())) {
-					addTaskToShortListById(((Task) genericTask).getId());
+				if (todayStr.equals(genericTask.getReleasedDateStr())) {
+					addTaskToShortListByTask((Task) genericTask);
 				}
 			}
 		}
@@ -339,6 +348,20 @@ public class TaskCtrl extends TaskCtrlBase {
 				addTaskToShortListById(id);
 			}
 			futureShortlistIds.remove(0);
+		}
+
+		return result;
+	}
+
+	// gets today's string representation, ensuring it is really correct
+	private String getTodayStrSafely() {
+		while (true) {
+			String try1 = DateUtils.serializeDate(DateUtils.now());
+			String try2 = DateUtils.serializeDate(DateUtils.now());
+			String try3 = DateUtils.serializeDate(DateUtils.now());
+			if (try1.equals(try2) && try1.equals(try3)) {
+				return try1;
+			}
 		}
 	}
 
@@ -576,6 +599,11 @@ public class TaskCtrl extends TaskCtrlBase {
 
 		Task task = getTaskById(id);
 
+		addTaskToShortListByTask(task);
+	}
+
+	private void addTaskToShortListByTask(Task task) {
+
 		if (task == null) {
 			return;
 		}
@@ -583,6 +611,8 @@ public class TaskCtrl extends TaskCtrlBase {
 		if (task.hasBeenDone()) {
 			return;
 		}
+
+		String id = task.getId();
 
 		if (shortlistIds.contains(id)) {
 			return;

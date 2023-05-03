@@ -955,6 +955,31 @@ window.secretary = {
 		window.open(url, '_blank');
 	},
 
+	copyToClipboard: function(content) {
+		var clipboardHelper = document.getElementById("clipboardHelper");
+		clipboardHelper.style.display = 'inline';
+		clipboardHelper.value = content;
+		clipboardHelper.select();
+		clipboardHelper.setSelectionRange(0, 99999);
+		navigator.clipboard.writeText(clipboardHelper.value);
+		clipboardHelper.style.display = 'none';
+	},
+
+	copyShortlistText: function() {
+		var text = "";
+		var sep = "";
+		var tasks = document.getElementById("shortlist").childNodes;
+		for (var i = 0; i < tasks.length; i++) {
+			var task = tasks[i];
+			if (task.id.indexOf("task-") == 0) {
+				text += sep;
+				sep = "\n";
+				text += task.childNodes[1].innerText + " " + task.childNodes[2].innerText + " " + task.childNodes[3].innerText;
+			}
+		}
+		this.copyToClipboard(text);
+	},
+
 }
 
 
