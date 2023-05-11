@@ -1011,6 +1011,28 @@ window.onkeydown = function(event) {
 		event.preventDefault();
 		return false;
 	}
+
+	// [Ctrl]+[D] for leave editing mode after saving
+	if ((event.metaKey || event.ctrlKey) && event.keyCode == 68) {
+		var addSingleTaskModal = document.getElementById("addSingleTaskModal");
+		if (addSingleTaskModal && (addSingleTaskModal.style.display === "block")) {
+			window.secretary.closeSingleTaskModal();
+		} else {
+			var addRepeatingTaskModal = document.getElementById("addRepeatingTaskModal");
+			if (addRepeatingTaskModal && (addRepeatingTaskModal.style.display === "block")) {
+				window.secretary.closeRepeatingTaskModal();
+			} else {
+				var inboxArea = document.getElementById("inboxArea");
+				if (inboxArea) {
+					// if we are on the inbox and want to "close" it we basically just return to main view
+					window.location = "/";
+				}
+			}
+		}
+		event.preventDefault();
+		return false;
+	}
+
 	if ((event.keyCode > 111) && (event.keyCode < 124)) {
 		if (event.keyCode == 111 + 6) {
 			// if [F6] is pressed, and the repeatingTaskDetails textarea is visible...
@@ -1079,3 +1101,7 @@ window.setInterval(function() {
 		}
 	}
 }, 30000);
+
+window.addEventListener("error", function(e) {
+	alert("Encountered an error: " + e);
+}, true);
