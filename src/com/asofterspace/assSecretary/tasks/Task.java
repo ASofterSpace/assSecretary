@@ -155,17 +155,12 @@ public class Task extends GenericTask {
 		// if this task is "scheduled" for a particular time (so if its title starts with "HH:MM "
 		// or "HH:MM.."), then reduce priority by A LOT, also based on the time, so that timed
 		// entries are (nearly) always at the top of the list, sorted by their time
-		if (title.length() > 5) {
-			if ((title.charAt(2) == ':') && ((title.charAt(5) == ' ') || (title.charAt(5) == '.')) &&
-				Character.isDigit(title.charAt(0)) && Character.isDigit(title.charAt(1)) &&
-				Character.isDigit(title.charAt(3)) && Character.isDigit(title.charAt(4))) {
-
-				int timeVal = StrUtils.strToInt(title.substring(0, 2) + title.substring(3, 5));
-				if (historicalView) {
-					return -(100 + timeVal);
-				} else {
-					return -(2500 - timeVal);
-				}
+		if (isTimedEntry()) {
+			int timeVal = StrUtils.strToInt(title.substring(0, 2) + title.substring(3, 5));
+			if (historicalView) {
+				return -(100 + timeVal);
+			} else {
+				return -(2500 - timeVal);
 			}
 		}
 
@@ -178,6 +173,19 @@ public class Task extends GenericTask {
 		}
 
 		return result;
+	}
+
+	private boolean isTimedEntry() {
+
+		if (title.length() > 5) {
+			if ((title.charAt(2) == ':') && ((title.charAt(5) == ' ') || (title.charAt(5) == '.')) &&
+				Character.isDigit(title.charAt(0)) && Character.isDigit(title.charAt(1)) &&
+				Character.isDigit(title.charAt(3)) && Character.isDigit(title.charAt(4))) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	public int getCurrentPriorityIgnoringTime(Date currentDay) {
@@ -647,11 +655,14 @@ public class Task extends GenericTask {
 
 						html.append("<span style='width: 2.5%; ");
 						html.append(miniBtnStyle);
-						html.append("' class='button' onclick='secretary.tasksPutOnShortListTomorrow(window.shortlistTLAs." + tla + ")'>");
+						// explicitly add the own id so that even a timed entry gets moved forward if and only if that entry itself is clicked
+						// for multi-move-forward
+						html.append("' class='button' onclick='secretary.tasksPutOnShortListTomorrow(secretary.arrayAdd(window.shortlistTLAs." + tla + ", \"" + id + "\"))'>");
 						html.append("&#x21F6;");
 						html.append("</span>");
 						mainWidth -= 3;
 
+						// append entry to shortlist TLA object, which is used to move multiple entries to another day
 						html.append("<script>\n");
 						html.append("if (!window.shortlistTLAs) {\n");
 						html.append("  window.shortlistTLAs = {};\n");
@@ -659,7 +670,11 @@ public class Task extends GenericTask {
 						html.append("if (!window.shortlistTLAs." + tla + ") {\n");
 						html.append("  window.shortlistTLAs." + tla + " = [];\n");
 						html.append("}\n");
-						html.append("window.shortlistTLAs." + tla + ".push(\"" + id + "\");\n");
+						// for this functionality, timed entries should not be included as they should not be forwarded
+						// together with the rest
+						if (!isTimedEntry()) {
+							html.append("window.shortlistTLAs." + tla + ".push(\"" + id + "\");\n");
+						}
 						html.append("</script>\n");
 					} else {
 						html.append("<span style='width: 2.5%; ");

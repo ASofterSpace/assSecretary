@@ -697,6 +697,13 @@ window.secretary = {
 		request.send(JSON.stringify(data));
 	},
 
+	arrayAdd: function(arr, toAdd) {
+		if (arr.indexOf(toAdd) < 0) {
+			arr.push(toAdd);
+		}
+		return arr;
+	},
+
 	filterTasks: function() {
 
 		// hide all tasks
@@ -1102,6 +1109,8 @@ window.setInterval(function() {
 	}
 }, 30000);
 
+/* this ended up not being helpful, as the string serialization of e is utterly meaningless... xD
 window.addEventListener("error", function(e) {
 	alert("Encountered an error: " + e);
 }, true);
+*/
