@@ -46,6 +46,9 @@ src/com/asofterspace/toolbox
 # pictures
 /server/pics
 
+# task origins
+/server/inc_task_origins.htm
+
 # toolbox-js
 /server/toolbox
 

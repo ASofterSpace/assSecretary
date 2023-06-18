@@ -117,6 +117,10 @@ public class Task extends GenericTask {
 			return "N/A";
 		}
 
+		if (tla.startsWith("dir")) {
+			return "DA";
+		}
+
 		switch (tla) {
 			case "private":
 				tla = AssSecretary.getDatabase().getUsername();
@@ -133,7 +137,11 @@ public class Task extends GenericTask {
 				return "SB";
 		}
 
-		tla = tla.substring(0, 3).toUpperCase();
+		if (tla.length() > 3) {
+			tla = tla.substring(0, 3);
+		}
+
+		tla = tla.toUpperCase();
 
 		return tla;
 	}
