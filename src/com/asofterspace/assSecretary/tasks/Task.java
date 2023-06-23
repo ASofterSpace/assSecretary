@@ -121,6 +121,10 @@ public class Task extends GenericTask {
 			return "DA";
 		}
 
+		if (tla.startsWith("effect")) {
+			return "EA";
+		}
+
 		switch (tla) {
 			case "private":
 				tla = AssSecretary.getDatabase().getUsername();
@@ -135,6 +139,8 @@ public class Task extends GenericTask {
 				return "FF";
 			case "seebruecke":
 				return "SB";
+			case "maibornwolff":
+				return "MW";
 		}
 
 		if (tla.length() > 3) {
