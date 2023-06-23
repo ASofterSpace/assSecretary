@@ -92,6 +92,9 @@ public class LtcDatabase {
 						if (tags.contains(";feuerwehr;") || tags.contains(";ff25;") || tags.contains(";ff43;")) {
 							task.setOrigin("firefighting");
 						}
+						if (tags.contains(";effective altruism;")) {
+							task.setOrigin("ea");
+						}
 						taskInstances.add(task);
 					}
 				} else {
