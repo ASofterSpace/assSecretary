@@ -303,11 +303,16 @@ public class AssSecretary {
 		boolean foundSome = false;
 		boolean recursively = false;
 		List<File> files = parent.getAllFiles(recursively);
+		List<Long> fileSizes = new ArrayList<>();
 
 		for (int i = 0; i < files.size(); i++) {
-			long iLen = files.get(i).getSize();
+			fileSizes.add(files.get(i).getSize());
+		}
+
+		for (int i = 0; i < files.size(); i++) {
+			long iLen = fileSizes.get(i);
 			for (int j = i+1; j < files.size(); j++) {
-				long jLen = files.get(j).getSize();
+				long jLen = fileSizes.get(j);
 				if (iLen == jLen) {
 					foundSome = true;
 					result.append("<div class='line'>");
