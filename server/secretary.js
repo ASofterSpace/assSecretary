@@ -982,7 +982,7 @@ window.secretary = {
 			if (task.id.indexOf("task-") == 0) {
 				text += sep;
 				sep = "\n";
-				text += task.childNodes[1].innerText + " " + task.childNodes[2].innerText + " " + task.childNodes[3].innerText;
+				text += task.childNodes[2].innerText + " " + task.childNodes[3].innerText;
 			}
 		}
 		this.copyToClipboard(text);
