@@ -883,17 +883,73 @@ window.secretary = {
 	},
 
 	// select a task on the shortlist
-	taskSelect: function(id) {
+	taskSelect: function(id, overrideToSelect, overrideToUnSelect, clickEvent) {
+		if (clickEvent) {
+			if (clickEvent.ctrlKey || clickEvent.shiftKey) {
+				if (clickEvent.ctrlKey) {
+					overrideToUnSelect = true;
+				}
+				if (clickEvent.shiftKey) {
+					overrideToSelect = true;
+				}
+				if (this.lastClickedTaskId != null) {
+					var lastEl = document.getElementById("select-task-" + this.lastClickedTaskId + "-on-shortlist");
+					var allTaskDivs = lastEl.parentElement.parentElement.childNodes;
+					var started = false;
+					var breakafter = false;
+					for (var i = 0; i < allTaskDivs.length; i++) {
+						if ((allTaskDivs[i].id == "task-" + id + "-on-shortlist") ||
+							(allTaskDivs[i].id == "task-" + this.lastClickedTaskId + "-on-shortlist")) {
+							if (started) {
+								breakafter = true;
+							}
+							started = true;
+						}
+						if (started) {
+							if (allTaskDivs[i].id.startsWith("task-") && allTaskDivs[i].id.endsWith("-on-shortlist")) {
+								var curId = allTaskDivs[i].id.substring(5);
+								curId = curId.substring(0, curId.length - 13);
+								this.taskSelect(curId, overrideToSelect, overrideToUnSelect, null);
+							}
+						}
+						if (breakafter) {
+							break;
+						}
+					}
+				}
+			}
+			this.lastClickedTaskId = id;
+		}
+
+		var doSelectVisually = true;
 		var index = this.selection.indexOf(id);
-		var el = document.getElementById("select-task-" + id + "-on-shortlist");
 		if (index < 0) {
-			this.selection.push(id);
-			el.innerHTML = "[X]";
-			el.parentElement.className = "line highlight";
+			// if we override to always unselect, and this is already selected, just do nothing!
+			if (!overrideToUnSelect) {
+				this.selection.push(id);
+				doSelectVisually = true;
+			} else {
+				doSelectVisually = false;
+			}
 		} else {
-			this.selection.pop(index);
-			el.innerHTML = "[ ]";
-			el.parentElement.className = "line";
+			// if we override to always select, and this is already selected, just do nothing!
+			if (!overrideToSelect) {
+				this.selection.splice(index, 1);
+				doSelectVisually = false;
+			} else {
+				doSelectVisually = true;
+			}
+		}
+
+		var el = document.getElementById("select-task-" + id + "-on-shortlist");
+		if (el) {
+			if (doSelectVisually) {
+				el.innerHTML = "[X]";
+				el.parentElement.className = "line highlight";
+			} else {
+				el.innerHTML = "[&nbsp;&nbsp;]";
+				el.parentElement.className = "line";
+			}
 		}
 	},
 

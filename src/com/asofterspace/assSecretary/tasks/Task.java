@@ -357,11 +357,16 @@ public class Task extends GenericTask {
 			html.append(leftButtonStyle);
 			html.append("' class='button' id='select-task-");
 			html.append(id);
-			html.append("-on-shortlist' onclick='secretary.taskSelect(\"");
-			html.append(id);
-			html.append("\")'>");
-			html.append("[ ]");
+			html.append("-on-shortlist'>");
+			html.append("[&nbsp;&nbsp;]");
 			html.append("</span>");
+			html.append("<script>\n");
+			html.append("window.setTimeout(function() {\n");
+			html.append("  document.getElementById('select-task-" + id + "-on-shortlist').onclick = function (e) {\n");
+			html.append("    secretary.taskSelect(\"" + id + "\", false, false, e);\n");
+			html.append("  };\n");
+			html.append("}, 100);\n");
+			html.append("</script>");
 			mainWidth -= 3;
 
 		} else {
