@@ -1038,7 +1038,7 @@ window.secretary = {
 			if (task.id.indexOf("task-") == 0) {
 				text += sep;
 				sep = "\n";
-				text += task.childNodes[2].innerText + " " + task.childNodes[3].innerText;
+				text += task.childNodes[3].innerText + " " + task.childNodes[4].innerText;
 			}
 		}
 		this.copyToClipboard(text);
