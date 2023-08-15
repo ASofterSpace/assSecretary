@@ -1002,19 +1002,6 @@ window.secretary = {
 		request.send(JSON.stringify(data));
 	},
 
-	insertDateTimeStampIntoTextarea: function(textareaEl) {
-		var start = textareaEl.selectionStart;
-		var end = textareaEl.selectionEnd;
-		// ... add a date-time-stamp!
-		var datetimestamp = toolbox.utils.DateUtils.getCurrentDateTimeStamp();
-		textareaEl.value =
-			textareaEl.value.substring(0, start) +
-			datetimestamp +
-			textareaEl.value.substring(end);
-		textareaEl.selectionStart = start + datetimestamp.length;
-		textareaEl.selectionEnd = start + datetimestamp.length;
-	},
-
 	openInNewTab: function(url) {
 		window.open(url, '_blank');
 	},
@@ -1097,30 +1084,62 @@ window.onkeydown = function(event) {
 		return false;
 	}
 
-	if ((event.keyCode > 111) && (event.keyCode < 124)) {
-		if (event.keyCode == 111 + 6) {
-			// if [F6] is pressed, and the repeatingTaskDetails textarea is visible...
-			var repeatingTaskDetails = document.getElementById("repeatingTaskDetails");
-			if (repeatingTaskDetails && window.repeatingTaskDetailsHasFocus) {
-				// ... add a datetimestamp!
-				window.secretary.insertDateTimeStampIntoTextarea(repeatingTaskDetails);
-			} else {
-				// same for the single task modal :)
-				var singleTaskDetails = document.getElementById("singleTaskDetails");
-				if (singleTaskDetails && window.singleTaskDetailsHasFocus) {
-					window.secretary.insertDateTimeStampIntoTextarea(singleTaskDetails);
-				}
-			}
-		}
-		// prevent function keys
-		event.preventDefault();
-		return false;
-	}
 	if (event.keyCode == 27) {
 		// prevent escape
 		event.preventDefault();
 		return false;
 	}
+
+	var textarea = document.activeElement;
+	if (textarea == null) {
+		return;
+	}
+
+	if ((textarea.tagName.toUpperCase() != "TEXTAREA") &&
+		(textarea.tagName.toUpperCase() != "INPUT")) {
+		return;
+	}
+
+	// function keys in general
+	if ((event.keyCode > 111) && (event.keyCode < 124)) {
+
+		// [F1] to add „“
+		if (event.keyCode == 111 + 1) {
+			toolbox.utils.StrUtils.insertText(textarea, "„“", event);
+		}
+
+		// [F2] to add “”
+		if (event.keyCode == 111 + 2) {
+			toolbox.utils.StrUtils.insertText(textarea, "“”", event);
+		}
+
+		// [F3] to add ‚‘
+		if (event.keyCode == 111 + 3) {
+			toolbox.utils.StrUtils.insertText(textarea, "‚‘", event);
+		}
+
+		// [F4] to add ’ (as that is useful more often than ‘’)
+		if (event.keyCode == 111 + 4) {
+			toolbox.utils.StrUtils.insertText(textarea, "’", event);
+		}
+
+		// [F6] to add a date-time-stamp
+		if (event.keyCode == 111 + 6) {
+			toolbox.utils.StrUtils.addDateTimeStamp(textarea, event);
+		}
+
+		// prevent function keys
+		event.preventDefault();
+		return false;
+	}
+
+	// [Tab] to indent or unindent selection
+	if (event.keyCode == 9) {
+		toolbox.utils.StrUtils.indentOrUnindent(textarea, event);
+		event.preventDefault();
+		return false;
+	}
+
 	// allow other keys
 	return true;
 };
