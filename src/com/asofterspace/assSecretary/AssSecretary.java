@@ -5,6 +5,7 @@
 package com.asofterspace.assSecretary;
 
 import com.asofterspace.assSecretary.facts.FactDatabase;
+import com.asofterspace.assSecretary.locations.LocationDatabase;
 import com.asofterspace.assSecretary.ltc.LtcDatabase;
 import com.asofterspace.assSecretary.missionControl.MissionControlDatabase;
 import com.asofterspace.assSecretary.missionControl.VmInfo;
@@ -46,8 +47,8 @@ public class AssSecretary {
 	public final static String FACT_DIR = "../assTrainer/config";
 
 	public final static String PROGRAM_TITLE = "assSecretary (Hugo)";
-	public final static String VERSION_NUMBER = "0.0.4.0(" + Utils.TOOLBOX_VERSION_NUMBER + ")";
-	public final static String VERSION_DATE = "21. October 2020 - 28. July 2023";
+	public final static String VERSION_NUMBER = "0.0.4.1(" + Utils.TOOLBOX_VERSION_NUMBER + ")";
+	public final static String VERSION_DATE = "21. October 2020 - 22. August 2023";
 
 	private static Database database;
 
@@ -97,6 +98,7 @@ public class AssSecretary {
 
 		database = new Database(dataDir);
 		QuickDatabase quickDB = new QuickDatabase(dataDir);
+		LocationDatabase locationDB = new LocationDatabase(dataDir);
 
 		missionControlDatabase = new MissionControlDatabase(dataDir, "mission_control");
 
@@ -224,7 +226,7 @@ public class AssSecretary {
 
 			System.out.println("Starting the server on port " + database.getPort() + "...");
 
-			Server server = new Server(webRoot, serverDir, database, taskCtrl, factDatabase, quickDB);
+			Server server = new Server(webRoot, serverDir, database, taskCtrl, factDatabase, quickDB, locationDB);
 
 			server.setWhitelist(whitelist);
 

@@ -6,6 +6,7 @@ package com.asofterspace.assSecretary.web;
 
 import com.asofterspace.assSecretary.Database;
 import com.asofterspace.assSecretary.facts.FactDatabase;
+import com.asofterspace.assSecretary.locations.LocationDatabase;
 import com.asofterspace.assSecretary.QuickDatabase;
 import com.asofterspace.assSecretary.tasks.TaskCtrl;
 import com.asofterspace.toolbox.io.Directory;
@@ -25,11 +26,13 @@ public class Server extends WebServer {
 
 	private QuickDatabase quickDB;
 
+	private LocationDatabase locationDB;
+
 	private Directory serverDir;
 
 
 	public Server(Directory webRoot, Directory serverDir, Database db, TaskCtrl taskCtrl,
-		FactDatabase factDatabase, QuickDatabase quickDB) {
+		FactDatabase factDatabase, QuickDatabase quickDB, LocationDatabase locationDB) {
 
 		super(webRoot, db.getPort());
 
@@ -41,12 +44,15 @@ public class Server extends WebServer {
 
 		this.quickDB = quickDB;
 
+		this.locationDB = locationDB;
+
 		this.serverDir = serverDir;
 	}
 
 	@Override
 	protected WebServerRequestHandler getHandler(Socket request) {
-		return new ServerRequestHandler(this, request, webRoot, serverDir, db, taskCtrl, factDatabase, quickDB);
+		return new ServerRequestHandler(
+			this, request, webRoot, serverDir, db, taskCtrl, factDatabase, quickDB, locationDB);
 	}
 
 }

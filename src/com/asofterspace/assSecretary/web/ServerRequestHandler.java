@@ -10,6 +10,8 @@ import com.asofterspace.assSecretary.AssSecretary;
 import com.asofterspace.assSecretary.Database;
 import com.asofterspace.assSecretary.facts.Fact;
 import com.asofterspace.assSecretary.facts.FactDatabase;
+import com.asofterspace.assSecretary.locations.LocationDatabase;
+import com.asofterspace.assSecretary.locations.LocationUtils;
 import com.asofterspace.assSecretary.missionControl.McInfo;
 import com.asofterspace.assSecretary.missionControl.VmInfo;
 import com.asofterspace.assSecretary.missionControl.WebInfo;
@@ -60,6 +62,8 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 	private QuickDatabase quickDB;
 
+	private LocationDatabase locationDB;
+
 	private Directory serverDir;
 
 	// only calculate this once at startup, not again and again for performance reasons
@@ -73,7 +77,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 
 	public ServerRequestHandler(WebServer server, Socket request, Directory webRoot, Directory serverDir,
-		Database db, TaskCtrl taskCtrl, FactDatabase factDatabase, QuickDatabase quickDB) {
+		Database db, TaskCtrl taskCtrl, FactDatabase factDatabase, QuickDatabase quickDB, LocationDatabase locationDB) {
 
 		super(server, request, webRoot);
 
@@ -84,6 +88,8 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 		this.factDatabase = factDatabase;
 
 		this.quickDB = quickDB;
+
+		this.locationDB = locationDB;
 
 		this.serverDir = serverDir;
 	}
@@ -566,7 +572,8 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 				// Today is Monday the 23rd of April 2027 and it is 08:37 right now. You are on planet Earth.
 				String generalInfo = "Today is <span id='curdatetime'>" + DateUtils.getDayOfWeekNameEN(now) + " the " +
 					StrUtils.replaceAll(DateUtils.serializeDateTimeLong(now, "<span class='sup'>", "</span>"), ", ", " and it is ") +
-					"</span> right now. <span id='cursleepstr'>" + sleepStr + "</span>You are currently on planet Earth.";
+					"</span> right now. <span id='cursleepstr'>" + sleepStr + "</span>You are currently probably " +
+					LocationUtils.serializeToday(locationDB.getWhenWheres(now)) + ".";
 
 				if (doneDateProblematicTaskInstances == null) {
 					doneDateProblematicTaskInstances = taskCtrl.getDoneDateProblematicTaskInstances();
@@ -1119,6 +1126,9 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 					weeklyHtmlStr.append(DateUtils.getDayOfWeekNameEN(day));
 					weeklyHtmlStr.append("</div>");
 
+					// location part
+					appendLocationForDayToHtml(day, weeklyHtmlStr);
+
 					List<Task> tasksToday = new ArrayList<>();
 
 					// check for all task instances if they apply today
@@ -1156,6 +1166,8 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 					weeklyHtmlStr.append("</div>");
 				}
+
+				appendLocationScriptToHtml(weeklyHtmlStr);
 
 				indexContent = StrUtils.replaceAll(indexContent, "[[WEEKLY_PLAN]]", weeklyHtmlStr.toString());
 
@@ -1263,6 +1275,9 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 						weeklyHtmlStr.append(DateUtils.getDayOfWeekNameEN(day));
 						weeklyHtmlStr.append("</div>");
 
+						// location part
+						appendLocationForDayToHtml(day, weeklyHtmlStr);
+
 						List<Task> tasksToday = new ArrayList<>();
 
 						// check for all task instances if they apply today
@@ -1311,6 +1326,8 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 					stayInLoop = DateUtils.getMonth(weekDays.get(0)) == month;
 				}
+
+				appendLocationScriptToHtml(monthlyHtmlStr);
 
 				indexContent = StrUtils.replaceAll(indexContent, "[[MONTHLY_PLAN]]", monthlyHtmlStr.toString());
 
@@ -1866,6 +1883,37 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 		result = StrUtils.replaceAll(result, "href=\"http://localhost:3012/\" target=\"_blank\"",
 			"href=\"http://localhost:3012/\"");
 		return result;
+	}
+
+	private void appendLocationForDayToHtml(Date day, StringBuilder html) {
+		html.append("<div style='padding-bottom: 10pt;'>");
+		html.append("<div style='display: table; width: 100%; text-align: center; background: rgba(121, 0, 252, 0.25); border-radius: 4pt; font-style: italic;' class='locationholder'>");
+		html.append("<span style='display: table-cell; vertical-align: middle;'>");
+		html.append(LocationUtils.serializeDay(locationDB.getWhenWheres(day)));
+		html.append("</span>");
+		html.append("</div>");
+		html.append("</div>");
+	}
+
+	private void appendLocationScriptToHtml(StringBuilder html) {
+		html.append("\n<script>\n");
+		html.append("var locationHolderHeightFun = function() {\n");
+		html.append("  var locHolders = document.getElementsByClassName('locationholder');\n");
+		html.append("  var maxHeight = 42;\n");
+		html.append("  for (var i = 0; i < locHolders.length; i++) {\n");
+		html.append("    if (maxHeight < locHolders[i].clientHeight) {\n");
+		html.append("      maxHeight = locHolders[i].clientHeight;\n");
+		html.append("    }\n");
+		html.append("  }\n");
+		html.append("  for (var i = 0; i < locHolders.length; i++) {\n");
+		html.append("    locHolders[i].style.height = maxHeight + 'px';\n");
+		html.append("  }\n");
+		html.append("};\n");
+		html.append("window.setTimeout(locationHolderHeightFun, 100);\n");
+		html.append("window.setTimeout(locationHolderHeightFun, 250);\n");
+		html.append("window.setTimeout(locationHolderHeightFun, 1000);\n");
+		html.append("window.setTimeout(locationHolderHeightFun, 2000);\n");
+		html.append("</script>\n");
 	}
 
 }
