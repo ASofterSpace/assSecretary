@@ -117,6 +117,10 @@ div.weekly_day {
 	box-sizing: border-box;
 }
 
+div.weekly_day.full_border {
+	border: 1px solid rgb(150, 200, 250);
+}
+
 div.weekly_day.today {
 	background: repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.6), rgba(0, 0, 0, 0), rgba(0, 0, 0, 0), rgba(255, 255, 255, 0.15), rgba(0, 0, 0, 0), rgba(0, 0, 0, 0), rgba(255, 255, 255, 0.2), rgba(0, 0, 0, 0), rgba(0, 0, 0, 0), rgba(255, 255, 255, 0.25), rgba(0, 0, 0, 0), rgba(0, 0, 0, 0), rgba(255, 255, 255, 0.3), rgba(0, 0, 0, 0), rgba(0, 0, 0, 0), rgba(255, 255, 255, 0.3), rgba(0, 0, 0, 0), rgba(0, 0, 0, 0), rgba(255, 255, 255, 0.3), rgba(0, 0, 0, 0), rgba(0, 0, 0, 0), rgba(255, 255, 255, 0.3), rgba(0, 0, 0, 0), rgba(0, 0, 0, 0), rgba(255, 255, 255, 0.3), rgba(0, 0, 0, 0), rgba(0, 0, 0, 0), rgba(255, 255, 255, 0.3), rgba(0, 0, 0, 0), rgba(0, 0, 0, 0), rgba(255, 255, 255, 0.3), rgba(0, 0, 0, 0), rgba(0, 0, 0, 0), rgba(255, 255, 255, 0.3), rgba(0, 0, 0, 0), rgba(0, 0, 0, 0));
 }
@@ -331,6 +335,28 @@ div#hiddenMainContent > div#shortlist {
 	margin-bottom: 10pt;
 	padding-bottom: 0;
 	border-radius: 10pt;
+}
+
+div.locationholder {
+	display: table;
+	width: 100%;
+	text-align: center;
+}
+
+div.locationholder, span.inline-location {
+	background: rgba(121, 0, 252, 0.25);
+	border-radius: 4pt;
+	font-style: italic;
+}
+
+div.locationholder > span {
+	display: table-cell;
+	vertical-align: middle;
+}
+
+span.inline-location {
+	margin-left: 8pt;
+	padding: 0px 5px 1px 5px;
 }
 
 

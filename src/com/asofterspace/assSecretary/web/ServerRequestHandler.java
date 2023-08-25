@@ -1127,7 +1127,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 					weeklyHtmlStr.append("</div>");
 
 					// location part
-					appendLocationForDayToHtml(day, weeklyHtmlStr);
+					appendLocationForDayToHtml(day, weeklyHtmlStr, locationDB);
 
 					List<Task> tasksToday = new ArrayList<>();
 
@@ -1276,7 +1276,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 						weeklyHtmlStr.append("</div>");
 
 						// location part
-						appendLocationForDayToHtml(day, weeklyHtmlStr);
+						appendLocationForDayToHtml(day, weeklyHtmlStr, locationDB);
 
 						List<Task> tasksToday = new ArrayList<>();
 
@@ -1885,17 +1885,17 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 		return result;
 	}
 
-	private void appendLocationForDayToHtml(Date day, StringBuilder html) {
+	public static void appendLocationForDayToHtml(Date day, StringBuilder html, LocationDatabase locationDB) {
 		html.append("<div style='padding-bottom: 10pt;'>");
-		html.append("<div style='display: table; width: 100%; text-align: center; background: rgba(121, 0, 252, 0.25); border-radius: 4pt; font-style: italic;' class='locationholder'>");
-		html.append("<span style='display: table-cell; vertical-align: middle;'>");
+		html.append("<div class='locationholder'>");
+		html.append("<span>");
 		html.append(LocationUtils.serializeDay(locationDB.getWhenWheres(day)));
 		html.append("</span>");
 		html.append("</div>");
 		html.append("</div>");
 	}
 
-	private void appendLocationScriptToHtml(StringBuilder html) {
+	public static void appendLocationScriptToHtml(StringBuilder html) {
 		html.append("\n<script>\n");
 		html.append("var locationHolderHeightFun = function() {\n");
 		html.append("  var locHolders = document.getElementsByClassName('locationholder');\n");

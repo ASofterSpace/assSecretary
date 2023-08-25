@@ -443,11 +443,18 @@ public class Task extends GenericTask {
 
 		boolean plainSingle = false;
 		if (isInstance()) {
+			String doneLabel = "not yet done";
+			if (hasBeenDone()) {
+				doneLabel = "actually done on " + DateUtils.serializeDate(getDoneDate()) +
+					" and set to done on " + DateUtils.serializeDateTime(getSetToDoneDateTime());
+				// get rid of milliseconds
+				doneLabel = doneLabel.substring(0, doneLabel.length() - 4);
+			}
 			if (getReleasedBasedOnId() == null) {
-				html.append("(plain single " + autoCleanStr + " task)");
+				html.append("(plain single " + autoCleanStr + " task, " + doneLabel + ")");
 				plainSingle = true;
 			} else {
-				html.append("(instance of a repeating " + autoCleanStr + " task)");
+				html.append("(instance of a repeating " + autoCleanStr + " task, " + doneLabel + ")");
 			}
 		} else {
 			html.append("(abstract repeating " + autoCleanStr + " task, not an instance at all)");

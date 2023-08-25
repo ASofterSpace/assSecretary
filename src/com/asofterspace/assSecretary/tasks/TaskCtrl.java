@@ -5,7 +5,11 @@
 package com.asofterspace.assSecretary.tasks;
 
 import com.asofterspace.assSecretary.Database;
+import com.asofterspace.assSecretary.locations.LocationDatabase;
+import com.asofterspace.assSecretary.locations.LocationUtils;
+import com.asofterspace.assSecretary.locations.WhenWhere;
 import com.asofterspace.assSecretary.ltc.LtcDatabase;
+import com.asofterspace.assSecretary.web.ServerRequestHandler;
 import com.asofterspace.toolbox.calendar.GenericTask;
 import com.asofterspace.toolbox.calendar.TaskCtrlBase;
 import com.asofterspace.toolbox.io.Directory;
@@ -81,6 +85,8 @@ public class TaskCtrl extends TaskCtrlBase {
 
 	private TaskDatabase taskDatabase;
 
+	private LocationDatabase locationDB;
+
 	private Directory webRoot;
 
 	private Directory uploadDir;
@@ -88,11 +94,14 @@ public class TaskCtrl extends TaskCtrlBase {
 	private Long lastUploadRequestTime = null;
 
 
-	public TaskCtrl(Database database, TaskDatabase taskDatabase, Directory webRoot, Directory uploadDir) {
+	public TaskCtrl(Database database, TaskDatabase taskDatabase, LocationDatabase locationDB,
+		Directory webRoot, Directory uploadDir) {
 
 		this.database = database;
 
 		this.taskDatabase = taskDatabase;
+
+		this.locationDB = locationDB;
 
 		this.webRoot = webRoot;
 
@@ -945,13 +954,127 @@ public class TaskCtrl extends TaskCtrlBase {
 		calendarFile.saveContent(baseContent);
 
 
+		// dedicated location file
+
+		baseFile = new TextFile(webRoot, "location.htm");
+		baseContent = baseFile.getContent();
+
+		Date actualToday = DateUtils.now();
+		Date today = actualToday;
+
+		int month = DateUtils.getMonth(today);
+		int year = DateUtils.getYear(today);
+
+		StringBuilder monthlyHtmlStr = new StringBuilder();
+
+		appendMonthToHtml(actualToday, month, year, monthlyHtmlStr);
+		appendMonthToHtml(actualToday, month+1, year, monthlyHtmlStr);
+		appendMonthToHtml(actualToday, month+2, year, monthlyHtmlStr);
+		appendMonthToHtml(actualToday, month+3, year, monthlyHtmlStr);
+
+		ServerRequestHandler.appendLocationScriptToHtml(monthlyHtmlStr);
+
+		baseContent = StrUtils.replaceAll(baseContent, "[[MONTHLY_PLAN]]", monthlyHtmlStr.toString());
+
+		TextFile locationFile = new TextFile(uploadDir, "location.htm");
+		locationFile.saveContent(baseContent);
+
+
 		// upload the file
 		IoUtils.execute("upload.bat");
 	}
 
 	public void appendDateToHtml(StringBuilder taskHtml, Date curDate) {
 		taskHtml.append("<div style='text-align:center;'>" + DateUtils.getDayOfWeekNameEN(curDate) + " the " +
-			DateUtils.serializeDateLong(curDate, "<span class=\"sup\">", "</span>") + "</div>");
+			DateUtils.serializeDateLong(curDate, "<span class=\"sup\">", "</span>"));
+
+		taskHtml.append("<span class='inline-location'>");
+		taskHtml.append(LocationUtils.serializeDay(locationDB.getWhenWheres(curDate)));
+		taskHtml.append("</span>");
+
+		taskHtml.append("</div>");
+	}
+
+	public void appendMonthToHtml(Date actualToday, int month, int year, StringBuilder monthlyHtmlStr) {
+
+		int dayNum = 1;
+
+		while (month > 12) {
+			year++;
+			month -= 12;
+		}
+
+		Date today = DateUtils.parseDateNumbers(dayNum, month, year);
+
+		monthlyHtmlStr.append("<div style='font-size:250%;font-weight:bold;text-align:center;'>");
+		monthlyHtmlStr.append(DateUtils.monthNumToName(month - 1) + " " + year);
+		monthlyHtmlStr.append("</div>");
+
+		List<Date> weekDays = DateUtils.getWeekForDate(today);
+
+		boolean stayInLoop = true;
+
+		while (stayInLoop) {
+
+			StringBuilder weeklyHtmlStr = new StringBuilder();
+
+			weeklyHtmlStr.append("<div style='padding:0;'>");
+
+			boolean onlyGetDone = false;
+
+			for (Date day : weekDays) {
+				weeklyHtmlStr.append("<div class='weekly_day full_border");
+				String boldness = "";
+				String styleStr = "";
+				boolean isToday = DateUtils.isSameDay(actualToday, day);
+				if (isToday) {
+					weeklyHtmlStr.append(" today");
+					boldness = "font-weight: bold;";
+				} else {
+					// set days to transparent which are before today
+					if (day.before(actualToday)) {
+						styleStr += "opacity: 0.4;";
+					}
+				}
+				weeklyHtmlStr.append("'");
+				// set days to invisible which do not actually belong to the current month
+				if (DateUtils.getMonth(day) != month) {
+					styleStr += "visibility: hidden;";
+				}
+				if (!"".equals(styleStr)) {
+					weeklyHtmlStr.append(" style='" + styleStr + "'");
+				}
+				weeklyHtmlStr.append(">");
+				weeklyHtmlStr.append("<div style='text-align: center; ");
+				weeklyHtmlStr.append(boldness);
+				weeklyHtmlStr.append("'>");
+				weeklyHtmlStr.append(DateUtils.serializeDate(day));
+				weeklyHtmlStr.append("</div>");
+				weeklyHtmlStr.append("<div style='text-align: center; ");
+				weeklyHtmlStr.append(boldness);
+				weeklyHtmlStr.append(" padding-bottom: 10pt;'>");
+				weeklyHtmlStr.append(DateUtils.getDayOfWeekNameEN(day));
+				weeklyHtmlStr.append("</div>");
+
+				// location part
+				ServerRequestHandler.appendLocationForDayToHtml(day, weeklyHtmlStr, locationDB);
+
+				weeklyHtmlStr.append("</div>");
+			}
+
+			weeklyHtmlStr.append("</div>");
+
+			monthlyHtmlStr.append(weeklyHtmlStr);
+
+			today = DateUtils.addDays(today, 7);
+
+			weekDays = DateUtils.getWeekForDate(today);
+
+			stayInLoop = DateUtils.getMonth(weekDays.get(0)) == month;
+		}
+
+		monthlyHtmlStr.append("<div style='padding-bottom: 25pt;'>");
+		monthlyHtmlStr.append("</div>");
 	}
 
 }

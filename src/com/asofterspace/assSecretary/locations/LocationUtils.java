@@ -54,7 +54,7 @@ public class LocationUtils {
 		}
 
 		if (usePrefix) {
-			if (result.toString().startsWith("Nest")) {
+			if (StrUtils.startsWithOrIs(result.toString(), "Nest")) {
 				prefix += "your ";
 			}
 		}

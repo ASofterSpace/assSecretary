@@ -47,8 +47,8 @@ public class AssSecretary {
 	public final static String FACT_DIR = "../assTrainer/config";
 
 	public final static String PROGRAM_TITLE = "assSecretary (Hugo)";
-	public final static String VERSION_NUMBER = "0.0.4.1(" + Utils.TOOLBOX_VERSION_NUMBER + ")";
-	public final static String VERSION_DATE = "21. October 2020 - 22. August 2023";
+	public final static String VERSION_NUMBER = "0.0.4.2(" + Utils.TOOLBOX_VERSION_NUMBER + ")";
+	public final static String VERSION_DATE = "21. October 2020 - 25. August 2023";
 
 	private static Database database;
 
@@ -107,7 +107,7 @@ public class AssSecretary {
 
 		TaskDatabase taskDatabase = new TaskDatabase(dataDir);
 		FactDatabase factDatabase = new FactDatabase(factDir);
-		TaskCtrl taskCtrl = new TaskCtrl(database, taskDatabase, webRoot, uploadDir);
+		TaskCtrl taskCtrl = new TaskCtrl(database, taskDatabase, locationDB, webRoot, uploadDir);
 
 
 		if (fix_data_mode) {
