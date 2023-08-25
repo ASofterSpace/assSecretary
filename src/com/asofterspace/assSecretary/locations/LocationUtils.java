@@ -50,7 +50,13 @@ public class LocationUtils {
 		for (String disp : toDisplay) {
 			result.append(sep);
 			sep = " / ";
-			result.append(StrUtils.replaceAll(disp, " ", "&nbsp;"));
+			result.append(
+				StrUtils.replaceAll(
+					// ensure whitespaces are not cut
+					StrUtils.replaceAll(disp, " ", "&nbsp;"),
+				// but allow whitespaces before brackets to be cut
+				"&nbsp;(", " (")
+			);
 		}
 
 		if (usePrefix) {
