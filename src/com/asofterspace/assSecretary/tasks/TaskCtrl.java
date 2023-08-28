@@ -7,7 +7,6 @@ package com.asofterspace.assSecretary.tasks;
 import com.asofterspace.assSecretary.Database;
 import com.asofterspace.assSecretary.locations.LocationDatabase;
 import com.asofterspace.assSecretary.locations.LocationUtils;
-import com.asofterspace.assSecretary.locations.WhenWhere;
 import com.asofterspace.assSecretary.ltc.LtcDatabase;
 import com.asofterspace.assSecretary.web.ServerRequestHandler;
 import com.asofterspace.toolbox.calendar.GenericTask;
@@ -967,10 +966,12 @@ public class TaskCtrl extends TaskCtrlBase {
 
 		StringBuilder monthlyHtmlStr = new StringBuilder();
 
-		appendMonthToHtml(actualToday, month, year, monthlyHtmlStr);
-		appendMonthToHtml(actualToday, month+1, year, monthlyHtmlStr);
-		appendMonthToHtml(actualToday, month+2, year, monthlyHtmlStr);
-		appendMonthToHtml(actualToday, month+3, year, monthlyHtmlStr);
+		boolean emptyView = true;
+
+		ServerRequestHandler.appendMonthToHtml(actualToday, month, year, locationDB, null, null, emptyView, monthlyHtmlStr);
+		ServerRequestHandler.appendMonthToHtml(actualToday, month+1, year, locationDB, null, null, emptyView, monthlyHtmlStr);
+		ServerRequestHandler.appendMonthToHtml(actualToday, month+2, year, locationDB, null, null, emptyView, monthlyHtmlStr);
+		ServerRequestHandler.appendMonthToHtml(actualToday, month+3, year, locationDB, null, null, emptyView, monthlyHtmlStr);
 
 		ServerRequestHandler.appendLocationScriptToHtml(monthlyHtmlStr);
 
@@ -989,92 +990,10 @@ public class TaskCtrl extends TaskCtrlBase {
 			DateUtils.serializeDateLong(curDate, "<span class=\"sup\">", "</span>"));
 
 		taskHtml.append("<span class='inline-location'>");
-		taskHtml.append(LocationUtils.serializeDay(locationDB.getWhenWheres(curDate)));
+		taskHtml.append(LocationUtils.serializeDay(locationDB.getFromTo(curDate)));
 		taskHtml.append("</span>");
 
 		taskHtml.append("</div>");
-	}
-
-	public void appendMonthToHtml(Date actualToday, int month, int year, StringBuilder monthlyHtmlStr) {
-
-		int dayNum = 1;
-
-		while (month > 12) {
-			year++;
-			month -= 12;
-		}
-
-		Date today = DateUtils.parseDateNumbers(dayNum, month, year);
-
-		monthlyHtmlStr.append("<div style='font-size:250%;font-weight:bold;text-align:center;'>");
-		monthlyHtmlStr.append(DateUtils.monthNumToName(month - 1) + " " + year);
-		monthlyHtmlStr.append("</div>");
-
-		List<Date> weekDays = DateUtils.getWeekForDate(today);
-
-		boolean stayInLoop = true;
-
-		while (stayInLoop) {
-
-			StringBuilder weeklyHtmlStr = new StringBuilder();
-
-			weeklyHtmlStr.append("<div style='padding:0;'>");
-
-			boolean onlyGetDone = false;
-
-			for (Date day : weekDays) {
-				weeklyHtmlStr.append("<div class='weekly_day full_border");
-				String boldness = "";
-				String styleStr = "";
-				boolean isToday = DateUtils.isSameDay(actualToday, day);
-				if (isToday) {
-					weeklyHtmlStr.append(" today");
-					boldness = "font-weight: bold;";
-				} else {
-					// set days to transparent which are before today
-					if (day.before(actualToday)) {
-						styleStr += "opacity: 0.4;";
-					}
-				}
-				weeklyHtmlStr.append("'");
-				// set days to invisible which do not actually belong to the current month
-				if (DateUtils.getMonth(day) != month) {
-					styleStr += "visibility: hidden;";
-				}
-				if (!"".equals(styleStr)) {
-					weeklyHtmlStr.append(" style='" + styleStr + "'");
-				}
-				weeklyHtmlStr.append(">");
-				weeklyHtmlStr.append("<div style='text-align: center; ");
-				weeklyHtmlStr.append(boldness);
-				weeklyHtmlStr.append("'>");
-				weeklyHtmlStr.append(DateUtils.serializeDate(day));
-				weeklyHtmlStr.append("</div>");
-				weeklyHtmlStr.append("<div style='text-align: center; ");
-				weeklyHtmlStr.append(boldness);
-				weeklyHtmlStr.append(" padding-bottom: 10pt;'>");
-				weeklyHtmlStr.append(DateUtils.getDayOfWeekNameEN(day));
-				weeklyHtmlStr.append("</div>");
-
-				// location part
-				ServerRequestHandler.appendLocationForDayToHtml(day, weeklyHtmlStr, locationDB);
-
-				weeklyHtmlStr.append("</div>");
-			}
-
-			weeklyHtmlStr.append("</div>");
-
-			monthlyHtmlStr.append(weeklyHtmlStr);
-
-			today = DateUtils.addDays(today, 7);
-
-			weekDays = DateUtils.getWeekForDate(today);
-
-			stayInLoop = DateUtils.getMonth(weekDays.get(0)) == month;
-		}
-
-		monthlyHtmlStr.append("<div style='padding-bottom: 25pt;'>");
-		monthlyHtmlStr.append("</div>");
 	}
 
 }

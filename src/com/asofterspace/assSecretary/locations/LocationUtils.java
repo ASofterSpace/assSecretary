@@ -4,6 +4,7 @@
  */
 package com.asofterspace.assSecretary.locations;
 
+import com.asofterspace.toolbox.utils.Pair;
 import com.asofterspace.toolbox.utils.StrUtils;
 
 import java.util.ArrayList;
@@ -12,22 +13,22 @@ import java.util.List;
 
 public class LocationUtils {
 
-	public static String serializeToday(List<WhenWhere> whenWheres) {
+	public static String serializeToday(Pair<List<WhenWhere>, List<WhenWhere>> whenWheres) {
 		return serializeDay(whenWheres, true);
 	}
 
-	public static String serializeDay(List<WhenWhere> whenWheres) {
+	public static String serializeDay(Pair<List<WhenWhere>, List<WhenWhere>> whenWheres) {
 		return serializeDay(whenWheres, false);
 	}
 
-	public static String serializeDay(List<WhenWhere> whenWheres, boolean usePrefix) {
+	public static String serializeDay(Pair<List<WhenWhere>, List<WhenWhere>> whenWheres, boolean usePrefix) {
 
 		String prefix = "";
 		if (usePrefix) {
 			prefix = "in ";
 		}
 
-		if ((whenWheres == null) || (whenWheres.size() < 1)) {
+		if (whenWheres == null) {
 			if (usePrefix) {
 				prefix = "on ";
 			}
@@ -36,16 +37,52 @@ public class LocationUtils {
 
 		StringBuilder result = new StringBuilder();
 
-		List<String> toDisplay = new ArrayList<>();
-		for (WhenWhere whenWhere : whenWheres) {
+		List<String> toDisplayLeft = new ArrayList<>();
+		for (WhenWhere whenWhere : whenWheres.getLeft()) {
 			List<String> locations = StrUtils.split(whenWhere.getWhere(), " / ");
 			for (String loc : locations) {
-				if (!toDisplay.contains(loc)) {
-					toDisplay.add(loc);
+				if (!toDisplayLeft.contains(loc)) {
+					toDisplayLeft.add(loc);
 				}
 			}
 		}
 
+		addToResultWhitespacely(toDisplayLeft, result);
+
+		if (whenWheres.getRight().size() > 0) {
+			List<String> toDisplayRight = new ArrayList<>();
+			for (WhenWhere whenWhere : whenWheres.getRight()) {
+				List<String> locations = StrUtils.split(whenWhere.getWhere(), " / ");
+				for (String loc : locations) {
+					if (!toDisplayRight.contains(loc)) {
+						toDisplayRight.add(loc);
+					}
+				}
+			}
+
+			if (!(toDisplayLeft.containsAll(toDisplayRight) &&
+				toDisplayRight.containsAll(toDisplayLeft))) {
+
+				if (usePrefix) {
+					result.append(", moving to ");
+				} else {
+					result.append(" -> ");
+				}
+
+				addToResultWhitespacely(toDisplayRight, result);
+			}
+		}
+
+		if (usePrefix) {
+			if (StrUtils.startsWithOrIs(result.toString(), "Nest")) {
+				prefix += "your ";
+			}
+		}
+
+		return prefix + result.toString();
+	}
+
+	private static void addToResultWhitespacely(List<String> toDisplay, StringBuilder result) {
 		String sep = "";
 		for (String disp : toDisplay) {
 			result.append(sep);
@@ -58,14 +95,6 @@ public class LocationUtils {
 				"&nbsp;(", " (")
 			);
 		}
-
-		if (usePrefix) {
-			if (StrUtils.startsWithOrIs(result.toString(), "Nest")) {
-				prefix += "your ";
-			}
-		}
-
-		return prefix + result.toString();
 	}
 
 }

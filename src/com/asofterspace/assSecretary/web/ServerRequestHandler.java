@@ -573,7 +573,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 				String generalInfo = "Today is <span id='curdatetime'>" + DateUtils.getDayOfWeekNameEN(now) + " the " +
 					StrUtils.replaceAll(DateUtils.serializeDateTimeLong(now, "<span class='sup'>", "</span>"), ", ", " and it is ") +
 					"</span> right now. <span id='cursleepstr'>" + sleepStr + "</span>You are currently probably " +
-					LocationUtils.serializeToday(locationDB.getWhenWheres(now)) + ".";
+					LocationUtils.serializeToday(locationDB.getFromTo(now)) + ".";
 
 				if (doneDateProblematicTaskInstances == null) {
 					doneDateProblematicTaskInstances = taskCtrl.getDoneDateProblematicTaskInstances();
@@ -632,7 +632,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 				tabsHtml += "<a href='/currenttasklog.htm'>Current Task Log</a>";
 				tabsHtml += "<a href='/weekly.htm'>Weekly View</a>";
 				tabsHtml += "<a href='/monthly.htm'>Monthly View</a>";
-				tabsHtml += "<a href='/monthly.htm?empty=true'>Empty Monthly View</a>";
+				tabsHtml += "<a href='/monthly.htm?empty=true'>Monthly Location View</a>";
 				tabsHtml += "<a href='/stats.htm'>Statistics</a>";
 				tabsHtml += "</div>";
 
@@ -1207,15 +1207,29 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 					}
 				}
 
-				int dayNum = 1;
 				int month = DateUtils.getMonth(today);
 				int year = DateUtils.getYear(today);
+
+				List<Task> tasks = new ArrayList<>();
+				List<Task> baseTasksForSchedule = new ArrayList<>();
+
+				if (!emptyView) {
+					tasks = taskCtrl.getAllTaskInstancesAsTasks();
+					baseTasksForSchedule = taskCtrl.getHugoAndMariTasks();
+
+					// add external tasks for the first month (as other months are not included for non-empty / task view),
+					// but have 9 days before and 9 days after so that there is enough buffer for days to be shown before
+					// and after the core month
+					boolean onlyGetDone = false;
+					tasks = taskCtrl.addExternalTaskInstances(tasks, DateUtils.parseDateNumbers(18, month - 1, year), DateUtils.parseDateNumbers(9, month + 1, year), onlyGetDone);
+				}
+
 				indexContent = StrUtils.replaceAll(indexContent, "[[PREV_DATE_YEAR]]", DateUtils.serializeDate(DateUtils.parseDateNumbers(1, month, year - 1)));
 				indexContent = StrUtils.replaceAll(indexContent, "[[PREV_DATE_MONTH]]", DateUtils.serializeDate(DateUtils.parseDateNumbers(1, month - 1, year)));
 				indexContent = StrUtils.replaceAll(indexContent, "[[NEXT_DATE_MONTH]]", DateUtils.serializeDate(DateUtils.parseDateNumbers(1, month + 1, year)));
 				indexContent = StrUtils.replaceAll(indexContent, "[[NEXT_DATE_YEAR]]", DateUtils.serializeDate(DateUtils.parseDateNumbers(1, month, year + 1)));
 
-				indexContent = StrUtils.replaceAll(indexContent, "[[CURDATE]]", DateUtils.serializeDate(DateUtils.now()));
+				indexContent = StrUtils.replaceAll(indexContent, "[[CURDATE]]", DateUtils.serializeDate(actualToday));
 
 				indexContent = StrUtils.replaceAll(indexContent, "[[MINI_CALENDAR]]", getMiniCalendarHtml());
 
@@ -1225,109 +1239,17 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 				StringBuilder monthlyHtmlStr = new StringBuilder();
 
-				today = DateUtils.parseDateNumbers(dayNum, month, year);
+				appendMonthToHtml(actualToday, month, year, locationDB, tasks, baseTasksForSchedule, emptyView, monthlyHtmlStr);
 
-				List<Date> weekDays = DateUtils.getWeekForDate(today);
-
-				List<Task> tasks = new ArrayList<>();
-				List<Task> baseTasksForSchedule = new ArrayList<>();
-
-				if (!emptyView) {
-					tasks = taskCtrl.getAllTaskInstancesAsTasks();
-					baseTasksForSchedule = taskCtrl.getHugoAndMariTasks();
+				// on empty / location-only view, show four months (while the regular monthly page only
+				// shows one)
+				if (emptyView) {
+					appendMonthToHtml(actualToday, month+1, year, locationDB, tasks, baseTasksForSchedule, emptyView, monthlyHtmlStr);
+					appendMonthToHtml(actualToday, month+2, year, locationDB, tasks, baseTasksForSchedule, emptyView, monthlyHtmlStr);
+					appendMonthToHtml(actualToday, month+3, year, locationDB, tasks, baseTasksForSchedule, emptyView, monthlyHtmlStr);
 				}
 
-				boolean stayInLoop = true;
-
-				while (stayInLoop) {
-
-					monthlyHtmlStr.append("<div>");
-
-					StringBuilder weeklyHtmlStr = new StringBuilder();
-
-					boolean onlyGetDone = false;
-					if (!emptyView) {
-						tasks = taskCtrl.addExternalTaskInstances(tasks, weekDays.get(0), weekDays.get(6), onlyGetDone);
-					}
-
-					for (Date day : weekDays) {
-						boolean isToday = DateUtils.isSameDay(actualToday, day);
-						weeklyHtmlStr.append("<div class='weekly_day");
-						String boldness = "";
-						if (isToday) {
-							weeklyHtmlStr.append(" today");
-							boldness = "font-weight: bold;";
-						}
-						weeklyHtmlStr.append("'");
-						// set days to transparent which do not actually belong to the current month
-						if (DateUtils.getMonth(day) != month) {
-							weeklyHtmlStr.append(" style='opacity: 0.4;'");
-						}
-						weeklyHtmlStr.append(">");
-						weeklyHtmlStr.append("<div style='text-align: center; ");
-						weeklyHtmlStr.append(boldness);
-						weeklyHtmlStr.append("'>");
-						weeklyHtmlStr.append(DateUtils.serializeDate(day));
-						weeklyHtmlStr.append("</div>");
-						weeklyHtmlStr.append("<div style='text-align: center; ");
-						weeklyHtmlStr.append(boldness);
-						weeklyHtmlStr.append(" padding-bottom: 10pt;'>");
-						weeklyHtmlStr.append(DateUtils.getDayOfWeekNameEN(day));
-						weeklyHtmlStr.append("</div>");
-
-						// location part
-						appendLocationForDayToHtml(day, weeklyHtmlStr, locationDB);
-
-						List<Task> tasksToday = new ArrayList<>();
-
-						// check for all task instances if they apply today
-						for (Task task : tasks) {
-							if (task.appliesTo(day)) {
-								tasksToday.add(task);
-							}
-						}
-
-						// for days in the future, also add ghost tasks (non-instances) - but no in the past,
-						// as there we would expect real instances to have been created instead!
-						if (day.after(actualToday)) {
-							for (Task task : baseTasksForSchedule) {
-								if (task.isScheduledOn(day) && task.getShowAsScheduled()) {
-									tasksToday.add(task);
-								}
-							}
-						}
-
-						boolean historicalView = false;
-
-						Collections.sort(tasksToday, new Comparator<Task>() {
-							public int compare(Task a, Task b) {
-								return a.getCurrentPriority(day, historicalView) - b.getCurrentPriority(day, historicalView);
-							}
-						});
-
-						boolean reducedView = true;
-						boolean onShortlist = false;
-						boolean standalone = false;
-
-						for (Task task : tasksToday) {
-							task.appendHtmlTo(weeklyHtmlStr, historicalView, reducedView, onShortlist, day, standalone, SHOW_BUTTONS, "");
-						}
-
-						weeklyHtmlStr.append("</div>");
-					}
-
-					monthlyHtmlStr.append("</div>");
-
-					monthlyHtmlStr.append(weeklyHtmlStr);
-
-					today = DateUtils.addDays(today, 7);
-
-					weekDays = DateUtils.getWeekForDate(today);
-
-					stayInLoop = DateUtils.getMonth(weekDays.get(0)) == month;
-				}
-
-				appendLocationScriptToHtml(monthlyHtmlStr);
+				ServerRequestHandler.appendLocationScriptToHtml(monthlyHtmlStr);
 
 				indexContent = StrUtils.replaceAll(indexContent, "[[MONTHLY_PLAN]]", monthlyHtmlStr.toString());
 
@@ -1889,7 +1811,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 		html.append("<div style='padding-bottom: 10pt;'>");
 		html.append("<div class='locationholder'>");
 		html.append("<span>");
-		html.append(LocationUtils.serializeDay(locationDB.getWhenWheres(day)));
+		html.append(LocationUtils.serializeDay(locationDB.getFromTo(day)));
 		html.append("</span>");
 		html.append("</div>");
 		html.append("</div>");
@@ -1914,6 +1836,136 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 		html.append("window.setTimeout(locationHolderHeightFun, 1000);\n");
 		html.append("window.setTimeout(locationHolderHeightFun, 2000);\n");
 		html.append("</script>\n");
+	}
+
+	public static void appendMonthToHtml(Date actualToday, int month, int year, LocationDatabase locationDB,
+		List<Task> tasks, List<Task> baseTasksForSchedule, boolean emptyView, StringBuilder monthlyHtmlStr) {
+
+		int dayNum = 1;
+
+		while (month > 12) {
+			year++;
+			month -= 12;
+		}
+
+		Date today = DateUtils.parseDateNumbers(dayNum, month, year);
+
+		monthlyHtmlStr.append("<div style='font-size:250%;font-weight:bold;text-align:center;'>");
+		monthlyHtmlStr.append(DateUtils.monthNumToName(month - 1) + " " + year);
+		monthlyHtmlStr.append("</div>");
+
+		List<Date> weekDays = DateUtils.getWeekForDate(today);
+
+		boolean stayInLoop = true;
+
+		while (stayInLoop) {
+
+			StringBuilder weeklyHtmlStr = new StringBuilder();
+
+			if (emptyView) {
+				weeklyHtmlStr.append("<div style='padding:0;'>");
+			}
+
+			for (Date day : weekDays) {
+				weeklyHtmlStr.append("<div class='weekly_day");
+				if (emptyView) {
+					weeklyHtmlStr.append(" full_border");
+				}
+				String boldness = "";
+				String styleStr = "";
+				boolean isToday = DateUtils.isSameDay(actualToday, day);
+				if (isToday) {
+					weeklyHtmlStr.append(" today");
+					boldness = "font-weight: bold;";
+				} else {
+					// set days to transparent which are before today
+					if (emptyView && day.before(actualToday)) {
+						styleStr += "opacity: 0.4;";
+					}
+				}
+				weeklyHtmlStr.append("'");
+				// set days to invisible which do not actually belong to the current month
+				if (DateUtils.getMonth(day) != month) {
+					if (emptyView) {
+						styleStr += "visibility: hidden;";
+					} else {
+						styleStr += "opacity: 0.4;";
+					}
+				}
+				if (!"".equals(styleStr)) {
+					weeklyHtmlStr.append(" style='" + styleStr + "'");
+				}
+				weeklyHtmlStr.append(">");
+				weeklyHtmlStr.append("<div style='text-align: center; ");
+				weeklyHtmlStr.append(boldness);
+				weeklyHtmlStr.append("'>");
+				weeklyHtmlStr.append(DateUtils.serializeDate(day));
+				weeklyHtmlStr.append("</div>");
+				weeklyHtmlStr.append("<div style='text-align: center; ");
+				weeklyHtmlStr.append(boldness);
+				weeklyHtmlStr.append(" padding-bottom: 10pt;'>");
+				weeklyHtmlStr.append(DateUtils.getDayOfWeekNameEN(day));
+				weeklyHtmlStr.append("</div>");
+
+				// location part
+				appendLocationForDayToHtml(day, weeklyHtmlStr, locationDB);
+
+				if (!emptyView) {
+					List<Task> tasksToday = new ArrayList<>();
+
+					// check for all task instances if they apply today
+					for (Task task : tasks) {
+						if (task.appliesTo(day)) {
+							tasksToday.add(task);
+						}
+					}
+
+					// for days in the future, also add ghost tasks (non-instances) - but no in the past,
+					// as there we would expect real instances to have been created instead!
+					if (day.after(actualToday)) {
+						for (Task task : baseTasksForSchedule) {
+							if (task.isScheduledOn(day) && task.getShowAsScheduled()) {
+								tasksToday.add(task);
+							}
+						}
+					}
+
+					boolean historicalView = false;
+
+					Collections.sort(tasksToday, new Comparator<Task>() {
+						public int compare(Task a, Task b) {
+							return a.getCurrentPriority(day, historicalView) - b.getCurrentPriority(day, historicalView);
+						}
+					});
+
+					boolean reducedView = true;
+					boolean onShortlist = false;
+					boolean standalone = false;
+
+					for (Task task : tasksToday) {
+						task.appendHtmlTo(weeklyHtmlStr, historicalView, reducedView, onShortlist, day, standalone, SHOW_BUTTONS, "");
+					}
+				}
+
+				weeklyHtmlStr.append("</div>");
+			}
+
+			if (!emptyView) {
+				weeklyHtmlStr.append("<div>");
+			}
+			weeklyHtmlStr.append("</div>");
+
+			monthlyHtmlStr.append(weeklyHtmlStr);
+
+			today = DateUtils.addDays(today, 7);
+
+			weekDays = DateUtils.getWeekForDate(today);
+
+			stayInLoop = DateUtils.getMonth(weekDays.get(0)) == month;
+		}
+
+		monthlyHtmlStr.append("<div style='padding-bottom: 25pt;'>");
+		monthlyHtmlStr.append("</div>");
 	}
 
 }

@@ -9,6 +9,7 @@ import com.asofterspace.toolbox.io.JSON;
 import com.asofterspace.toolbox.io.JsonFile;
 import com.asofterspace.toolbox.io.JsonParseException;
 import com.asofterspace.toolbox.utils.DateUtils;
+import com.asofterspace.toolbox.utils.Pair;
 import com.asofterspace.toolbox.utils.Record;
 
 import java.util.ArrayList;
@@ -62,13 +63,18 @@ public class LocationDatabase {
 		return whenWheres;
 	}
 
-	public List<WhenWhere> getWhenWheres(Date day) {
+	public Pair<List<WhenWhere>, List<WhenWhere>> getFromTo(Date day) {
+
+		Pair<List<WhenWhere>, List<WhenWhere>> result =
+			new Pair<>(new ArrayList<>(), new ArrayList<>());
+
 		if ((whenWheres == null) || (whenWheres.size() < 1)) {
-			return new ArrayList<>();
+			return result;
 		}
+
 		Date lastBefore = whenWheres.get(0).getDate();
-		List<WhenWhere> results = new ArrayList<>();
-		List<WhenWhere> furtherResults = new ArrayList<>();
+		List<WhenWhere> lastDayBeforeTodayResults = new ArrayList<>();
+		List<WhenWhere> todayResults = new ArrayList<>();
 		for (WhenWhere whenWhere : whenWheres) {
 			if (day.after(whenWhere.getDate())) {
 				lastBefore = whenWhere.getDate();
@@ -76,19 +82,21 @@ public class LocationDatabase {
 			}
 			// add everything that is the same day
 			if (DateUtils.isSameDay(day, whenWhere.getDate())) {
-				furtherResults.add(whenWhere);
+				todayResults.add(whenWhere);
 			}
 		}
 
 		// add everything that was from the day before
 		for (WhenWhere whenWhere : whenWheres) {
 			if (DateUtils.isSameDay(lastBefore, whenWhere.getDate())) {
-				results.add(whenWhere);
+				lastDayBeforeTodayResults.add(whenWhere);
 			}
 		}
-		results.addAll(furtherResults);
 
-		return results;
+		result.setLeft(lastDayBeforeTodayResults);
+		result.setRight(todayResults);
+
+		return result;
 	}
 
 	public void save() {
