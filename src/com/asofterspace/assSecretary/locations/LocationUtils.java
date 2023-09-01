@@ -32,7 +32,7 @@ public class LocationUtils {
 			if (usePrefix) {
 				prefix = "on ";
 			}
-			return prefix + "Planet&nbsp;Earth";
+			return prefix + "Planet Earth";
 		}
 
 		StringBuilder result = new StringBuilder();
@@ -88,11 +88,14 @@ public class LocationUtils {
 			result.append(sep);
 			sep = " / ";
 			result.append(
+				/*
 				StrUtils.replaceAll(
 					// ensure whitespaces are not cut
 					StrUtils.replaceAll(disp, " ", "&nbsp;"),
 				// but allow whitespaces before brackets to be cut
 				"&nbsp;(", " (")
+				*/
+				disp
 			);
 		}
 	}
