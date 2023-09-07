@@ -1171,6 +1171,8 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 				indexContent = StrUtils.replaceAll(indexContent, "[[WEEKLY_PLAN]]", weeklyHtmlStr.toString());
 
+				indexContent = StrUtils.replaceAll(indexContent, "[[CALENDAR_WEEK]]", ""+DateUtils.getWeek(today));
+
 				locEquiv = "_" + locEquiv;
 				TextFile indexFile = new TextFile(webRoot, locEquiv);
 				indexFile.saveContent(indexContent);
@@ -1863,7 +1865,8 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 			StringBuilder weeklyHtmlStr = new StringBuilder();
 
 			if (emptyView) {
-				weeklyHtmlStr.append("<div style='padding:0;'>");
+				weeklyHtmlStr.append("<div style='padding: 0 0 0 12pt; position: relative;'>");
+				weeklyHtmlStr.append("<div class='kw_on_month_view'>KW: " + DateUtils.getWeek(today) + "</div>");
 			}
 
 			for (Date day : weekDays) {
