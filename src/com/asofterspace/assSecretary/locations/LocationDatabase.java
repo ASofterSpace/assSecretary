@@ -76,13 +76,14 @@ public class LocationDatabase {
 		List<WhenWhere> lastDayBeforeTodayResults = new ArrayList<>();
 		List<WhenWhere> todayResults = new ArrayList<>();
 		for (WhenWhere whenWhere : whenWheres) {
-			if (day.after(whenWhere.getDate())) {
-				lastBefore = whenWhere.getDate();
-				continue;
+			if (day.before(whenWhere.getDate())) {
+				break;
 			}
 			// add everything that is the same day
 			if (DateUtils.isSameDay(day, whenWhere.getDate())) {
 				todayResults.add(whenWhere);
+			} else {
+				lastBefore = whenWhere.getDate();
 			}
 		}
 

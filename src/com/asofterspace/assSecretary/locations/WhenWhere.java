@@ -46,4 +46,10 @@ public class WhenWhere {
 	public Date getDate() {
 		return date.getDate();
 	}
+
+	@Override
+	public String toString() {
+		return this.date + ": " + this.where;
+	}
+
 }
