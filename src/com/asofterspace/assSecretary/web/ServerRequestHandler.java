@@ -1480,6 +1480,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 	private String getMiniCalendarHtml() {
 		String html = "";
 		Date today = DateUtils.now();
+		boolean beforeToday = true;
 		for (int weekCounter = 0; weekCounter < 6; weekCounter++) {
 			List<Date> week = DateUtils.getWeekForDate(today);
 			html += "<tr>";
@@ -1490,7 +1491,11 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 				html += "<td style='cursor: pointer;";
 				if (weekCounter == 0) {
 					if (DateUtils.isSameDay(today, day)) {
-						html += " background: rgba(150, 200, 250, 0.3)'";
+						html += " background: rgba(150, 200, 250, 0.3);";
+						beforeToday = false;
+					}
+					if (beforeToday) {
+						html += " opacity: 0.55;";
 					}
 				}
 				html += "' onclick='document.getElementById(\"singleTaskReleaseDate\").value = \"";
