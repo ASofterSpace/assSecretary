@@ -47,7 +47,7 @@ public class LocationUtils {
 			}
 		}
 
-		addToResultWhitespacely(toDisplayLeft, result);
+		addToResultWhitespacely(toDisplayLeft, result, usePrefix);
 
 		if (whenWheres.getRight().size() > 0) {
 			List<String> toDisplayRight = new ArrayList<>();
@@ -69,24 +69,25 @@ public class LocationUtils {
 					result.append(" -> ");
 				}
 
-				addToResultWhitespacely(toDisplayRight, result);
-			}
-		}
-
-		if (usePrefix) {
-			if (StrUtils.startsWithOrIs(result.toString(), "Nest")) {
-				prefix += "your ";
+				addToResultWhitespacely(toDisplayRight, result, usePrefix);
 			}
 		}
 
 		return prefix + result.toString();
 	}
 
-	private static void addToResultWhitespacely(List<String> toDisplay, StringBuilder result) {
+	private static void addToResultWhitespacely(List<String> toDisplay, StringBuilder result, boolean usePrefix) {
 		String sep = "";
 		for (String disp : toDisplay) {
 			result.append(sep);
 			sep = " / ";
+
+			if (usePrefix) {
+				if (StrUtils.startsWithOrIs(disp, "Nest")) {
+					result.append("the ");
+				}
+			}
+
 			result.append(
 				/*
 				StrUtils.replaceAll(
