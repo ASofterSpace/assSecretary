@@ -918,14 +918,16 @@ public class TaskCtrl extends TaskCtrlBase {
 
 			// add scheduled single task instances
 			for (Task task : tasks) {
-				if (task.appliesTo(day)) {
+				// get only the tasks of that particular day, NOT the ones that are older
+				// also, only the tasks that will not get auto-cleaned, to have a nice clear calendar page
+				if ((!task.getAutoCleanTask()) && DateUtils.isSameDay(day, task.getReleaseDate())) {
 					tasksToday.add(task);
 				}
 			}
 
 			// add scheduled base task instances
 			for (Task task : baseTasksForSchedule) {
-				if (task.isScheduledOn(day) && task.getShowAsScheduled()) {
+				if (task.getShowAsScheduled() && task.isScheduledOn(day)) {
 					tasksToday.add(task);
 				}
 			}
