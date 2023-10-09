@@ -565,7 +565,7 @@ window.secretary = {
 
 			this.currentlyDeleting = this.selection;
 
-			var html = "Do you really want to delete ALL the selected tasks?";
+			var html = "Do you really want to delete ALL the " + this.currentlyDeleting.length + " selected tasks?";
 
 			document.getElementById("deleteTaskModalDeleteButton").innerHTML = "Delete All";
 
@@ -1082,6 +1082,13 @@ window.onkeydown = function(event) {
 		}
 		event.preventDefault();
 		return false;
+	}
+
+	// [Entf] / [Del] key to delete multiple entries
+	if (event.keyCode == 46) {
+		if (window.secretary.selection.length > 0) {
+			window.secretary.showMultiDeleteModal();
+		}
 	}
 
 	if (event.keyCode == 27) {
