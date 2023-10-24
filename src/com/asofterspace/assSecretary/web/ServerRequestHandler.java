@@ -794,6 +794,8 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 				addLine(vmStatsHtml, "fem*streik", webInfo, "femOrg");
 
+				addLine(vmStatsHtml, "AGSG", webInfo, "agsgOrg");
+
 				addLine(vmStatsHtml, "Skyhook DB", vmInfo, "db");
 				addLine(vmStatsHtml, "Skyhook DB", webInfo, "skyDb");
 				addLine(vmStatsHtml, "Skyhook F1", vmInfo, "f1");
@@ -1441,7 +1443,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 		mcHtml += companyStart;
 		mcHtml += machineStart + "feministischerstreik.org<br>" + webInfo.get("femOrg") + machineEnd;
-		mcHtml += machineSeparator;
+		mcHtml += machineStart + "afghangirlssuccessgate.org<br>" + webInfo.get("agsgOrg") + machineEnd;
 		mcHtml += machineStart + "ASS Odyssey MM-01<br>" + AssSecretary.getMemeInfoShort() + machineEnd;
 		mcHtml += machineStart + "asofterspace.com<br>" + webInfo.get("assEn") + machineEnd;
 		mcHtml += machineStart + "asofterspace.de<br>" + webInfo.get("assDe") + machineEnd;

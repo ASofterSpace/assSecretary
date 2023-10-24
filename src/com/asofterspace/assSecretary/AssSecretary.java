@@ -47,8 +47,8 @@ public class AssSecretary {
 	public final static String FACT_DIR = "../assTrainer/config";
 
 	public final static String PROGRAM_TITLE = "assSecretary (Hugo)";
-	public final static String VERSION_NUMBER = "0.0.4.2(" + Utils.TOOLBOX_VERSION_NUMBER + ")";
-	public final static String VERSION_DATE = "21. October 2020 - 25. August 2023";
+	public final static String VERSION_NUMBER = "0.0.4.3(" + Utils.TOOLBOX_VERSION_NUMBER + ")";
+	public final static String VERSION_DATE = "21. October 2020 - 17. October 2023";
 
 	private static Database database;
 
@@ -271,6 +271,8 @@ public class AssSecretary {
 		addWebInfo(webInfo, "asofterspace", "assDe", "https://www.asofterspace.de/", missionControlDatabase);
 
 		addWebInfo(webInfo, "fem*streik", "femOrg", "https://feministischerstreik.org/", missionControlDatabase);
+
+		addWebInfo(webInfo, "AGSG", "agsgOrg", "https://afghangirlssuccessgate.org/", missionControlDatabase);
 
 		addVmInfo(vmInfo, "skyhook", "db", missionControlDatabase);
 		addVmInfo(vmInfo, "skyhook", "f1", missionControlDatabase);

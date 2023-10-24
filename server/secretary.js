@@ -1125,8 +1125,13 @@ window.onkeydown = function(event) {
 			toolbox.utils.StrUtils.insertText(textarea, "‚‘", event);
 		}
 
-		// [F4] to add ’ (as that is useful more often than ‘’)
+		// [F4] to add ‘’
 		if (event.keyCode == 111 + 4) {
+			toolbox.utils.StrUtils.insertText(textarea, "‘’", event);
+		}
+
+		// [F5] to add ’ (as that is useful more often than ‘’)
+		if (event.keyCode == 111 + 5) {
 			toolbox.utils.StrUtils.insertText(textarea, "’", event);
 		}
 

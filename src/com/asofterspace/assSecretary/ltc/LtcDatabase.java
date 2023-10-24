@@ -95,6 +95,9 @@ public class LtcDatabase {
 						if (tags.contains(";effective altruism;")) {
 							task.setOrigin("ea");
 						}
+						if (tags.contains(";Universität;")) {
+							task.setOrigin("uni");
+						}
 						taskInstances.add(task);
 					}
 				} else {
