@@ -582,9 +582,20 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 					StringBuilder probStr = new StringBuilder();
 					probStr.append("<br><span class='error'>My database seems slightly corrupted - there are tasks with problematic done dates or set to done dates (either could be wrong)!</span> They are:<br>");
 					for (GenericTask task : doneDateProblematicTaskInstances) {
+						probStr.append("<div style='position: relative; padding-right: 50pt;'>");
 						probStr.append("Done Date: " + DateUtils.serializeDate(task.getDoneDate()) +
 							" Set to Done Date: " + DateUtils.serializeDateTime(task.getSetToDoneDateTime()) +
-							" " + HTML.escapeHTMLstr(task.getTitle()) + "<br>");
+							" " + HTML.escapeHTMLstr(task.getTitle()));
+						if (task instanceof Task) {
+							Task taskTask = (Task) task;
+							probStr.append("<span style='position:absolute; top:0; right: 0; width: 45pt;' class='button' ");
+							probStr.append("' class='button' onclick='secretary.taskEdit(\"");
+							probStr.append(taskTask.getId());
+							probStr.append("\")'>");
+							probStr.append("Edit");
+							probStr.append("</span>");
+						}
+						probStr.append("</div>");
 					}
 					generalInfo = probStr.toString() + "<br>" + generalInfo;
 				}
