@@ -977,6 +977,51 @@ public class TaskCtrl extends TaskCtrlBase {
 
 		ServerRequestHandler.appendLocationScriptToHtml(monthlyHtmlStr);
 
+		// add script to highlight the today that is the browser's today rather than just the today of the server
+		// (as this html file might be shown much later)
+		monthlyHtmlStr.append("<script>\n");
+		monthlyHtmlStr.append("function leftPad0(origStr, length) {\n");
+		monthlyHtmlStr.append("  var result = '' + origStr;\n");
+		monthlyHtmlStr.append("  \n");
+		monthlyHtmlStr.append("  while (result.length < length) {\n");
+		monthlyHtmlStr.append("    result = '0' + result;\n");
+		monthlyHtmlStr.append("  }\n");
+		monthlyHtmlStr.append("  \n");
+		monthlyHtmlStr.append("  return result;\n");
+		monthlyHtmlStr.append("}\n");
+		monthlyHtmlStr.append("\n");
+		monthlyHtmlStr.append("function serializeDate(datetime) {\n");
+		monthlyHtmlStr.append("  return datetime.getFullYear() + '-' +\n");
+		monthlyHtmlStr.append("    leftPad0((datetime.getMonth()+1), 2) + '-' +\n");
+		monthlyHtmlStr.append("    leftPad0(datetime.getDate(), 2);\n");
+		monthlyHtmlStr.append("}\n");
+		monthlyHtmlStr.append("\n");
+		monthlyHtmlStr.append("window.setTimeout(function() {\n");
+		monthlyHtmlStr.append("  var now = new Date();\n");
+		monthlyHtmlStr.append("  var curMonth = now.getMonth() + 1;\n");
+		monthlyHtmlStr.append("  var curYear = now.getFullYear();\n");
+		monthlyHtmlStr.append("  var curDateStr = serializeDate(now);\n");
+		monthlyHtmlStr.append("  var todayEl = document.getElementById('day-' + curMonth + '-' + curDateStr);\n");
+		monthlyHtmlStr.append("  if (todayEl) {\n");
+		monthlyHtmlStr.append("    for (var month = 1; month < 13; month++) {\n");
+		monthlyHtmlStr.append("      for (var day = 1; day < 32; day++) {\n");
+		monthlyHtmlStr.append("        var curStr = curYear + '-' + leftPad0(month, 2) + '-' + leftPad0(day, 2);\n");
+		monthlyHtmlStr.append("        if (curStr > curDateStr) {\n");
+		monthlyHtmlStr.append("          break;\n");
+		monthlyHtmlStr.append("        }\n");
+		monthlyHtmlStr.append("        var curEl = document.getElementById('day-' + month + '-' + curStr);\n");
+		monthlyHtmlStr.append("        if (curEl) {\n");
+		monthlyHtmlStr.append("          curEl.className = 'weekly_day full_border';\n");
+		monthlyHtmlStr.append("          curEl.style.opacity = '0.4';\n");
+		monthlyHtmlStr.append("        }\n");
+		monthlyHtmlStr.append("      }\n");
+		monthlyHtmlStr.append("    }\n");
+		monthlyHtmlStr.append("    todayEl.className = 'weekly_day full_border today';\n");
+		monthlyHtmlStr.append("    todayEl.style.opacity = 'unset';\n");
+		monthlyHtmlStr.append("  }\n");
+		monthlyHtmlStr.append("}, 1000);\n");
+		monthlyHtmlStr.append("</script>\n");
+
 		baseContent = StrUtils.replaceAll(baseContent, "[[MONTHLY_PLAN]]", monthlyHtmlStr.toString());
 
 		TextFile locationFile = new TextFile(uploadDir, "location.htm");

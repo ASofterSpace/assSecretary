@@ -1122,20 +1122,15 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 				for (Date day : weekDays) {
 					boolean isToday = DateUtils.isSameDay(actualToday, day);
 					weeklyHtmlStr.append("<div class='weekly_day");
-					String boldness = "";
 					if (isToday) {
 						weeklyHtmlStr.append(" today");
-						boldness = "font-weight: bold;";
 					}
 					weeklyHtmlStr.append("'>");
-					weeklyHtmlStr.append("<div style='text-align: center; ");
-					weeklyHtmlStr.append(boldness);
-					weeklyHtmlStr.append("'>");
+					weeklyHtmlStr.append("<div style='text-align: center;' class='h'>");
 					weeklyHtmlStr.append(DateUtils.serializeDate(day));
 					weeklyHtmlStr.append("</div>");
 					weeklyHtmlStr.append("<div style='text-align: center; ");
-					weeklyHtmlStr.append(boldness);
-					weeklyHtmlStr.append(" padding-bottom: 10pt;'>");
+					weeklyHtmlStr.append("padding-bottom: 10pt;' class='h'>");
 					weeklyHtmlStr.append(DateUtils.getDayOfWeekNameEN(day));
 					weeklyHtmlStr.append("</div>");
 
@@ -1888,16 +1883,15 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 			}
 
 			for (Date day : weekDays) {
-				weeklyHtmlStr.append("<div class='weekly_day");
+				String serializedDate = DateUtils.serializeDate(day);
+				weeklyHtmlStr.append("<div id='day-" + DateUtils.getMonth(day) + "-" + serializedDate + "' class='weekly_day");
 				if (emptyView) {
 					weeklyHtmlStr.append(" full_border");
 				}
-				String boldness = "";
 				String styleStr = "";
 				boolean isToday = DateUtils.isSameDay(actualToday, day);
 				if (isToday) {
 					weeklyHtmlStr.append(" today");
-					boldness = "font-weight: bold;";
 				} else {
 					// set days to transparent which are before today
 					if (emptyView && day.before(actualToday)) {
@@ -1917,14 +1911,11 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 					weeklyHtmlStr.append(" style='" + styleStr + "'");
 				}
 				weeklyHtmlStr.append(">");
-				weeklyHtmlStr.append("<div style='text-align: center; ");
-				weeklyHtmlStr.append(boldness);
-				weeklyHtmlStr.append("'>");
-				weeklyHtmlStr.append(DateUtils.serializeDate(day));
+				weeklyHtmlStr.append("<div style='text-align: center;' class='h'>");
+				weeklyHtmlStr.append(serializedDate);
 				weeklyHtmlStr.append("</div>");
 				weeklyHtmlStr.append("<div style='text-align: center; ");
-				weeklyHtmlStr.append(boldness);
-				weeklyHtmlStr.append(" padding-bottom: 10pt;'>");
+				weeklyHtmlStr.append("padding-bottom: 10pt;' class='h'>");
 				weeklyHtmlStr.append(DateUtils.getDayOfWeekNameEN(day));
 				weeklyHtmlStr.append("</div>");
 
