@@ -832,7 +832,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 				indexContent = StrUtils.replaceAll(indexContent, "[[VM_STATS]]", vmStatsHtml.toString());
 
 
-				indexContent = StrUtils.replaceAll(indexContent, "[[MEME_INFO]]", AssSecretary.getMemeInfo());
+				indexContent = StrUtils.replaceAll(indexContent, "[[LOCAL_INFO]]", AssSecretary.getLocalInfo());
 
 
 				String towaHtml = "";
@@ -1450,7 +1450,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 		mcHtml += companyStart;
 		mcHtml += machineStart + "feministischerstreik.org<br>" + webInfo.get("femOrg") + machineEnd;
 		mcHtml += machineStart + "afghangirlssuccessgate.org<br>" + webInfo.get("agsgOrg") + machineEnd;
-		mcHtml += machineStart + "ASS Odyssey MM-01<br>" + AssSecretary.getMemeInfoShort() + machineEnd;
+		mcHtml += machineStart + "ASS Odyssey MM-01<br>" + AssSecretary.getLocalInfoShort() + machineEnd;
 		mcHtml += machineStart + "asofterspace.com<br>" + webInfo.get("assEn") + machineEnd;
 		mcHtml += machineStart + "asofterspace.de<br>" + webInfo.get("assDe") + machineEnd;
 		mcHtml += "<img class='logo' src='projectlogos/asofterspace/logo.png' />";

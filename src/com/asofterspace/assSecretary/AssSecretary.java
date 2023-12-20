@@ -47,16 +47,17 @@ public class AssSecretary {
 	public final static String FACT_DIR = "../assTrainer/config";
 
 	public final static String PROGRAM_TITLE = "assSecretary (Hugo)";
-	public final static String VERSION_NUMBER = "0.0.4.4(" + Utils.TOOLBOX_VERSION_NUMBER + ")";
-	public final static String VERSION_DATE = "21. October 2020 - 13. November 2023";
+	public final static String VERSION_NUMBER = "0.0.4.5(" + Utils.TOOLBOX_VERSION_NUMBER + ")";
+	public final static String VERSION_DATE = "21. October 2020 - 20. December 2023";
 
 	private static Database database;
 
 	private static MissionControlDatabase missionControlDatabase;
-	private static VmInfo vmInfo;
-	private static WebInfo webInfo;
-	private static String memeInfo = "";
-	private static String memeInfoShort = "<span class='awesome'>Memes all different</span>";
+	private static VmInfo vmInfo = new VmInfo();
+	private static WebInfo webInfo = new WebInfo();
+
+	private static String localInfo = "";
+	private static String localInfoShort = "";
 
 
 	public static void main(String[] args) {
@@ -235,9 +236,28 @@ public class AssSecretary {
 			server.serve(async);
 
 
-			System.out.println("Performing startup tasks...");
+			int startupTaskRepeatTimeMinutes = 29;
+			System.out.println("Creating startup task thread to re-run tests every " + startupTaskRepeatTimeMinutes + " minutes...");
 
-			runStartupTasks();
+			Thread startupTaskThread = new Thread() {
+
+				public void run() {
+
+					while (true) {
+
+						runStartupTasks();
+
+						try {
+							// wait for a while
+							Thread.sleep(startupTaskRepeatTimeMinutes * 60 * 1000);
+						} catch (InterruptedException e) {
+							// task interrupted - let's bail, this is not so important anyway!
+							break;
+						}
+					}
+				}
+			};
+			startupTaskThread.start();
 
 
 			System.out.println("Saving database directly after startup to save amount of open tasks...");
@@ -264,6 +284,26 @@ public class AssSecretary {
 
 	public static void runStartupTasks() {
 
+		System.out.println("Performing startup tasks...");
+
+		localInfo = "";
+		localInfoShort = "";
+
+		checkWebAndVmStatus();
+
+		checkMemeFolder();
+
+		checkMusicFolder();
+
+		if ("".equals(localInfoShort)) {
+			localInfoShort = "<span class='awesome'>All is well</span>";
+		}
+
+		System.out.println("Startup tasks done!");
+	}
+
+	private static void checkWebAndVmStatus() {
+
 		webInfo = new WebInfo();
 		vmInfo = new VmInfo();
 
@@ -288,8 +328,6 @@ public class AssSecretary {
 		addWebInfo(webInfo, "supervision-earth", "sveWeb", "https://supervision.earth/", missionControlDatabase);
 		addWebInfo(webInfo, "supervision-earth", "sveApp", "https://supervisionspace.app/", missionControlDatabase);
 		addWebInfo(webInfo, "supervision-earth", "sveLB", "http://svs-backend-loadbalancer-1910963306.eu-central-1.elb.amazonaws.com/", missionControlDatabase);
-
-		checkMemeFolder();
 	}
 
 	private static void checkMemeFolder() {
@@ -304,7 +342,7 @@ public class AssSecretary {
 
 		Directory parent = new Directory(database.getMemePath());
 
-		boolean foundSome = false;
+		boolean foundSomeProblem = false;
 		boolean recursively = false;
 		List<File> files = parent.getAllFiles(recursively);
 		List<Long> fileSizes = new ArrayList<>();
@@ -318,7 +356,7 @@ public class AssSecretary {
 			for (int j = i+1; j < files.size(); j++) {
 				long jLen = fileSizes.get(j);
 				if (iLen == jLen) {
-					foundSome = true;
+					foundSomeProblem = true;
 					result.append("<div class='line'>");
 					result.append("<span class='error'>" + files.get(i).getCanonicalFilename() +
 						"</span> and <span class='error'>" + files.get(j).getCanonicalFilename() + "</span>");
@@ -328,9 +366,79 @@ public class AssSecretary {
 		}
 		result.append("</div>");
 
-		if (foundSome) {
-			memeInfo = result.toString();
-			memeInfoShort = "<span class='error'>Meme collision!</span>";
+		if (foundSomeProblem) {
+			localInfo += result.toString();
+			localInfoShort += "<span class='error'>Meme collision!</span> ";
+		}
+	}
+
+	private static void checkMusicFolder() {
+
+		StringBuilder result = new StringBuilder();
+		result.append("<div>");
+		result.append("<div class='line'>");
+		result.append("Music files are present in the backup which shouldn't be!<br>");
+		result.append("They are:");
+		result.append("</div>");
+
+		boolean foundSomeProblem = false;
+
+		String SOURCE_ID = "hdd_13_3";
+		String TARGET_ID = "hdd_21_1";
+
+		Directory sourceDir = null;
+
+		for (char driveLetter = 'A'; driveLetter < 'Z'; driveLetter++) {
+			Directory potentialSourceDir = new Directory("" + driveLetter + ":\\");
+			File sourceIdFile = new File(potentialSourceDir, SOURCE_ID + ".txt");
+			if (sourceIdFile.exists()) {
+				sourceDir = potentialSourceDir;
+			}
+		}
+
+		Directory targetDir = null;
+
+		for (char driveLetter = 'A'; driveLetter < 'Z'; driveLetter++) {
+			Directory potentialTargetDir = new Directory("" + driveLetter + ":\\");
+			File targetIdFile = new File(potentialTargetDir, TARGET_ID + ".txt");
+			if (targetIdFile.exists()) {
+				targetDir = potentialTargetDir;
+			}
+		}
+
+		if ((sourceDir != null) && (targetDir != null)) {
+			Directory checkSourceDir = new Directory(sourceDir, "videos (some)/Musik");
+			Directory checkTargetDir = new Directory(targetDir, "videos (actual)/Musik");
+			boolean recursively = true;
+			List<File> sourceFiles = checkSourceDir.getAllFiles(recursively);
+			List<String> sourceFileLocalNames = new ArrayList<>();
+			for (File sourceFile : sourceFiles) {
+				sourceFileLocalNames.add(sourceFile.getLocalFilename());
+			}
+			List<File> targetFiles = checkTargetDir.getAllFiles(recursively);
+			for (File targetFile : targetFiles) {
+				boolean found = false;
+				String targetLocalFilename = targetFile.getLocalFilename();
+				for (String sourceFileLocalName : sourceFileLocalNames) {
+					if (sourceFileLocalName.equals(targetLocalFilename)) {
+						found = true;
+						break;
+					}
+				}
+				if (!found) {
+					foundSomeProblem = true;
+					result.append("<div class='line'>");
+					result.append("<span class='error'>" + targetFile.getCanonicalFilename() + "</span>");
+					result.append("</div>");
+				}
+			}
+		}
+
+		result.append("</div>");
+
+		if (foundSomeProblem) {
+			localInfo += result.toString();
+			localInfoShort += "<span class='error'>Music backup problems!</span> ";
 		}
 	}
 
@@ -412,12 +520,12 @@ public class AssSecretary {
 		WebAccessor.getAsynch(url, callback);
 	}
 
-	public static String getMemeInfo() {
-		return memeInfo;
+	public static String getLocalInfo() {
+		return localInfo;
 	}
 
-	public static String getMemeInfoShort() {
-		return memeInfoShort;
+	public static String getLocalInfoShort() {
+		return localInfoShort;
 	}
 
 }
