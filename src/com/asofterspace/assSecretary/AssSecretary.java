@@ -407,29 +407,39 @@ public class AssSecretary {
 		}
 
 		if ((sourceDir != null) && (targetDir != null)) {
-			Directory checkSourceDir = new Directory(sourceDir, "videos (some)/Musik");
-			Directory checkTargetDir = new Directory(targetDir, "videos (actual)/Musik");
-			boolean recursively = true;
-			List<File> sourceFiles = checkSourceDir.getAllFiles(recursively);
-			List<String> sourceFileLocalNames = new ArrayList<>();
-			for (File sourceFile : sourceFiles) {
-				sourceFileLocalNames.add(sourceFile.getLocalFilename());
-			}
-			List<File> targetFiles = checkTargetDir.getAllFiles(recursively);
-			for (File targetFile : targetFiles) {
-				boolean found = false;
-				String targetLocalFilename = targetFile.getLocalFilename();
-				for (String sourceFileLocalName : sourceFileLocalNames) {
-					if (sourceFileLocalName.equals(targetLocalFilename)) {
-						found = true;
-						break;
-					}
+			List<String> folderNames = new ArrayList<>();
+			folderNames.add("Musik");
+			folderNames.add("Musik (karaoke)");
+			folderNames.add("Musik (Long Mixes)");
+			folderNames.add("Musik (sea noise)");
+			folderNames.add("Musik (together)");
+			folderNames.add("Musik (unsortiert)");
+
+			for (String folderName : folderNames) {
+				Directory checkSourceDir = new Directory(sourceDir, "videos (some)/" + folderName);
+				Directory checkTargetDir = new Directory(targetDir, "videos (actual)/" + folderName);
+				boolean recursively = true;
+				List<File> sourceFiles = checkSourceDir.getAllFiles(recursively);
+				List<String> sourceFileLocalNames = new ArrayList<>();
+				for (File sourceFile : sourceFiles) {
+					sourceFileLocalNames.add(sourceFile.getLocalFilename());
 				}
-				if (!found) {
-					foundSomeProblem = true;
-					result.append("<div class='line'>");
-					result.append("<span class='error'>" + targetFile.getCanonicalFilename() + "</span>");
-					result.append("</div>");
+				List<File> targetFiles = checkTargetDir.getAllFiles(recursively);
+				for (File targetFile : targetFiles) {
+					boolean found = false;
+					String targetLocalFilename = targetFile.getLocalFilename();
+					for (String sourceFileLocalName : sourceFileLocalNames) {
+						if (sourceFileLocalName.equals(targetLocalFilename)) {
+							found = true;
+							break;
+						}
+					}
+					if (!found) {
+						foundSomeProblem = true;
+						result.append("<div class='line'>");
+						result.append("<span class='error'>" + targetFile.getCanonicalFilename() + "</span>");
+						result.append("</div>");
+					}
 				}
 			}
 		}

@@ -129,6 +129,10 @@ public class Task extends GenericTask {
 			return "QZT";
 		}
 
+		if (tla.startsWith("wood")) {
+			return "WW";
+		}
+
 		switch (tla) {
 			case "private":
 				tla = AssSecretary.getDatabase().getUsername();
