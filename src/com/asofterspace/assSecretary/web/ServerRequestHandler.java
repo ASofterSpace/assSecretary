@@ -660,11 +660,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 				boolean historicalView = false;
 
-				Collections.sort(shortlistTasks, new Comparator<Task>() {
-					public int compare(Task a, Task b) {
-						return a.getCurrentPriority(today, historicalView) - b.getCurrentPriority(today, historicalView);
-					}
-				});
+				sortTasksByPriority(shortlistTasks, today, historicalView);
 
 				taskShortlistHtml.append("<div id='shortlist'>");
 				if (shortlistTasks.size() == 0) {
@@ -1772,7 +1768,12 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 		Collections.sort(tasks, new Comparator<Task>() {
 			public int compare(Task a, Task b) {
-				return a.getCurrentPriority(today, historicalView) - b.getCurrentPriority(today, historicalView);
+				int aCurPrio = a.getCurrentPriority(today, historicalView);
+				int bCurPrio = b.getCurrentPriority(today, historicalView);
+				if (aCurPrio != bCurPrio) {
+					return aCurPrio - bCurPrio;
+				}
+				return a.getTitle().toLowerCase().compareTo(b.getTitle().toLowerCase());
 			}
 		});
 	}
