@@ -803,6 +803,8 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 				addLine(vmStatsHtml, "AGSG", webInfo, "agsgOrg");
 
+				addLine(vmStatsHtml, "HERA", webInfo, "heraTasks");
+
 				addLine(vmStatsHtml, "Skyhook DB", vmInfo, "db");
 				addLine(vmStatsHtml, "Skyhook DB", webInfo, "skyDb");
 				addLine(vmStatsHtml, "Skyhook F1", vmInfo, "f1");
@@ -1446,9 +1448,9 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 		mcHtml += companyStart;
 		mcHtml += machineStart + "feministischerstreik.org<br>" + webInfo.get("femOrg") + machineEnd;
 		mcHtml += machineStart + "afghangirlssuccessgate.org<br>" + webInfo.get("agsgOrg") + machineEnd;
+		mcHtml += machineStart + "Hera Tasks<br>" + webInfo.get("heraTasks") + machineEnd;
 		mcHtml += machineStart + "ASS Odyssey MM-01<br>" + AssSecretary.getLocalInfoShort() + machineEnd;
-		mcHtml += machineStart + "asofterspace.com<br>" + webInfo.get("assEn") + machineEnd;
-		mcHtml += machineStart + "asofterspace.de<br>" + webInfo.get("assDe") + machineEnd;
+		mcHtml += machineStart + "asofterspace<br>.com: " + webInfo.get("assEn") + "<br>.de: " + webInfo.get("assDe") + machineEnd;
 		mcHtml += "<img class='logo' src='projectlogos/asofterspace/logo.png' />";
 		mcHtml += companyEnd;
 
