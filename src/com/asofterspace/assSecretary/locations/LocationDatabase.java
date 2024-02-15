@@ -41,6 +41,12 @@ public class LocationDatabase {
 
 		dataDir.create();
 
+		this.mainLocations = new ArrayList<>();
+		this.whenWheres = new ArrayList<>();
+	}
+
+	public void reload() {
+
 		this.dbFile = new JsonFile(dataDir, DB_FILE_NAME);
 		this.dbFile.createParentDirectory();
 		try {

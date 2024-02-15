@@ -47,10 +47,11 @@ public class AssSecretary {
 	public final static String FACT_DIR = "../assTrainer/config";
 
 	public final static String PROGRAM_TITLE = "assSecretary (Hugo)";
-	public final static String VERSION_NUMBER = "0.0.4.7(" + Utils.TOOLBOX_VERSION_NUMBER + ")";
-	public final static String VERSION_DATE = "21. October 2020 - 12. February 2024";
+	public final static String VERSION_NUMBER = "0.0.4.8(" + Utils.TOOLBOX_VERSION_NUMBER + ")";
+	public final static String VERSION_DATE = "21. October 2020 - 15. February 2024";
 
 	private static Database database;
+	private static LocationDatabase locationDB;
 
 	private static MissionControlDatabase missionControlDatabase;
 	private static VmInfo vmInfo = new VmInfo();
@@ -99,7 +100,7 @@ public class AssSecretary {
 
 		database = new Database(dataDir);
 		QuickDatabase quickDB = new QuickDatabase(dataDir);
-		LocationDatabase locationDB = new LocationDatabase(dataDir);
+		locationDB = new LocationDatabase(dataDir);
 
 		missionControlDatabase = new MissionControlDatabase(dataDir, "mission_control");
 
@@ -298,6 +299,8 @@ public class AssSecretary {
 		if ("".equals(localInfoShort)) {
 			localInfoShort = "<span class='awesome'>All is well</span>";
 		}
+
+		locationDB.reload();
 
 		System.out.println("Startup tasks done!");
 	}
