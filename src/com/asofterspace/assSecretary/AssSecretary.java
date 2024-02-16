@@ -97,18 +97,28 @@ public class AssSecretary {
 		Directory uploadDir = new Directory(UPLOAD_DIR);
 
 		System.out.println("Loading database...");
-
 		database = new Database(dataDir);
+
+		System.out.println("Loading quick db...");
 		QuickDatabase quickDB = new QuickDatabase(dataDir);
+
+		System.out.println("Loading location db...");
 		locationDB = new LocationDatabase(dataDir);
 
+		System.out.println("Loading mission control db...");
 		missionControlDatabase = new MissionControlDatabase(dataDir, "mission_control");
 
 		// this one can be static, as it does not ever really change anymore :)
+		System.out.println("Loading LTC db...");
 		LtcDatabase.init(dataDir);
 
+		System.out.println("Loading task db...");
 		TaskDatabase taskDatabase = new TaskDatabase(dataDir);
+
+		System.out.println("Loading fact...");
 		FactDatabase factDatabase = new FactDatabase(factDir);
+
+		System.out.println("Starting up task ctrl...");
 		TaskCtrl taskCtrl = new TaskCtrl(database, taskDatabase, locationDB, webRoot, uploadDir);
 
 
