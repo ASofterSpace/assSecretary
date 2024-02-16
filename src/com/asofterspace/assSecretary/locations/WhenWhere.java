@@ -43,6 +43,10 @@ public class WhenWhere {
 		return where;
 	}
 
+	public String getTime() {
+		return time;
+	}
+
 	public Date getDate() {
 		return date.getDate();
 	}
