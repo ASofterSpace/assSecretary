@@ -19,18 +19,13 @@ import java.util.List;
 
 public class LocationDatabase {
 
-	private static final String DB_FILE_NAME = "locations.json";
+	private static final String[] DB_FILE_NAMES = { "locations_0_old.json", "locations_1_mid.json", "locations_2_cur.json" };
 
 	private Directory dataDir;
 
 	private JsonFile dbFile;
 
-	private JSON root;
-
-	private List<String> mainLocations;
 	private List<WhenWhere> whenWheres;
-
-	private static String MAIN_LOCATIONS = "mainLocations";
 
 	private static String WHEN_WHERE = "whenWhere";
 
@@ -41,27 +36,27 @@ public class LocationDatabase {
 
 		dataDir.create();
 
-		this.mainLocations = new ArrayList<>();
 		this.whenWheres = new ArrayList<>();
 	}
 
 	public void reload() {
 
-		this.dbFile = new JsonFile(dataDir, DB_FILE_NAME);
-		this.dbFile.createParentDirectory();
-		try {
-			this.root = dbFile.getAllContents();
-		} catch (JsonParseException e) {
-			System.err.println("LocationDB could not be loaded! This will be ignored...");
-			e.printStackTrace(System.err);
-			return;
-		}
-
-		this.mainLocations = root.getArrayAsStringList(MAIN_LOCATIONS);
-
 		this.whenWheres = new ArrayList<>();
-		for (Record rec : root.getArray(WHEN_WHERE)) {
-			this.whenWheres.add(new WhenWhere(rec));
+
+		for (int i = 0; i < 3; i++) {
+			this.dbFile = new JsonFile(dataDir, DB_FILE_NAMES[i]);
+			this.dbFile.createParentDirectory();
+			try {
+				JSON root = dbFile.getAllContents();
+
+				for (Record rec : root.getArray(WHEN_WHERE)) {
+					this.whenWheres.add(new WhenWhere(rec));
+				}
+			} catch (JsonParseException e) {
+				System.err.println("LocationDB " + i + ": " + DB_FILE_NAMES[i] + " could not be loaded! This will be ignored...");
+				e.printStackTrace(System.err);
+				return;
+			}
 		}
 	}
 
@@ -133,6 +128,7 @@ public class LocationDatabase {
 		return result;
 	}
 
+/*
 	public void save() {
 
 		if (root == null) {
@@ -140,8 +136,6 @@ public class LocationDatabase {
 		}
 
 		root.makeObject();
-
-		root.set(MAIN_LOCATIONS, mainLocations);
 
 		List<Record> whenWhereRecs = new ArrayList<>();
 		for (WhenWhere whenWhere : whenWheres) {
@@ -152,5 +146,6 @@ public class LocationDatabase {
 		dbFile.setAllContents(root);
 		dbFile.save();
 	}
+*/
 
 }
