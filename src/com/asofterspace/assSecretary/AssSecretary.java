@@ -329,6 +329,9 @@ public class AssSecretary {
 
 		addWebInfo(webInfo, "HERA", "heraTasks", "https://asofterspace.com/heraTasks/", missionControlDatabase);
 
+		addWebInfo(webInfo, "WoodWatchers", "wwFrontend", "https://woodwatchers.org/", missionControlDatabase);
+		addWebInfo(webInfo, "WoodWatchers", "wwBackend", "https://asofterspace.com/woodWatchers/", missionControlDatabase);
+
 		addVmInfo(vmInfo, "skyhook", "db", missionControlDatabase);
 		addVmInfo(vmInfo, "skyhook", "f1", missionControlDatabase);
 		addVmInfo(vmInfo, "skyhook", "f2", missionControlDatabase);

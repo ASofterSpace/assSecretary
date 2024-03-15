@@ -803,7 +803,10 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 				addLine(vmStatsHtml, "AGSG", webInfo, "agsgOrg");
 
-				addLine(vmStatsHtml, "HERA", webInfo, "heraTasks");
+				addLine(vmStatsHtml, "WoodWatchers", webInfo, "wwFrontend");
+				addLine(vmStatsHtml, "WoodWatchers", webInfo, "wwBackend");
+
+				addLine(vmStatsHtml, "CielHeraTaskList", webInfo, "heraTasks");
 
 				addLine(vmStatsHtml, "Skyhook DB", vmInfo, "db");
 				addLine(vmStatsHtml, "Skyhook DB", webInfo, "skyDb");
@@ -1446,8 +1449,10 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 		String machineSeparator = "<div class='machine_separator'>*</div>";
 
 		mcHtml += companyStart;
-		mcHtml += machineStart + "feministischerstreik.org<br>" + webInfo.get("femOrg") + machineEnd;
-		mcHtml += machineStart + "afghangirlssuccessgate.org<br>" + webInfo.get("agsgOrg") + machineEnd;
+		mcHtml += machineStart + "feministischerstreik.org<br>" + webInfo.get("femOrg") + "<br><br>" +
+			"afghangirlssuccessgate.org<br>" + webInfo.get("agsgOrg") + machineEnd;
+		mcHtml += machineStart + "WoodWatchers<br>front: " + webInfo.get("wwFrontend") + "<br>" +
+			"back: " + webInfo.get("wwBackend") + machineEnd;
 		mcHtml += machineStart + "Hera Tasks<br>" + webInfo.get("heraTasks") + machineEnd;
 		mcHtml += machineStart + "ASS Odyssey MM-01<br>" + AssSecretary.getLocalInfoShort() + machineEnd;
 		mcHtml += machineStart + "asofterspace<br>.com: " + webInfo.get("assEn") + "<br>.de: " + webInfo.get("assDe") + machineEnd;
