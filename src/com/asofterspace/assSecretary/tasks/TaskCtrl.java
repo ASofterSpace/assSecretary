@@ -909,6 +909,8 @@ public class TaskCtrl extends TaskCtrlBase {
 
 		StringBuilder taskHtml = new StringBuilder();
 
+		boolean firstDay = true;
+
 		for (Date day : days) {
 			taskHtml.append("<div class='separator_top'>&nbsp;</div>");
 			taskHtml.append("<div class='separator_bottom'>&nbsp;</div>");
@@ -925,10 +927,15 @@ public class TaskCtrl extends TaskCtrlBase {
 				}
 			}
 
-			// add scheduled base task instances
-			for (Task task : baseTasksForSchedule) {
-				if (task.getShowAsScheduled() && task.isScheduledOn(day)) {
-					tasksToday.add(task);
+			// the first day, only have the single task instances, not the repeated base tasks!
+			if (firstDay) {
+				firstDay = false;
+			} else {
+				// add scheduled base task instances
+				for (Task task : baseTasksForSchedule) {
+					if (task.getShowAsScheduled() && task.isScheduledOn(day)) {
+						tasksToday.add(task);
+					}
 				}
 			}
 
