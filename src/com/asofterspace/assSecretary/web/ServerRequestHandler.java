@@ -808,6 +808,8 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 				addLine(vmStatsHtml, "CielHeraTaskList", webInfo, "heraTasks");
 
+				addLine(vmStatsHtml, "QZT InstaPostCreator", webInfo, "qztIPC");
+
 				addLine(vmStatsHtml, "Skyhook DB", vmInfo, "db");
 				addLine(vmStatsHtml, "Skyhook DB", webInfo, "skyDb");
 				addLine(vmStatsHtml, "Skyhook F1", vmInfo, "f1");
@@ -1453,7 +1455,8 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 			"afghangirlssuccessgate.org<br>" + webInfo.get("agsgOrg") + machineEnd;
 		mcHtml += machineStart + "WoodWatchers<br>front: " + webInfo.get("wwFrontend") + "<br>" +
 			"back: " + webInfo.get("wwBackend") + machineEnd;
-		mcHtml += machineStart + "Hera Tasks<br>" + webInfo.get("heraTasks") + machineEnd;
+		mcHtml += machineStart + "Hera Tasks<br>" + webInfo.get("heraTasks") + "<br><br>" +
+			"QZT InstaPostCreator<br>" + webInfo.get("qztIPC") + machineEnd;
 		mcHtml += machineStart + "ASS Odyssey MM-01<br>" + AssSecretary.getLocalInfoShort() + machineEnd;
 		mcHtml += machineStart + "asofterspace<br>.com: " + webInfo.get("assEn") + "<br>.de: " + webInfo.get("assDe") + machineEnd;
 		mcHtml += "<img class='logo' src='projectlogos/asofterspace/logo.png' />";
