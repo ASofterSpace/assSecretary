@@ -877,11 +877,12 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 				indexContent = StrUtils.replaceAll(indexContent, "[[TASKS]]", taskHtml.toString());
 
 
+				List<Task> currentTasks = tasks;
+
 				tasks = new ArrayList<>();
 
 				Date tomorrow = DateUtils.daysInTheFuture(1);
 
-				List<Task> currentTasks = tasks;
 				for (Task task : currentTasks) {
 					if (task.appliesTo(tomorrow)) {
 						tasks.add(task);
