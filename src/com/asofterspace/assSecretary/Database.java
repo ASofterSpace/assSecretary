@@ -47,6 +47,11 @@ public class Database {
 	private Map<String, Object> currentTaskInstanceAmounts;
 	private Map<String, Object> doneTaskInstanceAmounts;
 
+	private String eventListURL = null;
+	private String eventListDir = null;
+	private Directory eventListDirectory = null;
+	private String eventListLatest = null;
+
 	private static String PORT = "port";
 	private static String USERNAME = "username";
 	private static String INBOX_CONTENT = "inboxContent";
@@ -58,6 +63,9 @@ public class Database {
 	private static String CURRENT_TASK_INSTANCE_AMOUNTS = "currentTaskInstanceAmounts";
 	private static String DONE_TASK_INSTANCE_AMOUNTS = "doneTaskInstanceAmounts";
 	private static String MEME_PATH = "memepath";
+	private static String EVENT_LIST_URL = "eventListURL";
+	private static String EVENT_LIST_DIR = "eventListDir";
+	private static String EVENT_LIST_LATEST = "eventListLatest";
 
 
 	public Database(Directory dataDir) {
@@ -105,6 +113,14 @@ public class Database {
 		this.currentTaskInstanceAmounts = root.getObjectMap(CURRENT_TASK_INSTANCE_AMOUNTS);
 
 		this.doneTaskInstanceAmounts = root.getObjectMap(DONE_TASK_INSTANCE_AMOUNTS);
+
+		this.eventListURL = root.getString(EVENT_LIST_URL);
+
+		this.eventListDir = root.getString(EVENT_LIST_DIR);
+
+		this.eventListDirectory = new Directory(this.eventListDir);
+
+		this.eventListLatest = root.getString(EVENT_LIST_LATEST);
 	}
 
 	public Record getRoot() {
@@ -161,6 +177,12 @@ public class Database {
 			taskCtrl.getDoneTaskInstancesAsTasks().size());
 		root.set(DONE_TASK_INSTANCE_AMOUNTS, doneTaskInstanceAmounts);
 
+		root.set(EVENT_LIST_URL, eventListURL);
+
+		root.set(EVENT_LIST_DIR, eventListDir);
+
+		root.set(EVENT_LIST_LATEST, eventListLatest);
+
 		dbFile.setAllContents(root);
 		dbFile.save();
 	}
@@ -211,6 +233,22 @@ public class Database {
 
 	public String getMemePath() {
 		return memePath;
+	}
+
+	public Directory getEventListDirectory() {
+		return eventListDirectory;
+	}
+
+	public String getEventListURL() {
+		return eventListURL;
+	}
+
+	public String getEventListLatest() {
+		return eventListLatest;
+	}
+
+	public void setEventListLatest(String eventListLatest) {
+		this.eventListLatest = eventListLatest;
 	}
 
 }

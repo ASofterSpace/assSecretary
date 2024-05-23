@@ -4,6 +4,7 @@
  */
 package com.asofterspace.assSecretary;
 
+import com.asofterspace.assSecretary.eventList.EventListDatabase;
 import com.asofterspace.assSecretary.facts.FactDatabase;
 import com.asofterspace.assSecretary.locations.LocationDatabase;
 import com.asofterspace.assSecretary.ltc.LtcDatabase;
@@ -47,8 +48,8 @@ public class AssSecretary {
 	public final static String FACT_DIR = "../assTrainer/config";
 
 	public final static String PROGRAM_TITLE = "assSecretary (Hugo)";
-	public final static String VERSION_NUMBER = "0.0.5.1(" + Utils.TOOLBOX_VERSION_NUMBER + ")";
-	public final static String VERSION_DATE = "21. October 2020 - 20. May 2024";
+	public final static String VERSION_NUMBER = "0.0.5.2(" + Utils.TOOLBOX_VERSION_NUMBER + ")";
+	public final static String VERSION_DATE = "21. October 2020 - 23. May 2024";
 
 	private static Database database;
 	private static LocationDatabase locationDB;
@@ -115,8 +116,11 @@ public class AssSecretary {
 		System.out.println("Loading task db...");
 		TaskDatabase taskDatabase = new TaskDatabase(dataDir);
 
-		System.out.println("Loading fact...");
+		System.out.println("Loading facts...");
 		FactDatabase factDatabase = new FactDatabase(factDir);
+
+		System.out.println("Loading event list...");
+		EventListDatabase.init(database);
 
 		System.out.println("Starting up task ctrl...");
 		TaskCtrl taskCtrl = new TaskCtrl(database, taskDatabase, locationDB, webRoot, uploadDir);
@@ -306,6 +310,8 @@ public class AssSecretary {
 
 		checkMusicFolder();
 
+		EventListDatabase.runEventListBackup();
+
 		if ("".equals(localInfoShort)) {
 			localInfoShort = "<span class='awesome'>All is well</span>";
 		}
@@ -340,14 +346,6 @@ public class AssSecretary {
 		addWebInfo(webInfo, "skyhook", "skyWeb", "https://skyhook.is/", missionControlDatabase);
 		addWebInfo(webInfo, "skyhook", "skyApp", "https://app.skyhook.is/", missionControlDatabase);
 		addWebInfo(webInfo, "skyhook", "skyDb", "http://skyhookdb.skyhook.is/phpmyadmin/", missionControlDatabase);
-
-		// this call was unreliable, sometimes working, often giving nonsense - so we prefer to get rid of it,
-		// such that all calls that are present always work, and when something is not working, it is actually
-		// seen as important rather than as "just one more thing that always fails"
-		// addVmInfo(vmInfo, "supervision-earth", "svs-backend", missionControlDatabase);
-		addWebInfo(webInfo, "supervision-earth", "sveWeb", "https://supervision.earth/", missionControlDatabase);
-		addWebInfo(webInfo, "supervision-earth", "sveApp", "https://supervisionspace.app/", missionControlDatabase);
-		addWebInfo(webInfo, "supervision-earth", "sveLB", "http://svs-backend-loadbalancer-1910963306.eu-central-1.elb.amazonaws.com/", missionControlDatabase);
 	}
 
 	private static void checkMemeFolder() {

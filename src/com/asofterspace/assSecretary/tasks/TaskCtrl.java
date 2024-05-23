@@ -5,6 +5,7 @@
 package com.asofterspace.assSecretary.tasks;
 
 import com.asofterspace.assSecretary.Database;
+import com.asofterspace.assSecretary.eventList.EventListDatabase;
 import com.asofterspace.assSecretary.locations.LocationDatabase;
 import com.asofterspace.assSecretary.locations.LocationUtils;
 import com.asofterspace.assSecretary.ltc.LtcDatabase;
@@ -790,7 +791,7 @@ public class TaskCtrl extends TaskCtrlBase {
 	}
 
 	/**
-	 * To the list of tasks add task instances from Mari, from the assWorkbench and from the legacy LTC
+	 * To the list of tasks add task instances from Mari, from the assWorkbench, from the legacy LTC and from the event list
 	 */
 	public List<Task> addExternalTaskInstances(List<Task> tasks, Date from, Date to, boolean onlyGetDone) {
 
@@ -872,6 +873,12 @@ public class TaskCtrl extends TaskCtrlBase {
 			// ignore onlyGetDone, as all LTC tasks are done ;)
 			List<Task> ltcTasks = LtcDatabase.getTaskInstances(from, to);
 			tasks.addAll(ltcTasks);
+		}
+
+		// none of the event list tasks are done, as they are all just future-y tasks ;)
+		if (!onlyGetDone) {
+			List<Task> eventListTasks = EventListDatabase.getTaskInstances(from, to);
+			tasks.addAll(eventListTasks);
 		}
 
 		return tasks;

@@ -174,6 +174,10 @@ public class Task extends GenericTask {
 	 */
 	public int getCurrentPriority(Date currentDay, boolean historicalView) {
 
+		if ("EVE".equals(externalSource)) {
+			return MAX_PRIORITY;
+		}
+
 		// if this task is "scheduled" for a particular time (so if its title starts with "HH:MM "
 		// or "HH:MM.."), then reduce priority by A LOT, also based on the time, so that timed
 		// entries are (nearly) always at the top of the list, sorted by their time
@@ -352,12 +356,16 @@ public class Task extends GenericTask {
 
 		String miniBtnStyle = "margin-left: 0.5%; box-sizing: border-box; ";
 		String btnStyle = "width: 6%; " + miniBtnStyle;
+		String customStyle = "";
+		if ("EVE".equals(getOrigin())) {
+			customStyle = " style='color: #EEF; font-style: italic;'";
+		}
 
 		if (onShortlist) {
 			// tasks on the shortlist are not affected by such mundane things as filtering etc.
 			html.append("<div class='line' id='task-");
 			html.append(id);
-			html.append("-on-shortlist'>");
+			html.append("-on-shortlist'" + customStyle + ">");
 
 			html.append("<span style='width: 2.5%; ");
 			String leftButtonStyle = miniBtnStyle;
@@ -380,14 +388,14 @@ public class Task extends GenericTask {
 		} else {
 			if (standalone) {
 				// standalone tasks are not affected by such mundane things as filtering etc. either
-				html.append("<div class='line'>");
+				html.append("<div class='line'" + customStyle + ">");
 			} else {
 				html.append("<div class='line task task-with-origin-");
 				html.append(getOrigin());
 				html.append(additionalClassName);
 				html.append("' id='task-");
 				html.append(id);
-				html.append("'>");
+				html.append("'" + customStyle + ">");
 			}
 		}
 		if (reducedView) {
@@ -525,12 +533,15 @@ public class Task extends GenericTask {
 
 			if (externalSource != null) {
 
-				html.append("<span style='width: 8%; " + miniBtnStyle + "' class='button'>");
-				html.append("(from ");
-				html.append(externalSource);
-				html.append(")");
-				html.append("</span>");
-				mainWidth -= 8.5;
+				// do not show EVE origin button on weekly and monthly view as it is a bit disrupting the flow ^^
+				if ((!reducedView) || !"EVE".equals(externalSource)) {
+					html.append("<span style='width: 8%; " + miniBtnStyle + "' class='button'>");
+					html.append("(from ");
+					html.append(externalSource);
+					html.append(")");
+					html.append("</span>");
+					mainWidth -= 8.5;
+				}
 
 			} else if (workbenchLink != null) {
 

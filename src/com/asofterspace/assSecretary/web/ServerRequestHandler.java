@@ -817,11 +817,6 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 				addLine(vmStatsHtml, "Skyhook App", webInfo, "skyApp");
 				addLine(vmStatsHtml, "Skyhook Webpage", webInfo, "skyWeb");
 
-				// addLine(vmStatsHtml, "Supervision Earth svs-backend", vmInfo, "svs-backend");
-				addLine(vmStatsHtml, "Supervision Earth App Frontend", webInfo, "sveApp");
-				addLine(vmStatsHtml, "Supervision Earth App Backend", webInfo, "sveLB");
-				addLine(vmStatsHtml, "Supervision Earth Webpage", webInfo, "sveWeb");
-
 				if (vmStatsHtml.length() < 1) {
 					vmStatsHtml.insert(0, "I have checked the VM disk statusses and web accessibility - and all is fine.");
 				} else {
@@ -886,7 +881,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 				Date tomorrow = DateUtils.daysInTheFuture(1);
 
-				List<Task> currentTasks = taskCtrl.getCurrentTaskInstancesAsTasks();
+				List<Task> currentTasks = tasks;
 				for (Task task : currentTasks) {
 					if (task.appliesTo(tomorrow)) {
 						tasks.add(task);
@@ -1451,12 +1446,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 		String machineSeparator = "<div class='machine_separator'>*</div>";
 
 		mcHtml += companyStart;
-		mcHtml += machineStart + "feministischerstreik.org<br>" + webInfo.get("femOrg") + "<br><br>" +
-			"afghangirlssuccessgate.org<br>" + webInfo.get("agsgOrg") + machineEnd;
-		mcHtml += machineStart + "WoodWatchers<br>front: " + webInfo.get("wwFrontend") + "<br>" +
-			"back: " + webInfo.get("wwBackend") + machineEnd;
-		mcHtml += machineStart + "Hera Tasks<br>" + webInfo.get("heraTasks") + "<br><br>" +
-			"QZT InstaPostCreator<br>" + webInfo.get("qztIPC") + machineEnd;
+		mcHtml += machineStart + "Hera Tasks<br>" + webInfo.get("heraTasks") + machineEnd;
 		mcHtml += machineStart + "ASS Odyssey MM-01<br>" + AssSecretary.getLocalInfoShort() + machineEnd;
 		mcHtml += machineStart + "asofterspace<br>.com: " + webInfo.get("assEn") + "<br>.de: " + webInfo.get("assDe") + machineEnd;
 		mcHtml += "<img class='logo' src='projectlogos/asofterspace/logo.png' />";
@@ -1472,12 +1462,12 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 		mcHtml += companyEnd;
 
 		mcHtml += companyStart;
-		mcHtml += machineStart + "Webpage<br>" + webInfo.get("sveWeb") + machineEnd;
-		mcHtml += machineStart + "App Frontend<br>" + webInfo.get("sveApp") + machineEnd;
-		mcHtml += machineStart + "App Backend<br>" + webInfo.get("sveLB") +
-			// "<br>" + vmInfo.get("svs-backend") +
-			machineEnd;
-		mcHtml += "<img class='logo' src='projectlogos/supervisionearth/logo.png' />";
+		mcHtml += machineStart + "feministischerstreik.org<br>" + webInfo.get("femOrg") + machineEnd;
+		mcHtml += machineStart + "afghangirlssuccessgate.org<br>" + webInfo.get("agsgOrg") + machineEnd;
+		mcHtml += machineStart + "WoodWatchers<br>front: " + webInfo.get("wwFrontend") + "<br>" +
+			"back: " + webInfo.get("wwBackend") + machineEnd;
+		mcHtml += machineStart + "QZT InstaPostCreator<br>" + webInfo.get("qztIPC") + machineEnd;
+		mcHtml += "<img class='logo' src='projectlogos/da/logo.png' />";
 		mcHtml += companyEnd;
 
 		return mcHtml;
