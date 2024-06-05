@@ -48,8 +48,8 @@ public class AssSecretary {
 	public final static String FACT_DIR = "../assTrainer/config";
 
 	public final static String PROGRAM_TITLE = "assSecretary (Hugo)";
-	public final static String VERSION_NUMBER = "0.0.5.2(" + Utils.TOOLBOX_VERSION_NUMBER + ")";
-	public final static String VERSION_DATE = "21. October 2020 - 23. May 2024";
+	public final static String VERSION_NUMBER = "0.0.5.3(" + Utils.TOOLBOX_VERSION_NUMBER + ")";
+	public final static String VERSION_DATE = "21. October 2020 - 5. June 2024";
 
 	private static Database database;
 	private static LocationDatabase locationDB;
@@ -336,6 +336,8 @@ public class AssSecretary {
 		addWebInfo(webInfo, "HERA", "heraTasks", "https://asofterspace.com/heraTasks/", missionControlDatabase);
 
 		addWebInfo(webInfo, "QZT", "qztIPC", "https://asofterspace.com/qzt/instaPostCreator/", missionControlDatabase);
+
+		addWebInfo(webInfo, "SB", "sbWW", "https://asofterspace.com/services/seebruecke/wegweiser/index.htm", missionControlDatabase);
 
 		addWebInfo(webInfo, "WoodWatchers", "wwFrontend", "https://woodwatchers.org/", missionControlDatabase);
 		addWebInfo(webInfo, "WoodWatchers", "wwBackend", "https://asofterspace.com/woodWatchers/", missionControlDatabase);
