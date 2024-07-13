@@ -347,6 +347,8 @@ public class Task extends GenericTask {
 
 		String id = getId();
 
+		html.append("\n");
+
 		// by default, main Width is the full 100%
 		float mainWidth = 100;
 
@@ -376,13 +378,6 @@ public class Task extends GenericTask {
 			html.append("-on-shortlist'>");
 			html.append("[&nbsp;&nbsp;]");
 			html.append("</span>");
-			html.append("<script>\n");
-			html.append("window.setTimeout(function() {\n");
-			html.append("  document.getElementById('select-task-" + id + "-on-shortlist').onclick = function (e) {\n");
-			html.append("    secretary.taskSelect(\"" + id + "\", false, false, e);\n");
-			html.append("  };\n");
-			html.append("}, 100);\n");
-			html.append("</script>");
 			mainWidth -= 3;
 
 		} else {
@@ -708,19 +703,13 @@ public class Task extends GenericTask {
 						mainWidth -= 3;
 
 						// append entry to shortlist TLA object, which is used to move multiple entries to another day
-						html.append("<script>\n");
-						html.append("if (!window.shortlistTLAs) {\n");
-						html.append("  window.shortlistTLAs = {};\n");
-						html.append("}\n");
-						html.append("if (!window.shortlistTLAs." + tla + ") {\n");
-						html.append("  window.shortlistTLAs." + tla + " = [];\n");
-						html.append("}\n");
 						// for this functionality, timed entries should not be included as they should not be forwarded
 						// together with the rest
 						if (!isTimedEntry()) {
+							html.append("<script>\n");
 							html.append("window.shortlistTLAs." + tla + ".push(\"" + id + "\");\n");
+							html.append("</script>\n");
 						}
-						html.append("</script>\n");
 					} else {
 						html.append("<span style='width: 2.5%; ");
 						html.append(miniBtnStyle);

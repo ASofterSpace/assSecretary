@@ -479,6 +479,9 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 	protected File getFileFromLocation(String location, String[] arguments) {
 
 		System.out.println("debug 1: " + location);
+		for (String arg : arguments) {
+			System.out.println(arg);
+		}
 
 		File sideBarImageFile = SideBarCtrl.getSideBarImageFile(location);
 		if (sideBarImageFile != null) {
@@ -681,6 +684,9 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 				System.out.println("debug 9");
 
+				Set<String> tlas = new HashSet<>();
+				List<String> shortlistIds = taskCtrl.getShortlistIDs();
+
 				taskShortlistHtml.append("<div id='shortlist'>");
 				if (shortlistTasks.size() == 0) {
 					taskShortlistHtml.append("<div>The task shortlist is empty - well done!</div>");
@@ -697,6 +703,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 					boolean standalone = false;
 					for (Task shortlistTask : shortlistTasks) {
 						shortlistTask.appendHtmlTo(taskShortlistHtml, historicalView, reducedView, onShortlist, today, standalone, SHOW_BUTTONS, "");
+						tlas.add(shortlistTask.getOriginTLA());
 					}
 				}
 				taskShortlistHtml.append("</div>\n");
@@ -719,7 +726,23 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 				taskShortlistHtml.append("window.setTimeout(window.reevaluateShortlistAmount, 100);\n");
 				taskShortlistHtml.append("window.setTimeout(window.reevaluateShortlistAmount, 1000);\n");
 				taskShortlistHtml.append("window.setTimeout(window.reevaluateShortlistAmount, 2000);\n");
+				taskShortlistHtml.append("window.setTimeout(function() {\n");
+				for (String id : shortlistIds) {
+					taskShortlistHtml.append("  document.getElementById('select-task-" + id + "-on-shortlist').onclick = function (e) {\n");
+					taskShortlistHtml.append("    secretary.taskSelect('" + id + "', false, false, e);\n");
+					taskShortlistHtml.append("  };\n");
+				}
+				taskShortlistHtml.append("}, 100);\n");
 				taskShortlistHtml.append("</script>\n");
+
+				StringBuilder scriptHtml = new StringBuilder();
+				scriptHtml.append("window.shortlistTLAs = {\n");
+				for (String tla : tlas) {
+					scriptHtml.append("  " + tla + ": [],\n");
+				}
+				scriptHtml.append("};\n");
+
+				indexContent = StrUtils.replaceAll(indexContent, "[[SCRIPT_CODE]]", scriptHtml.toString());
 
 				indexContent = StrUtils.replaceAll(indexContent, "[[TASK_SHORTLIST]]", taskShortlistHtml.toString());
 
@@ -894,25 +917,30 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 				System.out.println("debug 13");
 
-				List<Task> tasks = taskCtrl.getCurrentTaskInstancesAsTasks();
+				// no need to show the shortlist tasks a second time ^^
+				List<Task> tasks = taskCtrl.getCurrentTaskInstancesAsTasksWithoutShortlistTasks();
 
 				StringBuilder taskHtml = new StringBuilder();
 				boolean reducedView = false;
 				boolean onShortlist = false;
 				boolean standalone = false;
 
-				sortTasksByDate(tasks);
-
-				for (Task task : tasks) {
-					task.appendHtmlTo(taskHtml, historicalView, reducedView, onShortlist, today, standalone, SHOW_BUTTONS, " date-sorted-task");
+				boolean sortbyDate = false;
+				for (String arg : arguments) {
+					if ("sortby=date".equals(arg)) {
+						sortbyDate = true;
+					}
+				}
+				if (sortbyDate) {
+					sortTasksByDate(tasks);
+					indexContent = StrUtils.replaceAll(indexContent, "[[SORT_MODE]]", "Date");
+				} else {
+					sortTasksByPriority(tasks, today, historicalView);
+					indexContent = StrUtils.replaceAll(indexContent, "[[SORT_MODE]]", "Priority");
 				}
 
-				System.out.println("debug 14");
-
-				sortTasksByPriority(tasks, today, historicalView);
-
 				for (Task task : tasks) {
-					task.appendHtmlTo(taskHtml, historicalView, reducedView, onShortlist, today, standalone, SHOW_BUTTONS, " priority-sorted-task");
+					task.appendHtmlTo(taskHtml, historicalView, reducedView, onShortlist, today, standalone, SHOW_BUTTONS, " ");
 				}
 
 				indexContent = StrUtils.replaceAll(indexContent, "[[TASKS]]", taskHtml.toString());
@@ -922,13 +950,13 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 				List<Task> currentTasks = tasks;
 
-				tasks = new ArrayList<>();
+				List<Task> tomorrowTasks = new ArrayList<>();
 
 				Date tomorrow = DateUtils.daysInTheFuture(1);
 
 				for (Task task : currentTasks) {
 					if (task.appliesToDay(tomorrow, today)) {
-						tasks.add(task);
+						tomorrowTasks.add(task);
 					}
 				}
 
@@ -941,11 +969,11 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 				for (Task task : baseTasksForSchedule) {
 					if (task.getShowAsScheduled() && task.isScheduledOn(tomorrowCal)) {
-						tasks.add(task);
+						tomorrowTasks.add(task);
 					}
 				}
 
-				sortTasksByPriority(tasks, tomorrow, historicalView);
+				sortTasksByPriority(tomorrowTasks, tomorrow, historicalView);
 
 				System.out.println("debug 17");
 
@@ -964,11 +992,9 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 				boolean appendedOne = false;
 
-				if (tasks.size() > 0) {
-					for (Task task : tasks) {
-						task.appendHtmlTo(taskHtml, historicalView, reducedView, onShortlist, today, standalone, SHOW_BUTTONS, "");
-						appendedOne = true;
-					}
+				for (Task task : tomorrowTasks) {
+					task.appendHtmlTo(taskHtml, historicalView, reducedView, onShortlist, today, standalone, SHOW_BUTTONS, "");
+					appendedOne = true;
 				}
 
 				taskHtml.append("</div>");

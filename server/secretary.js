@@ -280,6 +280,8 @@ window.secretary = {
 			modal.style.display = "none";
 		}
 
+		/*
+		even though data may have changed, do not reload for faster operations
 		// if we are on the inbox page, and the inbox is dirty, then save it before refreshing the page!
 		if (window.saveDirtyInbox && window.inboxDirty) {
 			window.saveDirtyInbox();
@@ -292,6 +294,7 @@ window.secretary = {
 			// reload, as data might have changed while the modal was open...
 			window.location.reload(false);
 		}
+		*/
 	},
 
 	closeRepeatingTaskModal: function() {
@@ -300,8 +303,10 @@ window.secretary = {
 			modal.style.display = "none";
 		}
 
-		// reload, as data might have changed while the modal was open...
+		/*
+		even though data may have changed, do not reload for faster operations
 		window.location.reload(false);
+		*/
 	},
 
 	taskDetails: function(id) {
@@ -584,7 +589,7 @@ window.secretary = {
 		}
 	},
 
-	doDeleteTask: function(id) {
+	doDeleteTask: function() {
 
 		this.closeDeleteTaskModal();
 
@@ -595,8 +600,8 @@ window.secretary = {
 		request.onreadystatechange = function() {
 			if (request.readyState == 4 && request.status == 200) {
 				var result = JSON.parse(request.response);
-				if (result.success) {
-					window.location.reload(false);
+				if (!result.success) {
+					alert("Deleting was unsuccessful, maybe refresh the page!");
 				}
 			}
 		}
@@ -606,6 +611,18 @@ window.secretary = {
 		};
 
 		request.send(JSON.stringify(data));
+
+		window.setTimeout(function() {
+			var id = window.secretary.currentlyDeleting;
+			var el = document.getElementById("task-" + id);
+			if (el) {
+				el.parentNode.removeChild(el);
+			}
+			var el = document.getElementById("task-" + id + "-on-shortlist");
+			if (el) {
+				el.parentNode.removeChild(el);
+			}
+		}, 100);
 	},
 
 	taskAddToShortList: function(id) {
@@ -773,12 +790,11 @@ window.secretary = {
 		var sortTasks = document.getElementById("sortTasks");
 		if (sortTasks) {
 			if (sortTasks.innerHTML.indexOf("Date") >= 0) {
-				sortTasks.innerHTML = "Priority Sorting";
+				window.location = "/";
 			} else {
-				sortTasks.innerHTML = "Date Sorting";
+				window.location = "/?sortby=date";
 			}
 		}
-		this.filterTasks();
 	},
 
 	toggleTaskFutureView: function() {
@@ -898,6 +914,9 @@ window.secretary = {
 					var started = false;
 					var breakafter = false;
 					for (var i = 0; i < allTaskDivs.length; i++) {
+						if (!allTaskDivs[i].id) {
+							continue;
+						}
 						if ((allTaskDivs[i].id == "task-" + id + "-on-shortlist") ||
 							(allTaskDivs[i].id == "task-" + this.lastClickedTaskId + "-on-shortlist")) {
 							if (started) {
@@ -1029,6 +1048,14 @@ window.secretary = {
 			}
 		}
 		this.copyToClipboard(text);
+	},
+
+	setSiDur: function(newVal) {
+		document.getElementById('singleTaskDuration').value = newVal;
+	},
+
+	setRepDur: function(newVal) {
+		document.getElementById('repeatingTaskDuration').value = newVal;
 	},
 
 }

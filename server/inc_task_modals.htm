@@ -30,15 +30,15 @@
 					<input id="singleTaskDuration" type="text" value="00:00" style="width: 100%;" />
 				</div>
 				<div class="buttonBar verticalButtonBar">
-					<span class="button" onclick="document.getElementById('singleTaskDuration').value = '0:15';">15 min</span>
-					<span class="button" onclick="document.getElementById('singleTaskDuration').value = '0:30';">30 min</span>
-					<span class="button" onclick="document.getElementById('singleTaskDuration').value = '0:45';">45 min</span>
-					<span class="button" onclick="document.getElementById('singleTaskDuration').value = '1:00';">1 hour</span>
-					<span class="button" onclick="document.getElementById('singleTaskDuration').value = '2:00';">2 hours</span>
-					<span class="button" onclick="document.getElementById('singleTaskDuration').value = '3:00';">3 hours</span>
-					<span class="button" onclick="document.getElementById('singleTaskDuration').value = '4:00';">4 hours</span>
-					<span class="button" onclick="document.getElementById('singleTaskDuration').value = '6:00';">6 hours</span>
-					<span class="button" onclick="document.getElementById('singleTaskDuration').value = '8:00';">8 hours</span>
+					<span class="button" onclick="secretary.setSiDur('0:15')">15 min</span>
+					<span class="button" onclick="secretary.setSiDur('0:30')">40 min</span>
+					<span class="button" onclick="secretary.setSiDur('0:45')">45 min</span>
+					<span class="button" onclick="secretary.setSiDur('1:00')">1 hour</span>
+					<span class="button" onclick="secretary.setSiDur('2:00')">2 hours</span>
+					<span class="button" onclick="secretary.setSiDur('3:00')">3 hours</span>
+					<span class="button" onclick="secretary.setSiDur('4:00')">4 hours</span>
+					<span class="button" onclick="secretary.setSiDur('6:00')">6 hours</span>
+					<span class="button" onclick="secretary.setSiDur('8:00')">8 hours</span>
 				</div>
 			</div>
 			<div class="column" style="position: relative; margin-left: 50pt;">
@@ -132,26 +132,26 @@
 					<input id="repeatingTaskDuration" type="text" value="00:00" style="width: 100%;" />
 				</div>
 				<div class="buttonBar verticalButtonBar">
-					<span class="button" onclick="document.getElementById('repeatingTaskDuration').value = '0:15';">15 min</span>
-					<span class="button" onclick="document.getElementById('repeatingTaskDuration').value = '0:30';">30 min</span>
-					<span class="button" onclick="document.getElementById('repeatingTaskDuration').value = '0:45';">45 min</span>
-					<span class="button" onclick="document.getElementById('repeatingTaskDuration').value = '1:00';">1 hour</span>
-					<span class="button" onclick="document.getElementById('repeatingTaskDuration').value = '2:00';">2 hours</span>
-					<span class="button" onclick="document.getElementById('repeatingTaskDuration').value = '3:00';">3 hours</span>
-					<span class="button" onclick="document.getElementById('repeatingTaskDuration').value = '4:00';">4 hours</span>
-					<span class="button" onclick="document.getElementById('repeatingTaskDuration').value = '6:00';">6 hours</span>
-					<span class="button" onclick="document.getElementById('repeatingTaskDuration').value = '8:00';">8 hours</span>
+					<span class="button" onclick="secretary.setRepDur('0:15')">15 min</span>
+					<span class="button" onclick="secretary.setRepDur('0:30')">40 min</span>
+					<span class="button" onclick="secretary.setRepDur('0:45')">45 min</span>
+					<span class="button" onclick="secretary.setRepDur('1:00')">1 hour</span>
+					<span class="button" onclick="secretary.setRepDur('2:00')">2 hours</span>
+					<span class="button" onclick="secretary.setRepDur('3:00')">3 hours</span>
+					<span class="button" onclick="secretary.setRepDur('4:00')">4 hours</span>
+					<span class="button" onclick="secretary.setRepDur('6:00')">6 hours</span>
+					<span class="button" onclick="secretary.setRepDur('8:00')">8 hours</span>
 				</div>
 			</div>
 
 			<div class="column modal wobbling_center_5" style="position: absolute; left: -63pt; bottom: -0pt; top: unset; padding: 5pt 5pt 10pt 10pt;">
 				<div>
 					<input id="repeatingTaskBiweeklyEven" name="repeatingTaskBiweeklyEven" type="checkbox" />
-					<label for="repeatingTaskBiweeklyEven">Biweekly (even)</a>
+					<label for="repeatingTaskBiweeklyEven">Biweekly (even)</label>
 				</div>
 				<div>
 					<input id="repeatingTaskBiweeklyOdd" name="repeatingTaskBiweeklyOdd" type="checkbox" />
-					<label for="repeatingTaskBiweeklyOdd">Biweekly (odd)</a>
+					<label for="repeatingTaskBiweeklyOdd">Biweekly (odd)</label>
 				</div>
 			</div>
 			<div class="column modal wobbling_center_8" style="position: absolute; left: -70pt; bottom: -52pt; top: unset; padding: 5pt 5pt 10pt 10pt; width: 15%;">
@@ -173,11 +173,11 @@
 			</div>
 			<div class="column modal wobbling_center_3" style="position: absolute; left: 63pt; bottom: -118pt; top: unset; padding: 5pt 5pt 10pt 10pt;">
 				<input id="repeatingTaskShowAsScheduled" name="repeatingTaskShowAsScheduled" type="checkbox" checked />
-				<label for="repeatingTaskShowAsScheduled">Show as Scheduled in Future Calendar Days</a>
+				<label for="repeatingTaskShowAsScheduled">Show as Scheduled in Future Calendar Days</label>
 			</div>
 			<div class="column modal wobbling_center_6" style="position: absolute; left: 263pt; bottom: -121pt; top: unset; padding: 5pt 5pt 10pt 10pt;">
 				<input id="repeatingTaskAutoCleanTask" name="repeatingTaskAutoCleanTask" type="checkbox" />
-				<label for="repeatingTaskAutoCleanTask">Auto Clean Task Instance When Done a Week Ago</a>
+				<label for="repeatingTaskAutoCleanTask">Auto Clean Task Instance When Done a Week Ago</label>
 			</div>
 			<div class="column" style="width: 28%;">
 				<div>Origin:</div>

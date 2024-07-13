@@ -407,6 +407,21 @@ public class TaskCtrl extends TaskCtrlBase {
 		return result;
 	}
 
+	public List<Task> getCurrentTaskInstancesAsTasksWithoutShortlistTasks() {
+		boolean ordered = false;
+		List<GenericTask> genericTasks = getCurrentTaskInstances(ordered);
+		List<Task> result = new ArrayList<>();
+		for (GenericTask genericTask : genericTasks) {
+			if (genericTask instanceof Task) {
+				Task task = (Task) genericTask;
+				if (!shortlistIds.contains(task.getId())) {
+					result.add(task);
+				}
+			}
+		}
+		return result;
+	}
+
 	public List<Task> getCurrentTaskInstancesAsTasks() {
 		boolean ordered = false;
 		List<GenericTask> genericTasks = getCurrentTaskInstances(ordered);
@@ -576,6 +591,10 @@ public class TaskCtrl extends TaskCtrlBase {
 			}
 		}
 		return false;
+	}
+
+	public List<String> getShortlistIDs() {
+		return new ArrayList<>(shortlistIds);
 	}
 
 	public List<Task> getTasksOnShortlist() {
