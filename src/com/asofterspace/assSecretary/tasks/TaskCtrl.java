@@ -593,10 +593,6 @@ public class TaskCtrl extends TaskCtrlBase {
 		return false;
 	}
 
-	public List<String> getShortlistIDs() {
-		return new ArrayList<>(shortlistIds);
-	}
-
 	public List<Task> getTasksOnShortlist() {
 
 		List<Task> result = new ArrayList<>();

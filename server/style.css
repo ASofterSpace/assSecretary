@@ -103,6 +103,12 @@ span.button.checked {
 	background: rgba(150, 200, 250, 0.6);
 }
 
+span.button.selTaskBtn {
+	width: 2.5%;
+	margin-right: 0.5%;
+	box-sizing: border-box;
+}
+
 div.verticalButtonBar > span.button {
 	display: block;
 }

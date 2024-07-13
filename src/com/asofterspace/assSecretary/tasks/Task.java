@@ -369,11 +369,7 @@ public class Task extends GenericTask {
 			html.append(id);
 			html.append("-on-shortlist'" + customStyle + ">");
 
-			html.append("<span style='width: 2.5%; ");
-			String leftButtonStyle = miniBtnStyle;
-			leftButtonStyle = StrUtils.replaceAll(leftButtonStyle, "margin-left", "margin-right");
-			html.append(leftButtonStyle);
-			html.append("' class='button' id='select-task-");
+			html.append("<span class='selTaskBtn button' id='select-task-");
 			html.append(id);
 			html.append("-on-shortlist'>");
 			html.append("[&nbsp;&nbsp;]");
@@ -398,7 +394,7 @@ public class Task extends GenericTask {
 		}
 		if (!reducedView) {
 			if (isInstance()) {
-				html.append("<span style='width: 7.5%;'>");
+				html.append("<span style='width: 5%;'>");
 				if (historicalView) {
 					Date doneDate = getDoneDate();
 					if (doneDate == null) {
@@ -414,13 +410,13 @@ public class Task extends GenericTask {
 				html.append("</span>");
 			} else {
 				String schedDateStr = getScheduleDateStr();
-				html.append("<span style='width: 7.5%;' title='");
+				html.append("<span style='width: 5%;' title='");
 				html.append(schedDateStr);
 				html.append("'>");
 				html.append(schedDateStr);
 				html.append("</span>");
 			}
-			mainWidth -= 7.5;
+			mainWidth -= 5;
 		}
 
 		html.append("<span class='tla'");
@@ -701,15 +697,6 @@ public class Task extends GenericTask {
 						html.append("&#x21F6;");
 						html.append("</span>");
 						mainWidth -= 3;
-
-						// append entry to shortlist TLA object, which is used to move multiple entries to another day
-						// for this functionality, timed entries should not be included as they should not be forwarded
-						// together with the rest
-						if (!isTimedEntry()) {
-							html.append("<script>\n");
-							html.append("window.shortlistTLAs." + tla + ".push(\"" + id + "\");\n");
-							html.append("</script>\n");
-						}
 					} else {
 						html.append("<span style='width: 2.5%; ");
 						html.append(miniBtnStyle);

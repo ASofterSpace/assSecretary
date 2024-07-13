@@ -45,6 +45,7 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -478,10 +479,10 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 	@Override
 	protected File getFileFromLocation(String location, String[] arguments) {
 
-		System.out.println("debug 1: " + location);
-		for (String arg : arguments) {
-			System.out.println(arg);
-		}
+		// System.out.println("debug 1: " + location);
+		// for (String arg : arguments) {
+			// System.out.println(arg);
+		// }
 
 		File sideBarImageFile = SideBarCtrl.getSideBarImageFile(location);
 		if (sideBarImageFile != null) {
@@ -507,7 +508,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 			}
 
 
-			System.out.println("debug 2");
+			// System.out.println("debug 2");
 
 			// whenever any page is loaded, generate instances up until today, but do not save them yet
 			// (saving will be done when anything is actually done with the generated instances)
@@ -519,7 +520,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 			// answering a request for general information
 			if (locEquiv.equals("index.htm")) {
 
-				System.out.println("debug 3");
+				// System.out.println("debug 3");
 
 				String REFRESH_VM_STATS = "refreshVmStats";
 				if (arguments.length > 0) {
@@ -547,7 +548,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 					}
 				}
 
-				System.out.println("debug 4");
+				// System.out.println("debug 4");
 
 				System.out.println("Answering index request...");
 
@@ -556,7 +557,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 				indexContent = StrUtils.replaceAll(indexContent, "[[USERNAME]]", db.getUsername());
 
-				System.out.println("debug 5");
+				// System.out.println("debug 5");
 
 				String factsDiv = "";
 				String factsHidingStyle = "";
@@ -577,7 +578,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 				indexContent = StrUtils.replaceAll(indexContent, "[[FACTS]]", factsDiv);
 				indexContent = StrUtils.replaceAll(indexContent, "[[FACTS_HIDING_STYLE]]", factsHidingStyle);
 
-				System.out.println("debug 6");
+				// System.out.println("debug 6");
 
 				Date now = new Date();
 				int hour = DateUtils.getHour(now);
@@ -616,7 +617,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 					generalInfo = probStr.toString() + "<br>" + generalInfo;
 				}
 
-				System.out.println("debug 7");
+				// System.out.println("debug 7");
 
 				Date latestTaskDoneTimeAtLoad = taskCtrl.getLatestTaskDoneTimeAtLoad();
 				if (latestTaskDoneTimeAtLoad != null) {
@@ -653,7 +654,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 				indexContent = StrUtils.replaceAll(indexContent, "[[GENERAL_INFO]]", generalInfo);
 
-				System.out.println("debug 8");
+				// System.out.println("debug 8");
 
 
 				String tabsHtml = "<div id='tabList'>";
@@ -682,10 +683,9 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 				sortTasksByPriority(shortlistTasks, today, historicalView);
 
-				System.out.println("debug 9");
+				// System.out.println("debug 9");
 
-				Set<String> tlas = new HashSet<>();
-				List<String> shortlistIds = taskCtrl.getShortlistIDs();
+				Map<String, List<String>> tlas = new HashMap<>();
 
 				taskShortlistHtml.append("<div id='shortlist'>");
 				if (shortlistTasks.size() == 0) {
@@ -703,7 +703,13 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 					boolean standalone = false;
 					for (Task shortlistTask : shortlistTasks) {
 						shortlistTask.appendHtmlTo(taskShortlistHtml, historicalView, reducedView, onShortlist, today, standalone, SHOW_BUTTONS, "");
-						tlas.add(shortlistTask.getOriginTLA());
+						String tla = shortlistTask.getOriginTLA();
+						List<String> tlaList = tlas.get(tla);
+						if (tlaList == null) {
+							tlaList = new ArrayList<>();
+							tlas.put(tla, tlaList);
+						}
+						tlaList.add(shortlistTask.getId());
 					}
 				}
 				taskShortlistHtml.append("</div>\n");
@@ -727,18 +733,26 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 				taskShortlistHtml.append("window.setTimeout(window.reevaluateShortlistAmount, 1000);\n");
 				taskShortlistHtml.append("window.setTimeout(window.reevaluateShortlistAmount, 2000);\n");
 				taskShortlistHtml.append("window.setTimeout(function() {\n");
-				for (String id : shortlistIds) {
-					taskShortlistHtml.append("  document.getElementById('select-task-" + id + "-on-shortlist').onclick = function (e) {\n");
-					taskShortlistHtml.append("    secretary.taskSelect('" + id + "', false, false, e);\n");
-					taskShortlistHtml.append("  };\n");
-				}
+				taskShortlistHtml.append("  for (const key in window.shortlistTLAs) {\n");
+				taskShortlistHtml.append("    for (const id of window.shortlistTLAs[key]) {\n");
+				taskShortlistHtml.append("      document.getElementById('select-task-' + id + '-on-shortlist').onclick = function (e) {\n");
+				taskShortlistHtml.append("        secretary.taskSelect(id, false, false, e);\n");
+				taskShortlistHtml.append("      };\n");
+				taskShortlistHtml.append("    }\n");
+				taskShortlistHtml.append("  }\n");
 				taskShortlistHtml.append("}, 100);\n");
 				taskShortlistHtml.append("</script>\n");
 
 				StringBuilder scriptHtml = new StringBuilder();
 				scriptHtml.append("window.shortlistTLAs = {\n");
-				for (String tla : tlas) {
-					scriptHtml.append("  " + tla + ": [],\n");
+				for (Map.Entry<String, List<String>> entry : tlas.entrySet()) {
+					String tla = entry.getKey();
+					List<String> tlaList = entry.getValue();
+					scriptHtml.append("  " + tla + ": [");
+					for (String id : tlaList) {
+						scriptHtml.append("'" + id + "',");
+					}
+					scriptHtml.append("],\n");
 				}
 				scriptHtml.append("};\n");
 
@@ -746,7 +760,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 				indexContent = StrUtils.replaceAll(indexContent, "[[TASK_SHORTLIST]]", taskShortlistHtml.toString());
 
-				System.out.println("debug 10");
+				// System.out.println("debug 10");
 
 
 				String mariHtml = "";
@@ -836,7 +850,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 				}
 				indexContent = StrUtils.replaceAll(indexContent, "[[MARI]]", mariHtml);
 
-				System.out.println("debug 11");
+				// System.out.println("debug 11");
 
 				VmInfo vmInfo = AssSecretary.getVmInfo();
 				WebInfo webInfo = AssSecretary.getWebInfo();
@@ -880,7 +894,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 				indexContent = StrUtils.replaceAll(indexContent, "[[LOCAL_INFO]]", AssSecretary.getLocalInfo());
 
 
-				System.out.println("debug 12");
+				// System.out.println("debug 12");
 
 				String towaHtml = "";
 
@@ -904,7 +918,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 				indexContent = StrUtils.replaceAll(indexContent, "[[TOWA]]", towaHtml);
 
 
-				System.out.println("debug 12.5");
+				// System.out.println("debug 12.5");
 
 				indexContent = StrUtils.replaceAll(indexContent, "[[CURDATE]]", DateUtils.serializeDate(DateUtils.now()));
 
@@ -915,7 +929,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 				indexContent = StrUtils.replaceAll(indexContent, "[[MISSION_CONTROL_PREVIEW]]", getMissionControlHtml(false));
 
 
-				System.out.println("debug 13");
+				// System.out.println("debug 13");
 
 				// no need to show the shortlist tasks a second time ^^
 				List<Task> tasks = taskCtrl.getCurrentTaskInstancesAsTasksWithoutShortlistTasks();
@@ -940,12 +954,12 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 				}
 
 				for (Task task : tasks) {
-					task.appendHtmlTo(taskHtml, historicalView, reducedView, onShortlist, today, standalone, SHOW_BUTTONS, " ");
+					task.appendHtmlTo(taskHtml, historicalView, reducedView, onShortlist, today, standalone, SHOW_BUTTONS, "");
 				}
 
 				indexContent = StrUtils.replaceAll(indexContent, "[[TASKS]]", taskHtml.toString());
 
-				System.out.println("debug 15");
+				// System.out.println("debug 15");
 
 
 				List<Task> currentTasks = tasks;
@@ -960,7 +974,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 					}
 				}
 
-				System.out.println("debug 16");
+				// System.out.println("debug 16");
 
 				List<Task> baseTasksForSchedule = taskCtrl.getHugoAndMariTasks();
 
@@ -975,7 +989,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 				sortTasksByPriority(tomorrowTasks, tomorrow, historicalView);
 
-				System.out.println("debug 17");
+				// System.out.println("debug 17");
 
 				taskHtml = new StringBuilder();
 
@@ -1009,14 +1023,14 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 				indexContent = StrUtils.replaceAll(indexContent, "[[TASKS_TOMORROW]]", taskHtml.toString());
 
-				System.out.println("debug 18");
+				// System.out.println("debug 18");
 
 
 				locEquiv = "_" + locEquiv;
 				TextFile indexFile = new TextFile(webRoot, locEquiv);
 				indexFile.saveContent(indexContent);
 
-				System.out.println("debug 18.5");
+				// System.out.println("debug 18.5");
 			}
 
 
@@ -1379,13 +1393,13 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 			}
 
 
-			System.out.println("debug 19");
+			// System.out.println("debug 19");
 
 			// actually get the file
 			return webRoot.getFile(locEquiv);
 		}
 
-		System.out.println("debug null");
+		// System.out.println("debug null");
 
 		// if the file was not found on the whitelist, do not return it
 		// - even if it exists on the server!

@@ -142,6 +142,7 @@ window.secretary = {
 					document.getElementById("singleTaskReleaseUntil").value = "";
 					if (closeOnSubmit) {
 						window.secretary.closeSingleTaskModal();
+						window.location.reload();
 					}
 				}
 			}
@@ -150,6 +151,10 @@ window.secretary = {
 		var data = this.gatherDataForSingleTaskSubmit();
 
 		request.send(JSON.stringify(data));
+
+		if (closeOnSubmit) {
+			window.secretary.precloseSingleTaskModal();
+		}
 	},
 
 	gatherDataForSingleTaskSubmit: function() {
@@ -199,6 +204,7 @@ window.secretary = {
 
 					if (closeOnSubmit) {
 						window.secretary.closeRepeatingTaskModal();
+						window.location.reload();
 					}
 				}
 			}
@@ -207,6 +213,10 @@ window.secretary = {
 		var data = this.gatherDataForRepeatingTaskSubmit();
 
 		request.send(JSON.stringify(data));
+
+		if (closeOnSubmit) {
+			window.secretary.precloseRepeatingTaskModal();
+		}
 	},
 
 	gatherDataForRepeatingTaskSubmit: function() {
@@ -272,13 +282,21 @@ window.secretary = {
 		data.copyAfterwards = copyAfterwards;
 
 		request.send(JSON.stringify(data));
+
+		if (!copyAfterwards) {
+			window.secretary.precloseSingleTaskModal();
+		}
 	},
 
-	closeSingleTaskModal: function() {
+	precloseSingleTaskModal: function() {
 		var modal = document.getElementById("addSingleTaskModal");
 		if (modal) {
 			modal.style.display = "none";
 		}
+	},
+
+	closeSingleTaskModal: function() {
+		this.precloseSingleTaskModal();
 
 		/*
 		even though data may have changed, do not reload for faster operations
@@ -295,18 +313,26 @@ window.secretary = {
 			window.location.reload(false);
 		}
 		*/
+
+		document.getElementById("modalBackground").style.display = "none";
 	},
 
-	closeRepeatingTaskModal: function() {
+	precloseRepeatingTaskModal: function() {
 		var modal = document.getElementById("addRepeatingTaskModal");
 		if (modal) {
 			modal.style.display = "none";
 		}
+	},
+
+	closeRepeatingTaskModal: function() {
+		this.precloseRepeatingTaskModal();
 
 		/*
 		even though data may have changed, do not reload for faster operations
 		window.location.reload(false);
 		*/
+
+		document.getElementById("modalBackground").style.display = "none";
 	},
 
 	taskDetails: function(id) {
@@ -757,17 +783,6 @@ window.secretary = {
 		if (filterTaskFuture) {
 			if (filterTaskFuture.className == "button unchecked") {
 				this.hideTasksWithClassName("future-task");
-			}
-		}
-
-		var sortTasks = document.getElementById("sortTasks");
-		if (sortTasks) {
-			if (sortTasks.innerHTML.indexOf("Date") >= 0) {
-				// hide priority-sorted tasks when date-sorted tasks should be shown
-				this.hideTasksWithClassName("priority-sorted-task");
-			} else {
-				// hide date-sorted tasks when priority-sorted tasks should be shown
-				this.hideTasksWithClassName("date-sorted-task");
 			}
 		}
 	},
