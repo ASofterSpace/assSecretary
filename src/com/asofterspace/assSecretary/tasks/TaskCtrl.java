@@ -24,6 +24,7 @@ import com.asofterspace.toolbox.Utils;
 import com.asofterspace.toolbox.web.WebAccessor;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -939,8 +940,10 @@ public class TaskCtrl extends TaskCtrlBase {
 				firstDay = false;
 			} else {
 				// add scheduled base task instances
+				Calendar dayCal = Calendar.getInstance();
+				dayCal.setTime(day);
 				for (Task task : baseTasksForSchedule) {
-					if (task.getShowAsScheduled() && task.isScheduledOn(day)) {
+					if (task.getShowAsScheduled() && task.isScheduledOn(dayCal)) {
 						tasksToday.add(task);
 					}
 				}

@@ -239,7 +239,7 @@ public class Task extends GenericTask {
 				if (difference >= priorityEscalationAfterDays) {
 					// if priorityEscalationAfterDays have passed, then reduce priority by 10%,
 					// and keep reducing a bit more each day
-					result -= (TENTH_PRIORITY * difference) / priorityEscalationAfterDays;
+					result -= (TENTH_PRIORITY * (1 + difference - priorityEscalationAfterDays)) / priorityEscalationAfterDays;
 				}
 			}
 

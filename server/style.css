@@ -372,6 +372,8 @@ div.kw_on_month_view {
 }
 
 
+/* taken out animations to stress out our processor less
+
 @keyframes pulsating_alarm {
   0% {
 	background: rgba(50, 0, 0, 0);
@@ -600,3 +602,5 @@ div.kw_on_month_view {
 .wobbling_center_8 {
   animation: wobbling_center_8 95s linear infinite;
 }
+
+*/

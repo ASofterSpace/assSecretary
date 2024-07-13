@@ -41,6 +41,7 @@ import com.asofterspace.toolbox.web.WebServerRequestHandler;
 import java.io.IOException;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -477,6 +478,8 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 	@Override
 	protected File getFileFromLocation(String location, String[] arguments) {
 
+		System.out.println("debug 1: " + location);
+
 		File sideBarImageFile = SideBarCtrl.getSideBarImageFile(location);
 		if (sideBarImageFile != null) {
 			return sideBarImageFile;
@@ -501,6 +504,8 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 			}
 
 
+			System.out.println("debug 2");
+
 			// whenever any page is loaded, generate instances up until today, but do not save them yet
 			// (saving will be done when anything is actually done with the generated instances)
 			if (locEquiv.endsWith(".htm")) {
@@ -510,6 +515,8 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 			// answering a request for general information
 			if (locEquiv.equals("index.htm")) {
+
+				System.out.println("debug 3");
 
 				String REFRESH_VM_STATS = "refreshVmStats";
 				if (arguments.length > 0) {
@@ -537,12 +544,16 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 					}
 				}
 
+				System.out.println("debug 4");
+
 				System.out.println("Answering index request...");
 
 				TextFile indexBaseFile = new TextFile(webRoot, locEquiv);
 				String indexContent = indexBaseFile.getContent();
 
 				indexContent = StrUtils.replaceAll(indexContent, "[[USERNAME]]", db.getUsername());
+
+				System.out.println("debug 5");
 
 				String factsDiv = "";
 				String factsHidingStyle = "";
@@ -562,6 +573,8 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 				}
 				indexContent = StrUtils.replaceAll(indexContent, "[[FACTS]]", factsDiv);
 				indexContent = StrUtils.replaceAll(indexContent, "[[FACTS_HIDING_STYLE]]", factsHidingStyle);
+
+				System.out.println("debug 6");
 
 				Date now = new Date();
 				int hour = DateUtils.getHour(now);
@@ -600,6 +613,8 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 					generalInfo = probStr.toString() + "<br>" + generalInfo;
 				}
 
+				System.out.println("debug 7");
+
 				Date latestTaskDoneTimeAtLoad = taskCtrl.getLatestTaskDoneTimeAtLoad();
 				if (latestTaskDoneTimeAtLoad != null) {
 					if (latestTaskDoneTimeAtLoad.after(now)) {
@@ -635,6 +650,8 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 				indexContent = StrUtils.replaceAll(indexContent, "[[GENERAL_INFO]]", generalInfo);
 
+				System.out.println("debug 8");
+
 
 				String tabsHtml = "<div id='tabList'>";
 				tabsHtml += "<a href='/inbox.htm'>Inbox</a>";
@@ -661,6 +678,8 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 				boolean historicalView = false;
 
 				sortTasksByPriority(shortlistTasks, today, historicalView);
+
+				System.out.println("debug 9");
 
 				taskShortlistHtml.append("<div id='shortlist'>");
 				if (shortlistTasks.size() == 0) {
@@ -703,6 +722,8 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 				taskShortlistHtml.append("</script>\n");
 
 				indexContent = StrUtils.replaceAll(indexContent, "[[TASK_SHORTLIST]]", taskShortlistHtml.toString());
+
+				System.out.println("debug 10");
 
 
 				String mariHtml = "";
@@ -792,6 +813,8 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 				}
 				indexContent = StrUtils.replaceAll(indexContent, "[[MARI]]", mariHtml);
 
+				System.out.println("debug 11");
+
 				VmInfo vmInfo = AssSecretary.getVmInfo();
 				WebInfo webInfo = AssSecretary.getWebInfo();
 				StringBuilder vmStatsHtml = new StringBuilder();
@@ -834,6 +857,8 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 				indexContent = StrUtils.replaceAll(indexContent, "[[LOCAL_INFO]]", AssSecretary.getLocalInfo());
 
 
+				System.out.println("debug 12");
+
 				String towaHtml = "";
 
 				if (db.connectToTowa()) {
@@ -856,6 +881,19 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 				indexContent = StrUtils.replaceAll(indexContent, "[[TOWA]]", towaHtml);
 
 
+				System.out.println("debug 12.5");
+
+				indexContent = StrUtils.replaceAll(indexContent, "[[CURDATE]]", DateUtils.serializeDate(DateUtils.now()));
+
+				indexContent = StrUtils.replaceAll(indexContent, "[[MINI_CALENDAR]]", getMiniCalendarHtml());
+
+				indexContent = StrUtils.replaceAll(indexContent, "[[SIDEBAR]]", SideBarCtrl.getSidebarHtmlStr(EMPLOYEE_HUGO));
+
+				indexContent = StrUtils.replaceAll(indexContent, "[[MISSION_CONTROL_PREVIEW]]", getMissionControlHtml(false));
+
+
+				System.out.println("debug 13");
+
 				List<Task> tasks = taskCtrl.getCurrentTaskInstancesAsTasks();
 
 				StringBuilder taskHtml = new StringBuilder();
@@ -869,6 +907,8 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 					task.appendHtmlTo(taskHtml, historicalView, reducedView, onShortlist, today, standalone, SHOW_BUTTONS, " date-sorted-task");
 				}
 
+				System.out.println("debug 14");
+
 				sortTasksByPriority(tasks, today, historicalView);
 
 				for (Task task : tasks) {
@@ -876,6 +916,8 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 				}
 
 				indexContent = StrUtils.replaceAll(indexContent, "[[TASKS]]", taskHtml.toString());
+
+				System.out.println("debug 15");
 
 
 				List<Task> currentTasks = tasks;
@@ -885,20 +927,27 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 				Date tomorrow = DateUtils.daysInTheFuture(1);
 
 				for (Task task : currentTasks) {
-					if (task.appliesTo(tomorrow)) {
+					if (task.appliesToDay(tomorrow, today)) {
 						tasks.add(task);
 					}
 				}
 
+				System.out.println("debug 16");
+
 				List<Task> baseTasksForSchedule = taskCtrl.getHugoAndMariTasks();
 
+				Calendar tomorrowCal = Calendar.getInstance();
+				tomorrowCal.setTime(tomorrow);
+
 				for (Task task : baseTasksForSchedule) {
-					if (task.isScheduledOn(tomorrow) && task.getShowAsScheduled()) {
+					if (task.getShowAsScheduled() && task.isScheduledOn(tomorrowCal)) {
 						tasks.add(task);
 					}
 				}
 
 				sortTasksByPriority(tasks, tomorrow, historicalView);
+
+				System.out.println("debug 17");
 
 				taskHtml = new StringBuilder();
 
@@ -934,18 +983,14 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 				indexContent = StrUtils.replaceAll(indexContent, "[[TASKS_TOMORROW]]", taskHtml.toString());
 
+				System.out.println("debug 18");
 
-				indexContent = StrUtils.replaceAll(indexContent, "[[MISSION_CONTROL_PREVIEW]]", getMissionControlHtml(false));
-
-				indexContent = StrUtils.replaceAll(indexContent, "[[CURDATE]]", DateUtils.serializeDate(DateUtils.now()));
-
-				indexContent = StrUtils.replaceAll(indexContent, "[[MINI_CALENDAR]]", getMiniCalendarHtml());
-
-				indexContent = StrUtils.replaceAll(indexContent, "[[SIDEBAR]]", SideBarCtrl.getSidebarHtmlStr(EMPLOYEE_HUGO));
 
 				locEquiv = "_" + locEquiv;
 				TextFile indexFile = new TextFile(webRoot, locEquiv);
 				indexFile.saveContent(indexContent);
+
+				System.out.println("debug 18.5");
 			}
 
 
@@ -1141,7 +1186,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 					// check for all task instances if they apply today
 					for (Task task : tasks) {
-						if (task.appliesTo(day)) {
+						if (task.appliesToDay(day, actualToday)) {
 							tasksToday.add(task);
 						}
 					}
@@ -1149,8 +1194,11 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 					// for days in the future, also add ghost tasks (non-instances) - but no in the past,
 					// as there we would expect real instances to have been created instead!
 					if (day.after(actualToday)) {
+						Calendar dayCal = Calendar.getInstance();
+						dayCal.setTime(day);
+
 						for (Task task : baseTasksForSchedule) {
-							if (task.isScheduledOn(day) && task.getShowAsScheduled()) {
+							if (task.getShowAsScheduled() && task.isScheduledOn(dayCal)) {
 								tasksToday.add(task);
 							}
 						}
@@ -1305,9 +1353,13 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 			}
 
 
+			System.out.println("debug 19");
+
 			// actually get the file
 			return webRoot.getFile(locEquiv);
 		}
+
+		System.out.println("debug null");
 
 		// if the file was not found on the whitelist, do not return it
 		// - even if it exists on the server!
@@ -1448,7 +1500,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 		String machineSeparator = "<div class='machine_separator'>*</div>";
 
 		mcHtml += companyStart;
-		mcHtml += machineStart + "ASS Odyssey MM-01<br>" + AssSecretary.getLocalInfoShort() + machineEnd;
+		mcHtml += machineStart + "ASS Chaotic Joy MOYA-XV<br>" + AssSecretary.getLocalInfoShort() + machineEnd;
 		mcHtml += machineStart + "asofterspace<br>.com: " + webInfo.get("assEn") + "<br>.de: " + webInfo.get("assDe") + machineEnd;
 		mcHtml += machineStart + "Hera Tasks<br>" + webInfo.get("heraTasks") + machineEnd;
 		mcHtml += "<img class='logo' src='projectlogos/asofterspace/logo.png' />";
@@ -1932,7 +1984,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 					// check for all task instances if they apply today
 					for (Task task : tasks) {
-						if (task.appliesTo(day)) {
+						if (task.appliesToDay(day, actualToday)) {
 							tasksToday.add(task);
 						}
 					}
@@ -1940,8 +1992,11 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 					// for days in the future, also add ghost tasks (non-instances) - but no in the past,
 					// as there we would expect real instances to have been created instead!
 					if (day.after(actualToday)) {
+						Calendar dayCal = Calendar.getInstance();
+						dayCal.setTime(day);
+
 						for (Task task : baseTasksForSchedule) {
-							if (task.isScheduledOn(day) && task.getShowAsScheduled()) {
+							if (task.getShowAsScheduled() && task.isScheduledOn(dayCal)) {
 								tasksToday.add(task);
 							}
 						}
