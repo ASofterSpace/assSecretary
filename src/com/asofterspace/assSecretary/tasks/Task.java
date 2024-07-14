@@ -364,7 +364,7 @@ public class Task extends GenericTask {
 		}
 
 		if (onShortlist) {
-			// tasks on the shortlist are not affected by such mundane things as filtering etc.
+			// tasks on the shortlist are not affected by such mundane things as filtering etc., so their ids are different
 			html.append("<div class='line' id='task-");
 			html.append(id);
 			html.append("-on-shortlist'" + customStyle + ">");
@@ -379,7 +379,9 @@ public class Task extends GenericTask {
 		} else {
 			if (standalone) {
 				// standalone tasks are not affected by such mundane things as filtering etc. either
-				html.append("<div class='line'" + customStyle + ">");
+				html.append("<div class='line'" + customStyle + " id='task-");
+				html.append(id);
+				html.append("-x'>");
 			} else {
 				html.append("<div class='line task task-with-origin-");
 				html.append(getOrigin());

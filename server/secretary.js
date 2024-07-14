@@ -606,18 +606,22 @@ window.secretary = {
 		}
 	},
 
-	closeDeleteTaskModal: function() {
+	precloseDeleteTaskModal: function() {
 		var modal = document.getElementById("deleteTaskModal");
 		if (modal) {
 			modal.style.display = "none";
-
-			document.getElementById("modalBackground").style.display = "none";
 		}
+	},
+
+	closeDeleteTaskModal: function() {
+		this.precloseDeleteTaskModal();
+
+		document.getElementById("modalBackground").style.display = "none";
 	},
 
 	doDeleteTask: function() {
 
-		this.closeDeleteTaskModal();
+		this.precloseDeleteTaskModal();
 
 		var request = new XMLHttpRequest();
 		request.open("POST", "taskDelete", true);
@@ -638,17 +642,34 @@ window.secretary = {
 
 		request.send(JSON.stringify(data));
 
+		var delIds = window.secretary.currentlyDeleting;
+
 		window.setTimeout(function() {
-			var id = window.secretary.currentlyDeleting;
-			var el = document.getElementById("task-" + id);
-			if (el) {
-				el.parentNode.removeChild(el);
+			if (Array.isArray(delIds)) {
+				for (var id of delIds) {
+					secretary.removeTaskFromDOM(id);
+				}
+			} else {
+				secretary.removeTaskFromDOM(id);
 			}
-			var el = document.getElementById("task-" + id + "-on-shortlist");
-			if (el) {
-				el.parentNode.removeChild(el);
-			}
+			secretary.closeDeleteTaskModal();
 		}, 100);
+	},
+
+	removeTaskFromDOM: function(id) {
+
+		var el = document.getElementById("task-" + id);
+		if (el) {
+			el.parentNode.removeChild(el);
+		}
+		var el = document.getElementById("task-" + id + "-on-shortlist");
+		if (el) {
+			el.parentNode.removeChild(el);
+		}
+		var el = document.getElementById("task-" + id + "-x");
+		if (el) {
+			el.parentNode.removeChild(el);
+		}
 	},
 
 	taskAddToShortList: function(id) {
