@@ -142,7 +142,7 @@ window.secretary = {
 					document.getElementById("singleTaskReleaseUntil").value = "";
 					if (closeOnSubmit) {
 						window.secretary.closeSingleTaskModal();
-						window.location.reload();
+						window.location.reload(false);
 					}
 				}
 			}
@@ -204,7 +204,7 @@ window.secretary = {
 
 					if (closeOnSubmit) {
 						window.secretary.closeRepeatingTaskModal();
-						window.location.reload();
+						window.location.reload(false);
 					}
 				}
 			}
@@ -271,7 +271,8 @@ window.secretary = {
 							document.getElementById("singleTaskCurrentMode").innerHTML = "editing one single entry";
 						}
 					} else {
-						window.location.reload(false);
+						window.secretary.removeTaskFromDOM(window.secretary.currentlyEditing);
+						window.secretary.closeSingleTaskModal();
 					}
 				}
 			}
@@ -355,8 +356,8 @@ window.secretary = {
 		request.onreadystatechange = function() {
 			if (request.readyState == 4 && request.status == 200) {
 				var result = JSON.parse(request.response);
-				if (result.success) {
-					window.location.reload(false);
+				if (!result.success) {
+					alert("The task could not be set to done! Maybe refresh the page?");
 				}
 			}
 		}
@@ -366,6 +367,7 @@ window.secretary = {
 		};
 
 		request.send(JSON.stringify(data));
+		this.removeTaskFromDOM(id);
 	},
 
 	taskUnDone: function(id) {
