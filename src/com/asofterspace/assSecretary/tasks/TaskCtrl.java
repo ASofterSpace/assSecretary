@@ -516,6 +516,8 @@ public class TaskCtrl extends TaskCtrlBase {
 
 	/**
 	 * Returns a Task if it worked and an ad hoc task was created, and false otherwise
+	 * (does NOT save the taskCtrl after creating the task - the caller should do that, as often the caller
+	 * also modifies other stuff at the same time and can then just call one save after everything)
 	 */
 	public Task addAdHocTask(String title, String details, Date scheduleDate, String origin, Integer priority,
 		Integer priorityEscalationAfterDays, String duration, Boolean showAsScheduled, Boolean autoCleanTask) {
@@ -543,8 +545,6 @@ public class TaskCtrl extends TaskCtrlBase {
 				ourTask.getReleaseDate().before(DateUtils.now())) {
 				shortlistIds.add(ourTask.getId());
 			}
-
-			save();
 
 			return ourTask;
 

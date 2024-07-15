@@ -137,6 +137,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 					if (addedOrEditedTask == null) {
 						return;
 					}
+					taskCtrl.save();
 					answer = new WebServerAnswerInJson(new JSON("{\"success\": true, \"id\": \"" +
 						addedOrEditedTask.getId() + "\"}"));
 					break;
@@ -147,6 +148,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 					if (addedOrEditedTask == null) {
 						return;
 					}
+					taskCtrl.save();
 					answer = new WebServerAnswerInJson(new JSON("{\"success\": true, \"id\": \"" +
 						addedOrEditedTask.getId() + "\"}"));
 					break;
@@ -256,12 +258,11 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 						addedOrEditedTask.setDoneDate(doneDate);
 					}
 
-					taskCtrl.save();
-
 					answer = new WebServerAnswerInJson(new JSON("{\"success\": true}"));
 
 					// only continue if a copy of the task should actually be made
 					if ((json.getBoolean("copyAfterwards") == null) || (json.getBoolean("copyAfterwards") == false)) {
+						taskCtrl.save();
 						break;
 					}
 
@@ -281,6 +282,8 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 					answer = new WebServerAnswerInJson(new JSON("{\"success\": " + (newTask != null) + ", " +
 						"\"id\": \"" + newTask.getId() + "\", \"newReleaseDate\": \"" +
 						DateUtils.serializeDate(newReleaseDate) + "\"}"));
+
+					taskCtrl.save();
 
 					break;
 
@@ -1618,7 +1621,6 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 			task.setDoneDate(doneDate);
 			task.setSetToDoneDateTime(DateUtils.now());
 			taskCtrl.removeTaskFromShortListById(task.getId());
-			taskCtrl.save();
 		}
 	}
 
@@ -1674,7 +1676,6 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 				task.setDurationStr(json.getString("duration"));
 				task.setShowAsScheduled(json.getBoolean(TaskCtrl.SHOW_AS_SCHEDULED));
 				task.setAutoCleanTask(json.getBoolean(TaskCtrl.AUTO_CLEAN_TASK));
-				taskCtrl.save();
 				result = task;
 			} else {
 				respond(404);
@@ -1718,7 +1719,6 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 			Task newTask = new Task();
 			setRepeatingTaskValues(newTask, json);
 			taskCtrl.addNewRepeatingTask(newTask);
-			taskCtrl.save();
 			result = newTask;
 
 		} else {
@@ -1726,7 +1726,6 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 			Task task = taskCtrl.getTaskById(editingId);
 			if (task != null) {
 				setRepeatingTaskValues(task, json);
-				taskCtrl.save();
 				result = task;
 			} else {
 				respond(404);
