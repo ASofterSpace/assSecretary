@@ -10,7 +10,6 @@ import com.asofterspace.toolbox.io.JsonFile;
 import com.asofterspace.toolbox.io.JsonParseException;
 import com.asofterspace.toolbox.utils.DateUtils;
 import com.asofterspace.toolbox.utils.Record;
-import com.asofterspace.toolbox.utils.Triple;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -64,6 +63,51 @@ public class LocationDatabase {
 		return whenWheres;
 	}
 
+	public List<WhenWhere> getFromTo(Date day) {
+
+		List<WhenWhere> result = new ArrayList<>();
+
+		if ((whenWheres == null) || (whenWheres.size() < 1)) {
+			return result;
+		}
+
+		Date lastBefore = whenWheres.get(0).getDate();
+		List<WhenWhere> todayResults = new ArrayList<>();
+
+		for (WhenWhere whenWhere : whenWheres) {
+			if (day.before(whenWhere.getDate())) {
+				break;
+			}
+			// prepare to add everything that is the same day later
+			if (DateUtils.isSameDay(day, whenWhere.getDate())) {
+				todayResults.add(whenWhere);
+			} else {
+				lastBefore = whenWhere.getDate();
+			}
+		}
+
+		// but first add everything that was from the day before
+		String lastDayBeforeTodayTime = null;
+		List<WhenWhere> lastDayBeforeTodayResultsAnyTime = new ArrayList<>();
+		for (WhenWhere whenWhere : whenWheres) {
+			if (DateUtils.isSameDay(lastBefore, whenWhere.getDate())) {
+				lastDayBeforeTodayResultsAnyTime.add(whenWhere);
+				lastDayBeforeTodayTime = whenWhere.getTime();
+			}
+		}
+		for (WhenWhere whenWhere : lastDayBeforeTodayResultsAnyTime) {
+			if (lastDayBeforeTodayTime.equals(whenWhere.getTime())) {
+				result.add(whenWhere);
+			}
+		}
+
+		// aaaand now add the today results
+		result.addAll(todayResults);
+
+		return result;
+	}
+
+	/*
 	public Triple<List<WhenWhere>, List<WhenWhere>, List<WhenWhere>> getFromTo(Date day) {
 
 		Triple<List<WhenWhere>, List<WhenWhere>, List<WhenWhere>> result =
@@ -127,8 +171,9 @@ public class LocationDatabase {
 
 		return result;
 	}
+	*/
 
-/*
+	/*
 	public void save() {
 
 		if (root == null) {
@@ -146,6 +191,6 @@ public class LocationDatabase {
 		dbFile.setAllContents(root);
 		dbFile.save();
 	}
-*/
+	*/
 
 }
