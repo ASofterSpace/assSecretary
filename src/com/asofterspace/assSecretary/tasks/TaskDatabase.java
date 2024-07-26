@@ -7,6 +7,7 @@ package com.asofterspace.assSecretary.tasks;
 import com.asofterspace.toolbox.io.Directory;
 import com.asofterspace.toolbox.io.JsonFile;
 import com.asofterspace.toolbox.io.JsonParseException;
+import com.asofterspace.toolbox.io.TextFile;
 import com.asofterspace.toolbox.utils.Record;
 import com.asofterspace.toolbox.utils.StrUtils;
 
@@ -65,9 +66,8 @@ public class TaskDatabase {
 		dbFile.save();
 
 		String backupName = "tasks-backup-" + StrUtils.leftPad0(rand.nextInt(10000), 4) + ".json";
-		JsonFile backupFile = new JsonFile(dataDir, backupName);
-		backupFile.setAllContents(loadedRoot);
-		backupFile.save();
+		TextFile backupFile = new TextFile(dataDir, backupName);
+		backupFile.saveContent(dbFile.getContent());
 	}
 
 }
