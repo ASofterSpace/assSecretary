@@ -125,12 +125,24 @@ public class Task extends GenericTask {
 			return "EA";
 		}
 
+		if (tla.startsWith("food")) {
+			return "FS";
+		}
+
 		if (tla.startsWith("queeres")) {
 			return "QZT";
 		}
 
+		if (tla.startsWith("queer")) {
+			return "QLD";
+		}
+
 		if (tla.startsWith("wood")) {
 			return "WW";
+		}
+
+		if (tla.startsWith("transition")) {
+			return "TT";
 		}
 
 		switch (tla) {
