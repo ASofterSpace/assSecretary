@@ -1079,10 +1079,10 @@ window.secretary = {
 		var tasks = document.getElementById("shortlist").childNodes;
 		for (var i = 0; i < tasks.length; i++) {
 			var task = tasks[i];
-			if (task.id.indexOf("task-") == 0) {
+			if ((task.id) && (task.id.indexOf("task-") == 0)) {
 				text += sep;
 				sep = "\n";
-				text += task.childNodes[3].innerText + " " + task.childNodes[4].innerText;
+				text += task.childNodes[2].innerText + " " + task.childNodes[3].innerText;
 			}
 		}
 		this.copyToClipboard(text);
@@ -1094,6 +1094,27 @@ window.secretary = {
 
 	setRepDur: function(newVal) {
 		document.getElementById('repeatingTaskDuration').value = newVal;
+	},
+
+	selectDuplicateTasks: function() {
+		var lastText = "";
+		var lastId = "";
+		var tasks = document.getElementById("shortlist").childNodes;
+		for (var i = 0; i < tasks.length; i++) {
+			var task = tasks[i];
+			if ((task.id) && (task.id.indexOf("task-") == 0)) {
+				var curText = task.childNodes[3].innerText;
+				if (lastText === curText) {
+					var actualId = lastId.replaceAll("task-", "").replaceAll("-on-shortlist", "");
+					var overrideToSelect = true;
+					var overrideToUnSelect = false;
+					var event = null;
+					this.taskSelect(actualId, overrideToSelect, overrideToUnSelect, event);
+				}
+				lastId = task.id;
+				lastText = curText;
+			}
+		}
 	},
 
 }

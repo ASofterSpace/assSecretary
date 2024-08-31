@@ -690,16 +690,29 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 				Map<String, List<String>> tlas = new HashMap<>();
 
-				taskShortlistHtml.append("<div id='shortlist'>");
+				// BEHAVIOR NEEDS TO AGREE WITH JAVASCRIPT CODE 50 LINES BELOW
+				String shortlistDivClassName = "";
+				String shortlistFullLabelStDisp = "style='display: none;'";
+				if (shortlistTasks.size() > 36) {
+					shortlistDivClassName = "class='pulsating_alarm'";
+					shortlistFullLabelStDisp = "style='display: block;'";
+				}
+
+				taskShortlistHtml.append("<div id='shortlist' " + shortlistDivClassName + ">");
 				if (shortlistTasks.size() == 0) {
 					taskShortlistHtml.append("<div>The task shortlist is empty - well done!</div>");
 				} else {
 					taskShortlistHtml.append("<div style='position:relative;'>Here is the task shortlist for today:");
-					taskShortlistHtml.append("<span class='button' style='position:absolute;right:0;top:-5pt;padding:2pt 8pt;' ");
+					taskShortlistHtml.append("<span style='position:absolute;right:0;top:-5pt;'>");
+					taskShortlistHtml.append("<span class='button' style='padding:2pt 8pt;' ");
+					taskShortlistHtml.append("onclick='secretary.selectDuplicateTasks();'>");
+					taskShortlistHtml.append("Select Duplicate Tasks</span>&nbsp;");
+					taskShortlistHtml.append("<span class='button' style='padding:2pt 8pt;' ");
 					taskShortlistHtml.append("onclick='secretary.copyShortlistText();'>");
 					taskShortlistHtml.append("Extract Shortlist as Text</span>");
+					taskShortlistHtml.append("</span>");
 					taskShortlistHtml.append("</div>");
-					taskShortlistHtml.append("<div id='shortlist-full-label' style='display: none;'><span class='error'>" +
+					taskShortlistHtml.append("<div id='shortlist-full-label' " + shortlistFullLabelStDisp + "><span class='error'>" +
 						"The task shortlist is very full - please reschedule, do or outright delete some tasks!</span></div>");
 					boolean reducedView = false;
 					boolean onShortlist = true;
@@ -716,6 +729,8 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 					}
 				}
 				taskShortlistHtml.append("</div>\n");
+
+				// BEHAVIOR NEEDS TO AGREE WITH JAVA CODE 50 LINES ABOVE
 				taskShortlistHtml.append("<script>\n");
 				taskShortlistHtml.append("window.shortlistAmount = " + shortlistTasks.size() + ";\n");
 				taskShortlistHtml.append("window.reevaluateShortlistAmount = function() {\n");
@@ -731,10 +746,6 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 				taskShortlistHtml.append("    }\n");
 				taskShortlistHtml.append("  }\n");
 				taskShortlistHtml.append("}\n");
-				// evaluate on startup of the page
-				taskShortlistHtml.append("window.setTimeout(window.reevaluateShortlistAmount, 100);\n");
-				taskShortlistHtml.append("window.setTimeout(window.reevaluateShortlistAmount, 1000);\n");
-				taskShortlistHtml.append("window.setTimeout(window.reevaluateShortlistAmount, 2000);\n");
 				taskShortlistHtml.append("window.setTimeout(function() {\n");
 				taskShortlistHtml.append("  for (const key in window.shortlistTLAs) {\n");
 				taskShortlistHtml.append("    for (const id of window.shortlistTLAs[key]) {\n");
