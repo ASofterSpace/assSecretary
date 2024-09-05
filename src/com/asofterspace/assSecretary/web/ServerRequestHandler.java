@@ -665,7 +665,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 				tabsHtml += "<a href='/repeating.htm'>Repeating Tasks</a>";
 				tabsHtml += "<a href='/tasklog.htm'>Task Log</a>";
 				tabsHtml += "<a href='/currenttasklog.htm'>Current Task Log</a>";
-				tabsHtml += "<a href='/weekly.htm'>Weekly View</a>";
+				tabsHtml += "<a href='/weekly.htm?date=" + DateUtils.serializeDate(now) + "'>Weekly View</a>";
 				tabsHtml += "<a href='/monthly.htm'>Monthly View</a>";
 				tabsHtml += "<a href='/monthly.htm?empty=true'>Monthly Location View</a>";
 				tabsHtml += "<a href='/stats.htm'>Statistics</a>";
