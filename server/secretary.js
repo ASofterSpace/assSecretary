@@ -639,12 +639,12 @@ window.secretary = {
 		}
 
 		var data = {
-			id: window.secretary.currentlyDeleting,
+			id: secretary.currentlyDeleting,
 		};
 
 		request.send(JSON.stringify(data));
 
-		var delIds = window.secretary.currentlyDeleting;
+		var delIds = secretary.currentlyDeleting;
 
 		window.setTimeout(function() {
 			if (Array.isArray(delIds)) {
@@ -656,6 +656,8 @@ window.secretary = {
 			}
 			secretary.closeDeleteTaskModal();
 		}, 100);
+
+		secretary.currentlyDeleting = [];
 	},
 
 	removeTaskFromDOM: function(id) {
