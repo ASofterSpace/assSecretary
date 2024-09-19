@@ -141,7 +141,6 @@ window.secretary = {
 
 					document.getElementById("singleTaskReleaseUntil").value = "";
 					if (closeOnSubmit) {
-						window.secretary.closeSingleTaskModal();
 						window.location.reload(false);
 					}
 				}
@@ -203,7 +202,6 @@ window.secretary = {
 					}
 
 					if (closeOnSubmit) {
-						window.secretary.closeRepeatingTaskModal();
 						window.location.reload(false);
 					}
 				}
