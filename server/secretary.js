@@ -656,6 +656,7 @@ window.secretary = {
 		}, 100);
 
 		secretary.currentlyDeleting = [];
+		secretary.selection = [];
 	},
 
 	removeTaskFromDOM: function(id) {
