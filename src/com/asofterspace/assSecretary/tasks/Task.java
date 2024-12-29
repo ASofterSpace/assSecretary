@@ -692,7 +692,7 @@ public class Task extends GenericTask {
 						html.append("</span>");
 						mainWidth -= 3;
 
-						html.append("<span style='width: 2.5%; ");
+						html.append("<span style='width: 2.5%; font-size: 8pt; ");
 						html.append(miniBtnStyle);
 						html.append("' class='button' onclick='secretary.taskPutOnShortListTomorrow(\"");
 						html.append(id);
