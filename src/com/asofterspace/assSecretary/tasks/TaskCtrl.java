@@ -1061,7 +1061,11 @@ public class TaskCtrl extends TaskCtrlBase {
 
 
 		// upload the file
-		IoUtils.execute("upload.bat");
+		if ("\\".equals(System.lineSeparator())) {
+			IoUtils.execute("upload.bat");
+		} else {
+			IoUtils.execute("upload.sh");
+		}
 	}
 
 	public void appendDateToHtml(StringBuilder taskHtml, Date curDate) {

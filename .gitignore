@@ -56,3 +56,5 @@ src/com/asofterspace/toolbox
 upload/
 upload.bat
 upload_file.bat
+upload.sh
+upload_file.sh
