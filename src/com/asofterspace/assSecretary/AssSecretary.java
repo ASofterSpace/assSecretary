@@ -48,8 +48,8 @@ public class AssSecretary {
 	public final static String FACT_DIR = "../assTrainer/config";
 
 	public final static String PROGRAM_TITLE = "assSecretary (Hugo)";
-	public final static String VERSION_NUMBER = "0.1.0.6(" + Utils.TOOLBOX_VERSION_NUMBER + ")";
-	public final static String VERSION_DATE = "21. October 2020 - 31. December 2024";
+	public final static String VERSION_NUMBER = "0.1.0.7(" + Utils.TOOLBOX_VERSION_NUMBER + ")";
+	public final static String VERSION_DATE = "21. October 2020 - 2. January 2025";
 
 	private static Database database;
 	private static LocationDatabase locationDB;
@@ -60,6 +60,9 @@ public class AssSecretary {
 
 	private static String localInfo = "";
 	private static String localInfoShort = "";
+
+	private static Directory thisDir = null;
+	private static Directory scriptsDir = null;
 
 
 	public static void main(String[] args) {
@@ -475,8 +478,20 @@ public class AssSecretary {
 	private static void addVmInfo(VmInfo vmInfo, String origin, String which,
 		MissionControlDatabase missionControlDatabase) {
 
-		Directory thisDir = new Directory(".");
-		IoUtils.execute(thisDir.getAbsoluteDirname() + "\\" + SCRIPTS_DIR + "\\" + origin + "_df_" + which + ".bat");
+		if (thisDir == null) {
+			thisDir = new Directory(".");
+		}
+
+		if (scriptsDir == null) {
+			scriptsDir = new Directory(SCRIPTS_DIR);
+		}
+
+		if ("\\".equals(System.lineSeparator())) {
+			IoUtils.execute(thisDir.getAbsoluteDirname() + "\\" + SCRIPTS_DIR + "\\" + origin + "_df_" + which + ".bat");
+		} else {
+			File scriptFile = new File(scriptsDir, origin + "_df_" + which + ".sh");
+			IoUtils.execute(scriptFile.getCanonicalFilename());
+		}
 
 		SimpleFile dfDbFile = new SimpleFile(thisDir, origin + "_out_" + which + ".txt");
 		List<String> lines = dfDbFile.getContents();

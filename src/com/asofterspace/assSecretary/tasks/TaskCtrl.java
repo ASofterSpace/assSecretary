@@ -13,6 +13,7 @@ import com.asofterspace.assSecretary.web.ServerRequestHandler;
 import com.asofterspace.toolbox.calendar.GenericTask;
 import com.asofterspace.toolbox.calendar.TaskCtrlBase;
 import com.asofterspace.toolbox.io.Directory;
+import com.asofterspace.toolbox.io.File;
 import com.asofterspace.toolbox.io.IoUtils;
 import com.asofterspace.toolbox.io.JSON;
 import com.asofterspace.toolbox.io.JsonParseException;
@@ -1064,7 +1065,8 @@ public class TaskCtrl extends TaskCtrlBase {
 		if ("\\".equals(System.lineSeparator())) {
 			IoUtils.execute("upload.bat");
 		} else {
-			IoUtils.execute("upload.sh");
+			File uploadFile = new File("upload.sh");
+			IoUtils.execute(uploadFile.getCanonicalFilename());
 		}
 	}
 
