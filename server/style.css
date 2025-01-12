@@ -218,12 +218,12 @@ div.footer {
 	height: 200pt;
 }
 
-div.details > a, span > a {
+div.details > a, span > a, span > i > a {
 	color: #AACCFF;
 	text-decoration: underline;
 }
 
-div.details > a:hover, span > a:hover {
+div.details > a:hover, span > a:hover, span > i > a:hover {
 	color: #CCEEFF;
 }
 
