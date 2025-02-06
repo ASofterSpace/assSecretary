@@ -65,7 +65,7 @@ public class TaskDatabase {
 		dbFile.setAllContents(loadedRoot);
 		dbFile.save();
 
-		String backupName = "tasks-backup-" + StrUtils.leftPad0(rand.nextInt(10000), 4) + ".json";
+		String backupName = "tasks-backup-" + StrUtils.leftPad0(rand.nextInt(100), 2) + ".json";
 		TextFile backupFile = new TextFile(dataDir, backupName);
 		backupFile.saveContent(dbFile.getContent());
 	}

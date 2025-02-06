@@ -73,7 +73,7 @@ public class EventListDatabase {
 
 			if (!newRoot.equals(eventListBackupRoot)) {
 				eventListBackupRoot = newRoot;
-				String newLatestSlotStr = StrUtils.leftPad0(MathUtils.randomInteger(10000), 4);
+				String newLatestSlotStr = StrUtils.leftPad0(MathUtils.randomInteger(100), 2);
 				TextFile newBackupFile = new TextFile(
 					database.getEventListDirectory(),
 					BACKUP_PREFIX + newLatestSlotStr + ".json"
