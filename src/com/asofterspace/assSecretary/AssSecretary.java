@@ -8,6 +8,7 @@ import com.asofterspace.assSecretary.eventList.EventListDatabase;
 import com.asofterspace.assSecretary.facts.FactDatabase;
 import com.asofterspace.assSecretary.locations.LocationDatabase;
 import com.asofterspace.assSecretary.ltc.LtcDatabase;
+import com.asofterspace.assSecretary.missionControl.McInfo;
 import com.asofterspace.assSecretary.missionControl.MissionControlDatabase;
 import com.asofterspace.assSecretary.missionControl.VmInfo;
 import com.asofterspace.assSecretary.missionControl.WebInfo;
@@ -48,8 +49,8 @@ public class AssSecretary {
 	public final static String FACT_DIR = "../assTrainer/config";
 
 	public final static String PROGRAM_TITLE = "assSecretary (Hugo)";
-	public final static String VERSION_NUMBER = "0.1.0.8(" + Utils.TOOLBOX_VERSION_NUMBER + ")";
-	public final static String VERSION_DATE = "21. October 2020 - 6. February 2025";
+	public final static String VERSION_NUMBER = "0.1.0.9(" + Utils.TOOLBOX_VERSION_NUMBER + ")";
+	public final static String VERSION_DATE = "21. October 2020 - 25. May 2025";
 
 	private static Database database;
 	private static LocationDatabase locationDB;
@@ -257,6 +258,8 @@ public class AssSecretary {
 			int startupTaskRepeatTimeMinutes = 29;
 			System.out.println("Creating startup task thread to re-run tests every " + startupTaskRepeatTimeMinutes + " minutes...");
 
+			McInfo.initStaticsFromDatabase(database);
+
 			Thread startupTaskThread = new Thread() {
 
 				public void run() {
@@ -329,28 +332,41 @@ public class AssSecretary {
 		webInfo = new WebInfo();
 		vmInfo = new VmInfo();
 
-		addWebInfo(webInfo, "asofterspace", "assEn", "https://www.asofterspace.com/", missionControlDatabase);
-		addWebInfo(webInfo, "asofterspace", "assDe", "https://www.asofterspace.de/", missionControlDatabase);
+		addWebInfo(webInfo, "asofterspace", "assEn", database, missionControlDatabase);
+		addWebInfo(webInfo, "asofterspace", "assDe", database, missionControlDatabase);
 
-		addWebInfo(webInfo, "fem*streik", "femOrg", "https://feministischerstreik.org/", missionControlDatabase);
+		addWebInfo(webInfo, "fem*streik", "femOrg", database, missionControlDatabase);
 
-		addWebInfo(webInfo, "AGSG", "agsgOrg", "https://afghangirlssuccessgate.org/", missionControlDatabase);
+		addWebInfo(webInfo, "AGSG", "agsgOrg", database, missionControlDatabase);
 
-		addWebInfo(webInfo, "HERA", "heraTasks", "https://asofterspace.com/heraTasks/", missionControlDatabase);
+		addWebInfo(webInfo, "HERA", "heraTasks", database, missionControlDatabase);
 
-		addWebInfo(webInfo, "QZT", "qztIPC", "https://asofterspace.com/qzt/instaPostCreator/", missionControlDatabase);
+		addWebInfo(webInfo, "QZT", "qztIPC", database, missionControlDatabase);
+		addWebInfo(webInfo, "CSD", "csdWeb", database, missionControlDatabase);
 
-		addWebInfo(webInfo, "SB", "sbWW", "https://asofterspace.com/services/seebruecke/wegweiser/index.htm", missionControlDatabase);
+		addWebInfo(webInfo, "SB", "sbWW", database, missionControlDatabase);
 
-		addWebInfo(webInfo, "WoodWatchers", "wwFrontend", "https://woodwatchers.org/", missionControlDatabase);
-		addWebInfo(webInfo, "WoodWatchers", "wwBackend", "https://asofterspace.com/woodWatchers/", missionControlDatabase);
+		addWebInfo(webInfo, "WoodWatchers", "wwFrontend", database, missionControlDatabase);
+		addWebInfo(webInfo, "WoodWatchers", "wwBackend", database, missionControlDatabase);
 
 		addVmInfo(vmInfo, "skyhook", "db", missionControlDatabase);
 		addVmInfo(vmInfo, "skyhook", "f1", missionControlDatabase);
 		addVmInfo(vmInfo, "skyhook", "f2", missionControlDatabase);
-		addWebInfo(webInfo, "skyhook", "skyWeb", "https://skyhook.is/", missionControlDatabase);
-		addWebInfo(webInfo, "skyhook", "skyApp", "https://app.skyhook.is/", missionControlDatabase);
-		addWebInfo(webInfo, "skyhook", "skyDb", "http://skyhookdb.skyhook.is/phpmyadmin/", missionControlDatabase);
+		addWebInfo(webInfo, "skyhook", "skyWeb", database, missionControlDatabase);
+		addWebInfo(webInfo, "skyhook", "skyApp", database, missionControlDatabase);
+		addWebInfo(webInfo, "skyhook", "skyDb", database, missionControlDatabase);
+
+		addWebInfo(webInfo, "SB", "sbWeb", database, missionControlDatabase);
+		addWebInfo(webInfo, "SB", "gsWeb", database, missionControlDatabase);
+		addWebInfo(webInfo, "SB", "sbCms", database, missionControlDatabase);
+		addWebInfo(webInfo, "SB", "sbCloud", database, missionControlDatabase);
+		addWebInfo(webInfo, "SB", "sbPort", database, missionControlDatabase);
+		addWebInfo(webInfo, "SB", "sbMails", database, missionControlDatabase);
+		addWebInfo(webInfo, "SB", "sbZam", database, missionControlDatabase);
+		addWebInfo(webInfo, "SB", "sbOrg", database, missionControlDatabase);
+		addWebInfo(webInfo, "SB", "sbWiki", database, missionControlDatabase);
+		addWebInfo(webInfo, "SB", "sbDA", database, missionControlDatabase);
+		addWebInfo(webInfo, "SB", "bkhWeb", database, missionControlDatabase);
 	}
 
 	private static void checkMemeFolder() {
@@ -500,69 +516,75 @@ public class AssSecretary {
 		int highestPerc = 0;
 		String highestFs = "";
 
-		for (String line : lines) {
-			if ("".equals(line.trim())) {
-				continue;
-			}
-			if (line.startsWith("Filesystem ")) {
-				continue;
-			}
-			if (line.startsWith("load pubkey ")) {
-				continue;
-			}
-			if (line.startsWith("/dev/loop") && line.contains("100% /snap/")) {
-				continue;
-			}
-
-			// transform "/dev/sda1 ... 50% /" into just "50%"
-			String fs = line.substring(0, line.indexOf(" "));
-			line = line.trim();
-			line = line.substring(0, line.lastIndexOf(" "));
-			line = line.trim();
-			line = line.substring(line.lastIndexOf(" ") + 1);
-			if (line.endsWith("%")) {
-				line = line.substring(0, line.length() - 1);
-				int curPerc = StrUtils.strToInt(line);
-				if (curPerc > highestPerc) {
-					highestPerc = curPerc;
-					highestFs = fs;
-				}
-			} else {
-				nonsense = true;
-			}
-		}
-
 		String result = "";
-		if (nonsense) {
-			result += "<span class='error'>Responded with nonsense!</span>";
+
+		if (lines == null) {
+			result += "<span class='error'>Could not be connected to!</span>";
 			missionControlDatabase.addDfDatapoint(new Date(), origin, which, null);
 		} else {
-			if (highestPerc < 30) {
-				result += "<span class='awesome'>";
-			}
-			if (highestPerc >= 80) {
-				if (highestPerc >= 90) {
-					result += "<span class='error'>";
+			for (String line : lines) {
+				if ("".equals(line.trim())) {
+					continue;
+				}
+				if (line.startsWith("Filesystem ")) {
+					continue;
+				}
+				if (line.startsWith("load pubkey ")) {
+					continue;
+				}
+				if (line.startsWith("/dev/loop") && line.contains("100% /snap/")) {
+					continue;
+				}
+
+				// transform "/dev/sda1 ... 50% /" into just "50%"
+				String fs = line.substring(0, line.indexOf(" "));
+				line = line.trim();
+				line = line.substring(0, line.lastIndexOf(" "));
+				line = line.trim();
+				line = line.substring(line.lastIndexOf(" ") + 1);
+				if (line.endsWith("%")) {
+					line = line.substring(0, line.length() - 1);
+					int curPerc = StrUtils.strToInt(line);
+					if (curPerc > highestPerc) {
+						highestPerc = curPerc;
+						highestFs = fs;
+					}
 				} else {
-					result += "<span class='warning'>";
+					nonsense = true;
 				}
 			}
-			result += highestFs + " is to " + highestPerc + "% full";
-			if ((highestPerc < 30) || (highestPerc >= 80)) {
-				result += "</span>";
+
+			if (nonsense) {
+				result += "<span class='error'>Responded with nonsense!</span>";
+				missionControlDatabase.addDfDatapoint(new Date(), origin, which, null);
+			} else {
+				if (highestPerc < 30) {
+					result += "<span class='awesome'>";
+				}
+				if (highestPerc >= 80) {
+					if (highestPerc >= 90) {
+						result += "<span class='error'>";
+					} else {
+						result += "<span class='warning'>";
+					}
+				}
+				result += highestFs + " is to " + highestPerc + "% full";
+				if ((highestPerc < 30) || (highestPerc >= 80)) {
+					result += "</span>";
+				}
+				missionControlDatabase.addDfDatapoint(new Date(), origin, which, highestPerc);
 			}
-			missionControlDatabase.addDfDatapoint(new Date(), origin, which, highestPerc);
 		}
 
 		vmInfo.set(which, result);
 	}
 
-	private static void addWebInfo(WebInfo webInfo, String origin, String which, String url,
+	private static void addWebInfo(WebInfo webInfo, String origin, String which, Database database,
 		MissionControlDatabase missionControlDatabase) {
 
 		WebAccessedCallback callback = new WebInfoCallback(webInfo, origin, which, missionControlDatabase);
 
-		WebAccessor.getAsynch(url, callback);
+		WebAccessor.getAsynch(database.getMcWebLinks().get(which), callback);
 	}
 
 	public static String getLocalInfo() {

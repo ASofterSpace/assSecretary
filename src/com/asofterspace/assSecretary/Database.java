@@ -46,6 +46,9 @@ public class Database {
 
 	private Map<String, Object> currentTaskInstanceAmounts;
 	private Map<String, Object> doneTaskInstanceAmounts;
+	private Map<String, String> mcInfoNames;
+	private Map<String, String> mcInfoOverviewCaptions;
+	private Map<String, String> mcWebLinks;
 
 	private String eventListURL = null;
 	private String eventListDir = null;
@@ -66,6 +69,9 @@ public class Database {
 	private static String EVENT_LIST_URL = "eventListURL";
 	private static String EVENT_LIST_DIR = "eventListDir";
 	private static String EVENT_LIST_LATEST = "eventListLatest";
+	private static String MC_INFO_NAMES = "mcInfoNames";
+	private static String MC_INFO_OVERVIEW_CAPTIONS = "mcInfoOverviewCaptions";
+	private static String MC_WEB_LINKS = "mcWebLinks";
 
 
 	public Database(Directory dataDir) {
@@ -121,6 +127,12 @@ public class Database {
 		this.eventListDirectory = new Directory(this.eventListDir);
 
 		this.eventListLatest = root.getString(EVENT_LIST_LATEST);
+
+		this.mcInfoNames = root.getStringMap(MC_INFO_NAMES);
+
+		this.mcInfoOverviewCaptions = root.getStringMap(MC_INFO_OVERVIEW_CAPTIONS);
+
+		this.mcWebLinks = root.getStringMap(MC_WEB_LINKS);
 	}
 
 	public Record getRoot() {
@@ -182,6 +194,12 @@ public class Database {
 		root.set(EVENT_LIST_DIR, eventListDir);
 
 		root.set(EVENT_LIST_LATEST, eventListLatest);
+
+		root.set(MC_INFO_NAMES, mcInfoNames);
+
+		root.set(MC_INFO_OVERVIEW_CAPTIONS, mcInfoOverviewCaptions);
+
+		root.set(MC_WEB_LINKS, mcWebLinks);
 
 		dbFile.setAllContents(root);
 		dbFile.save();
@@ -249,6 +267,18 @@ public class Database {
 
 	public void setEventListLatest(String eventListLatest) {
 		this.eventListLatest = eventListLatest;
+	}
+
+	public Map<String, String> getMcInfoNames() {
+		return mcInfoNames;
+	}
+
+	public Map<String, String> getMcInfoOverviewCaptions() {
+		return mcInfoOverviewCaptions;
+	}
+
+	public Map<String, String> getMcWebLinks() {
+		return mcWebLinks;
 	}
 
 }

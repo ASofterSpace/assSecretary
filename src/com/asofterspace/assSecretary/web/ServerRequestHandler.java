@@ -870,27 +870,40 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 				WebInfo webInfo = AssSecretary.getWebInfo();
 				StringBuilder vmStatsHtml = new StringBuilder();
 
-				addLine(vmStatsHtml, "asofterspace.com", webInfo, "assEn");
-				addLine(vmStatsHtml, "asofterspace.de", webInfo, "assDe");
+				addLine(vmStatsHtml, webInfo, "assEn");
+				addLine(vmStatsHtml, webInfo, "assDe");
 
-				addLine(vmStatsHtml, "fem*streik", webInfo, "femOrg");
+				addLine(vmStatsHtml, webInfo, "femOrg");
 
-				addLine(vmStatsHtml, "AGSG", webInfo, "agsgOrg");
+				addLine(vmStatsHtml, webInfo, "agsgOrg");
 
-				addLine(vmStatsHtml, "WoodWatchers", webInfo, "wwFrontend");
-				addLine(vmStatsHtml, "WoodWatchers", webInfo, "wwBackend");
+				addLine(vmStatsHtml, webInfo, "wwFrontend");
+				addLine(vmStatsHtml, webInfo, "wwBackend");
 
-				addLine(vmStatsHtml, "CielHeraTaskList", webInfo, "heraTasks");
+				addLine(vmStatsHtml, webInfo, "heraTasks");
 
-				addLine(vmStatsHtml, "SB WegWeiserTool", webInfo, "sbWW");
-				addLine(vmStatsHtml, "QZT InstaPostCreator", webInfo, "qztIPC");
+				addLine(vmStatsHtml, webInfo, "sbWW");
+				addLine(vmStatsHtml, webInfo, "qztIPC");
+				addLine(vmStatsHtml, webInfo, "csdWeb");
 
-				addLine(vmStatsHtml, "Skyhook DB", vmInfo, "db");
-				addLine(vmStatsHtml, "Skyhook DB", webInfo, "skyDb");
-				addLine(vmStatsHtml, "Skyhook F1", vmInfo, "f1");
-				addLine(vmStatsHtml, "Skyhook F2", vmInfo, "f2");
-				addLine(vmStatsHtml, "Skyhook App", webInfo, "skyApp");
-				addLine(vmStatsHtml, "Skyhook Webpage", webInfo, "skyWeb");
+				addLine(vmStatsHtml, vmInfo, "db");
+				addLine(vmStatsHtml, webInfo, "skyDb");
+				addLine(vmStatsHtml, vmInfo, "f1");
+				addLine(vmStatsHtml, vmInfo, "f2");
+				addLine(vmStatsHtml, webInfo, "skyApp");
+				addLine(vmStatsHtml, webInfo, "skyWeb");
+
+				addLine(vmStatsHtml, webInfo, "sbWeb");
+				addLine(vmStatsHtml, webInfo, "sbCms");
+				addLine(vmStatsHtml, webInfo, "sbCloud");
+				addLine(vmStatsHtml, webInfo, "sbPort");
+				addLine(vmStatsHtml, webInfo, "sbMails");
+				addLine(vmStatsHtml, webInfo, "sbZam");
+				addLine(vmStatsHtml, webInfo, "sbOrg");
+				addLine(vmStatsHtml, webInfo, "sbWiki");
+				addLine(vmStatsHtml, webInfo, "gsWeb");
+				addLine(vmStatsHtml, webInfo, "sbDA");
+				addLine(vmStatsHtml, webInfo, "bkhWeb");
 
 				if (vmStatsHtml.length() < 1) {
 					vmStatsHtml.insert(0, "I have checked the VM disk statusses and web accessibility - and all is fine.");
@@ -1555,27 +1568,37 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 		mcHtml += companyStart;
 		mcHtml += machineStart + "ASS Chaotic Joy MOYA-XV<br>" + AssSecretary.getLocalInfoShort() + machineEnd;
-		mcHtml += machineStart + "asofterspace<br>.com: " + webInfo.get("assEn") + "<br>.de: " + webInfo.get("assDe") + machineEnd;
-		mcHtml += machineStart + "Hera Tasks<br>" + webInfo.get("heraTasks") + machineEnd;
+		mcHtml += machineStart + "asofterspace<br>" + webInfo.getOv("assEn") + "<br>" + webInfo.getOv("assDe") + machineEnd;
+		mcHtml += machineStart + "Hera Tasks<br>" + webInfo.getOv("heraTasks") + machineEnd;
 		mcHtml += "<img class='logo' src='projectlogos/asofterspace/logo.png' />";
 		mcHtml += companyEnd;
 
 		mcHtml += companyStart;
-		mcHtml += machineStart + "Webpage<br>" + webInfo.get("skyWeb") + machineEnd;
-		mcHtml += machineStart + "App<br>" + webInfo.get("skyApp") + machineEnd;
-		mcHtml += machineStart + "F1<br>" + vmInfo.get("f1") + machineEnd;
-		mcHtml += machineStart + "F2<br>" + vmInfo.get("f2") + machineEnd;
-		mcHtml += machineStart + "DB<br>" + webInfo.get("skyDb") + "<br>" + vmInfo.get("db") + machineEnd;
+		mcHtml += machineStart + "Webpage<br>" + webInfo.getOv("skyWeb") + machineEnd;
+		mcHtml += machineStart + "App<br>" + webInfo.getOv("skyApp") + machineEnd;
+		mcHtml += machineStart + "F1<br>" + vmInfo.getOv("f1") + machineEnd;
+		mcHtml += machineStart + "F2<br>" + vmInfo.getOv("f2") + machineEnd;
+		mcHtml += machineStart + "DB<br>" + webInfo.getOv("skyDb") + "<br>" + vmInfo.getOv("db") + machineEnd;
 		mcHtml += "<img class='logo' src='projectlogos/skyhook/logo.png' />";
 		mcHtml += companyEnd;
 
 		mcHtml += companyStart;
-		mcHtml += machineStart + "feministischerstreik.org<br>" + webInfo.get("femOrg") + machineEnd;
-		mcHtml += machineStart + "afghangirlssuccessgate.org<br>" + webInfo.get("agsgOrg") + machineEnd;
-		mcHtml += machineStart + "WoodWatchers<br>front: " + webInfo.get("wwFrontend") + "<br>" +
-			"back: " + webInfo.get("wwBackend") + machineEnd;
-		mcHtml += machineStart + "SB WegWeiserTool<br>" + webInfo.get("sbWW") + machineEnd;
-		mcHtml += machineStart + "QZT InstaPostCreator<br>" + webInfo.get("qztIPC") + machineEnd;
+		mcHtml += machineStart + "Webpage<br>" + webInfo.getOv("sbWeb") + "<br>" + webInfo.getOv("sbCms") + "<br>" + webInfo.getOv("gsWeb") + machineEnd;
+		mcHtml += machineStart + "Cloud<br>" + webInfo.getOv("sbCloud") + "<br>" + webInfo.getOv("sbPort") + machineEnd;
+		mcHtml += machineStart + "Internal<br>" + webInfo.getOv("sbMails") + "<br>" + webInfo.getOv("sbZam") + "<br>" + webInfo.getOv("sbOrg") + machineEnd;
+		mcHtml += machineStart + "External<br>" + webInfo.getOv("sbWiki") + "<br>" + webInfo.getOv("sbWW") + machineEnd;
+		mcHtml += machineStart + "Bezahlkarte Hessen<br>" + webInfo.getOv("bkhWeb") + machineEnd;
+		mcHtml += machineStart + "DA<br>" + webInfo.getOv("sbDA") + machineEnd;
+		mcHtml += "<img class='logo' src='projectlogos/seebruecke/logo.png' />";
+		mcHtml += companyEnd;
+
+		mcHtml += companyStart;
+		mcHtml += machineStart + "feministischerstreik.org<br>" + webInfo.getOv("femOrg") + machineEnd;
+		mcHtml += machineStart + "afghangirlssuccessgate.org<br>" + webInfo.getOv("agsgOrg") + machineEnd;
+		mcHtml += machineStart + "WoodWatchers<br>front: " + webInfo.getOv("wwFrontend") + "<br>" +
+			"back: " + webInfo.getOv("wwBackend") + machineEnd;
+		mcHtml += machineStart + "CSD Tübingen<br>" + webInfo.getOv("csdWeb") + machineEnd;
+		mcHtml += machineStart + "QZT InstaPostCreator<br>" + webInfo.getOv("qztIPC") + machineEnd;
 
 		mcHtml += "<img class='logo' src='projectlogos/da/logo.png' />";
 		mcHtml += companyEnd;
@@ -1583,11 +1606,11 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 		return mcHtml;
 	}
 
-	private void addLine(StringBuilder vmStatsHtml, String name, McInfo mcInfo, String key) {
+	private void addLine(StringBuilder vmStatsHtml, McInfo mcInfo, String key) {
 		if (mcInfo == null) {
-			vmStatsHtml.append("<div class='line'>" + name + ": Weird, the information object is completely missing</div>");
+			vmStatsHtml.append("<div class='line'>Weird, the information object with key '" + key + "' is completely missing</div>");
 		} else if (mcInfo.isImportant(key)) {
-			vmStatsHtml.append("<div class='line'>" + name + ": " + mcInfo.get(key) + "</div>");
+			vmStatsHtml.append("<div class='line'>" + McInfo.getName(key) + ": " + mcInfo.get(key) + "</div>");
 		}
 	}
 
