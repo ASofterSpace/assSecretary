@@ -1385,7 +1385,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 
 			// answering a request for the stats page
-			if (locEquiv.equals("stats.htm")) {
+			if (locEquiv.equals("stats.htm") || locEquiv.equals("stats")) {
 
 				System.out.println("Answering stats request...");
 
@@ -1585,10 +1585,8 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 		mcHtml += companyStart;
 		mcHtml += machineStart + "Webpage<br>" + webInfo.getOv("sbWeb") + "<br>" + webInfo.getOv("sbCms") + "<br>" + webInfo.getOv("gsWeb") + machineEnd;
 		mcHtml += machineStart + "Cloud<br>" + webInfo.getOv("sbCloud") + "<br>" + webInfo.getOv("sbPort") + machineEnd;
-		mcHtml += machineStart + "Internal<br>" + webInfo.getOv("sbMails") + "<br>" + webInfo.getOv("sbZam") + "<br>" + webInfo.getOv("sbOrg") + machineEnd;
-		mcHtml += machineStart + "External<br>" + webInfo.getOv("sbWiki") + "<br>" + webInfo.getOv("sbWW") + machineEnd;
-		mcHtml += machineStart + "Bezahlkarte Hessen<br>" + webInfo.getOv("bkhWeb") + machineEnd;
-		mcHtml += machineStart + "DA<br>" + webInfo.getOv("sbDA") + machineEnd;
+		mcHtml += machineStart + "Internal<br>" + webInfo.getOv("sbMails") + "<br>" + webInfo.getOv("sbZam") + "<br>" + webInfo.getOv("sbOrg") + "<br>" + webInfo.getOv("sbWiki") + machineEnd;
+		mcHtml += machineStart + "Other<br>" + webInfo.getOv("bkhWeb") + "<br>" + webInfo.getOv("sbDA") + "<br>" + webInfo.getOv("sbWW") + machineEnd;
 		mcHtml += "<img class='logo' src='projectlogos/seebruecke/logo.png' />";
 		mcHtml += companyEnd;
 
