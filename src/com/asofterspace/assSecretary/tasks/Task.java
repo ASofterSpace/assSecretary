@@ -532,7 +532,7 @@ public class Task extends GenericTask {
 					html.append("\")'>");
 					html.append("Details");
 					html.append("</span>");
-					mainWidth -= 6.5;
+					mainWidth -= 6.5f;
 				}
 			}
 
@@ -545,7 +545,7 @@ public class Task extends GenericTask {
 					html.append(externalSource);
 					html.append(")");
 					html.append("</span>");
-					mainWidth -= 8.5;
+					mainWidth -= 8.5f;
 				}
 
 			} else if (workbenchLink != null) {
@@ -555,14 +555,14 @@ public class Task extends GenericTask {
 				html.append("\")'>");
 				html.append("(from Workbench)");
 				html.append("</span>");
-				mainWidth -= 11.5;
+				mainWidth -= 11.5f;
 
 			} else if (TaskCtrl.FINANCE_ORIGIN.equals(origin)) {
 
 				html.append("<span style='width: 9%; " + miniBtnStyle + "' class='button'>");
 				html.append("(from Mari)");
 				html.append("</span>");
-				mainWidth -= 9.5;
+				mainWidth -= 9.5f;
 
 			// if this is not an actual instance, but just a ghost of a scheduled task, then of course it cannot
 			// be edited in any way shape or form, so no point in showing any of the regular buttons :)
@@ -572,11 +572,11 @@ public class Task extends GenericTask {
 				html.append("<span style='");
 				if (reducedView) {
 					html.append(btnStyle);
-					mainWidth -= 6.5;
+					mainWidth -= 6.5f;
 				} else {
 					html.append("width: 9.5%; ");
 					html.append(miniBtnStyle);
-					mainWidth -= 10;
+					mainWidth -= 10f;
 				}
 				html.append("' class='button' onclick='secretary.taskPreRelease(\"");
 				html.append(id);
@@ -594,7 +594,7 @@ public class Task extends GenericTask {
 				html.append("\")'>");
 				html.append("Edit");
 				html.append("</span>");
-				mainWidth -= 6.5;
+				mainWidth -= 6.5f;
 
 				html.append("<span style='");
 				html.append("width: 10.5%; ");
@@ -612,7 +612,7 @@ public class Task extends GenericTask {
 					html.append("Delete Parent");
 				}
 				html.append("</span>");
-				mainWidth -= 11;
+				mainWidth -= 11f;
 
 			} else {
 
@@ -626,7 +626,7 @@ public class Task extends GenericTask {
 						html.append("\")' id='task-up-" + id + "'>");
 						html.append("/\\");
 						html.append("</span>");
-						mainWidth -= 2.5;
+						mainWidth -= 2.5f;
 
 						html.append("<span style='");
 						html.append("width: 2%; ");
@@ -636,7 +636,7 @@ public class Task extends GenericTask {
 						html.append("\")' id='task-down-" + id + "'>");
 						html.append("\\/");
 						html.append("</span>");
-						mainWidth -= 2.5;
+						mainWidth -= 2.5f;
 					}
 
 					html.append("<span style='");
@@ -646,7 +646,7 @@ public class Task extends GenericTask {
 					html.append("\")'>");
 					html.append("Un-Do");
 					html.append("</span>");
-					mainWidth -= 6.5;
+					mainWidth -= 6.5f;
 				} else {
 					html.append("<span style='");
 					html.append(btnStyle);
@@ -655,7 +655,7 @@ public class Task extends GenericTask {
 					html.append("\")'>");
 					html.append("Done");
 					html.append("</span>");
-					mainWidth -= 6.5;
+					mainWidth -= 6.5f;
 				}
 
 				html.append("<span style='");
@@ -665,7 +665,7 @@ public class Task extends GenericTask {
 				html.append("\")'>");
 				html.append("Edit");
 				html.append("</span>");
-				mainWidth -= 6.5;
+				mainWidth -= 6.5f;
 
 				html.append("<span style='");
 				html.append(btnStyle);
@@ -679,7 +679,7 @@ public class Task extends GenericTask {
 				html.append("\")'>");
 				html.append("Delete");
 				html.append("</span>");
-				mainWidth -= 6.5;
+				mainWidth -= 6.5f;
 
 				if ((!reducedView) && (!historicalView) && (!standalone)) {
 					if (onShortlist) {

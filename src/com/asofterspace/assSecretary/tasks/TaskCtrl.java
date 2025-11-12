@@ -94,6 +94,9 @@ public class TaskCtrl extends TaskCtrlBase {
 	private Directory uploadDir;
 
 	private Long lastUploadRequestTime = null;
+	private Long uploadThreadRanLastTime = null;
+	private int currentUploadThreadNum = 0;
+	private static final int UPLOAD_THREAD_TICK = 2*1000;
 
 
 	public TaskCtrl(Database database, TaskDatabase taskDatabase, LocationDatabase locationDB,
@@ -125,22 +128,36 @@ public class TaskCtrl extends TaskCtrlBase {
 
 		database.setTaskCtrl(this);
 
+		startUploadThread();
+	}
+
+	private void startUploadThread() {
+
 		TaskCtrl taskCtrl = this;
+
+		this.currentUploadThreadNum++;
+
+		int thisUploadThreadNum = this.currentUploadThreadNum;
 
 		Thread t = new Thread(new Runnable() { public void run() {
 
 			while (true) {
 
+				// for some reason, a new thread was started - let's stop this one here then!
+				if (taskCtrl.currentUploadThreadNum > thisUploadThreadNum) {
+					return;
+				}
+
+				taskCtrl.uploadThreadRanLastTime = System.currentTimeMillis();
+
 				// this does not need to be exactly synchronized, as the upload calendar just works on
 				// a best-effort basis anyway; it will not always be 100% up-to-date
 				if (taskCtrl.lastUploadRequestTime != null) {
 
-					long curTime = System.currentTimeMillis();
-
 					// System.out.println("Comparing upload request: " + (curTime - taskCtrl.lastUploadRequestTime));
 
 					// if more than a minute ago an upload was requested, then do it now!
-					if (curTime - taskCtrl.lastUploadRequestTime > 60*1000) {
+					if (taskCtrl.uploadThreadRanLastTime - taskCtrl.lastUploadRequestTime > 60*1000) {
 
 						taskCtrl.lastUploadRequestTime = null;
 
@@ -150,7 +167,7 @@ public class TaskCtrl extends TaskCtrlBase {
 
 				try {
 					// check every two seconds
-					Thread.sleep(2000);
+					Thread.sleep(UPLOAD_THREAD_TICK);
 
 				} catch (InterruptedException e) {
 					System.out.println("Interrupted upload thread, returning...");
@@ -905,6 +922,13 @@ public class TaskCtrl extends TaskCtrlBase {
 		System.out.println("Requesting to upload calendar...");
 
 		this.lastUploadRequestTime = System.currentTimeMillis();
+
+		// if the upload thread is no longer running...
+		if ((uploadThreadRanLastTime == null) ||
+			(lastUploadRequestTime - uploadThreadRanLastTime > 3*UPLOAD_THREAD_TICK)) {
+			// ... restart it!
+			startUploadThread();
+		}
 	}
 
 	public void uploadPreviewCalendar() {
