@@ -56,7 +56,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 	public final static String MARI_DATABASE_FILE = "../assAccountant/config/database.cnf";
 
-	private Database db;
+	private Database database;
 
 	private TaskCtrl taskCtrl;
 
@@ -79,11 +79,11 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 
 	public ServerRequestHandler(WebServer server, Socket request, Directory webRoot, Directory serverDir,
-		Database db, TaskCtrl taskCtrl, FactDatabase factDatabase, QuickDatabase quickDB, LocationDatabase locationDB) {
+		Database database, TaskCtrl taskCtrl, FactDatabase factDatabase, QuickDatabase quickDB, LocationDatabase locationDB) {
 
 		super(server, request, webRoot);
 
-		this.db = db;
+		this.database = database;
 
 		this.taskCtrl = taskCtrl;
 
@@ -302,8 +302,8 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 					break;
 
 				case "/saveInbox":
-					db.setInboxContent(json.getString("content"));
-					db.save();
+					database.setInboxContent(json.getString("content"));
+					database.save();
 					answer = new WebServerAnswerInJson(new JSON("{\"success\": true}"));
 					break;
 
@@ -558,7 +558,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 				TextFile indexBaseFile = new TextFile(webRoot, locEquiv);
 				String indexContent = indexBaseFile.getContent();
 
-				indexContent = StrUtils.replaceAll(indexContent, "[[USERNAME]]", db.getUsername());
+				indexContent = StrUtils.replaceAll(indexContent, "[[USERNAME]]", database.getUsername());
 
 				// System.out.println("debug 5");
 
@@ -779,7 +779,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 				String mariHtml = "";
 
-				if (db.connectToMari()) {
+				if (database.connectToMari()) {
 
 					String problems = WebAccessor.get("http://localhost:3011/unacknowledged-problems");
 
@@ -866,49 +866,52 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 				// System.out.println("debug 11");
 
-				VmInfo vmInfo = AssSecretary.getVmInfo();
-				WebInfo webInfo = AssSecretary.getWebInfo();
 				StringBuilder vmStatsHtml = new StringBuilder();
 
-				addLine(vmStatsHtml, webInfo, "assEn");
-				addLine(vmStatsHtml, webInfo, "assDe");
+				if (database.useMissionControl()) {
+					VmInfo vmInfo = AssSecretary.getVmInfo();
+					WebInfo webInfo = AssSecretary.getWebInfo();
 
-				addLine(vmStatsHtml, webInfo, "femOrg");
+					addLine(vmStatsHtml, webInfo, "assEn");
+					addLine(vmStatsHtml, webInfo, "assDe");
 
-				addLine(vmStatsHtml, webInfo, "agsgOrg");
+					addLine(vmStatsHtml, webInfo, "femOrg");
 
-				addLine(vmStatsHtml, webInfo, "wwFrontend");
-				addLine(vmStatsHtml, webInfo, "wwBackend");
+					addLine(vmStatsHtml, webInfo, "agsgOrg");
 
-				addLine(vmStatsHtml, webInfo, "heraTasks");
+					addLine(vmStatsHtml, webInfo, "wwFrontend");
+					addLine(vmStatsHtml, webInfo, "wwBackend");
 
-				addLine(vmStatsHtml, webInfo, "sbWW");
-				addLine(vmStatsHtml, webInfo, "qztIPC");
-				addLine(vmStatsHtml, webInfo, "csdWeb");
+					addLine(vmStatsHtml, webInfo, "heraTasks");
 
-				addLine(vmStatsHtml, vmInfo, "db");
-				addLine(vmStatsHtml, webInfo, "skyDb");
-				addLine(vmStatsHtml, vmInfo, "f1");
-				addLine(vmStatsHtml, vmInfo, "f2");
-				addLine(vmStatsHtml, webInfo, "skyApp");
-				addLine(vmStatsHtml, webInfo, "skyWeb");
+					addLine(vmStatsHtml, webInfo, "sbWW");
+					addLine(vmStatsHtml, webInfo, "qztIPC");
+					addLine(vmStatsHtml, webInfo, "csdWeb");
 
-				addLine(vmStatsHtml, webInfo, "sbWeb");
-				addLine(vmStatsHtml, webInfo, "sbCms");
-				addLine(vmStatsHtml, webInfo, "sbCloud");
-				addLine(vmStatsHtml, webInfo, "sbPort");
-				addLine(vmStatsHtml, webInfo, "sbMails");
-				addLine(vmStatsHtml, webInfo, "sbZam");
-				addLine(vmStatsHtml, webInfo, "sbOrg");
-				addLine(vmStatsHtml, webInfo, "sbWiki");
-				addLine(vmStatsHtml, webInfo, "gsWeb");
-				addLine(vmStatsHtml, webInfo, "sbDA");
-				addLine(vmStatsHtml, webInfo, "bkhWeb");
+					addLine(vmStatsHtml, vmInfo, "database");
+					addLine(vmStatsHtml, webInfo, "skyDb");
+					addLine(vmStatsHtml, vmInfo, "f1");
+					addLine(vmStatsHtml, vmInfo, "f2");
+					addLine(vmStatsHtml, webInfo, "skyApp");
+					addLine(vmStatsHtml, webInfo, "skyWeb");
 
-				if (vmStatsHtml.length() < 1) {
-					vmStatsHtml.insert(0, "I have checked the VM disk statusses and web accessibility - and all is fine.");
-				} else {
-					vmStatsHtml.insert(0, "I have checked the VM disk statusses and web accessibility - the status is:");
+					addLine(vmStatsHtml, webInfo, "sbWeb");
+					addLine(vmStatsHtml, webInfo, "sbCms");
+					addLine(vmStatsHtml, webInfo, "sbCloud");
+					addLine(vmStatsHtml, webInfo, "sbPort");
+					addLine(vmStatsHtml, webInfo, "sbMails");
+					addLine(vmStatsHtml, webInfo, "sbZam");
+					addLine(vmStatsHtml, webInfo, "sbOrg");
+					addLine(vmStatsHtml, webInfo, "sbWiki");
+					addLine(vmStatsHtml, webInfo, "gsWeb");
+					addLine(vmStatsHtml, webInfo, "sbDA");
+					addLine(vmStatsHtml, webInfo, "bkhWeb");
+
+					if (vmStatsHtml.length() < 1) {
+						vmStatsHtml.insert(0, "I have checked the VM disk statusses and web accessibility - and all is fine.");
+					} else {
+						vmStatsHtml.insert(0, "I have checked the VM disk statusses and web accessibility - the status is:");
+					}
 				}
 				vmStatsHtml.insert(0, "<div style='position:relative;'>");
 
@@ -925,7 +928,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 				String towaHtml = "";
 
-				if (db.connectToTowa()) {
+				if (database.connectToTowa()) {
 
 					String currentAdvice = WebAccessor.get("http://localhost:3016/currentAdvice");
 
@@ -1069,7 +1072,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 				TextFile indexBaseFile = new TextFile(webRoot, locEquiv);
 				String indexContent = indexBaseFile.getContent();
 
-				indexContent = StrUtils.replaceAll(indexContent, "[[INBOX_CONTENT]]", db.getInboxContent());
+				indexContent = StrUtils.replaceAll(indexContent, "[[INBOX_CONTENT]]", database.getInboxContent());
 
 				indexContent = StrUtils.replaceAll(indexContent, "[[CURDATE]]", DateUtils.serializeDate(DateUtils.now()));
 
@@ -1437,8 +1440,8 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 		StringBuilder html = new StringBuilder();
 
-		Map<String, Object> currentTasks = db.getCurrentTaskInstanceAmounts();
-		Map<String, Object> doneTasks = db.getDoneTaskInstanceAmounts();
+		Map<String, Object> currentTasks = database.getCurrentTaskInstanceAmounts();
+		Map<String, Object> doneTasks = database.getDoneTaskInstanceAmounts();
 
 		Set<String> combinedDateSet = new HashSet<>();
 		combinedDateSet.addAll(currentTasks.keySet());
@@ -1549,7 +1552,15 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 		return html.toString();
 	}
 
-	private String getMissionControlHtml(boolean createLinks) {
+	private String getMissionControlHtml(boolean fullPage) {
+
+		if (!database.useMissionControl()) {
+			if (fullPage) {
+				return "Mission Control is turned off - you can turn it on via " +
+					database.getKeyInfoForPrinting(Database.USE_MISSION_CONTROL);
+			}
+			return "";
+		}
 
 		String mcHtml = "";
 
@@ -1578,7 +1589,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 		mcHtml += machineStart + "App<br>" + webInfo.getOv("skyApp") + machineEnd;
 		mcHtml += machineStart + "F1<br>" + vmInfo.getOv("f1") + machineEnd;
 		mcHtml += machineStart + "F2<br>" + vmInfo.getOv("f2") + machineEnd;
-		mcHtml += machineStart + "DB<br>" + webInfo.getOv("skyDb") + "<br>" + vmInfo.getOv("db") + machineEnd;
+		mcHtml += machineStart + "DB<br>" + webInfo.getOv("skyDb") + "<br>" + vmInfo.getOv("database") + machineEnd;
 		mcHtml += "<img class='logo' src='projectlogos/skyhook/logo.png' />";
 		mcHtml += companyEnd;
 

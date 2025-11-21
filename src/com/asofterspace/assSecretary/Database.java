@@ -20,12 +20,16 @@ import java.util.Map;
 public class Database {
 
 	private static final String DB_FILE_NAME = "database.json";
+	private static final String TASK_STATS_FILE_NAME = "task-stats.json";
 
 	private Directory dataDir;
 
 	private JsonFile dbFile;
-
+	private String dbFilePath;
 	private JSON root;
+
+	private JsonFile taskStatsFile;
+	private JSON taskStatsRoot;
 
 	private Integer port;
 
@@ -39,6 +43,8 @@ public class Database {
 	private Boolean connectToTowa;
 	private Boolean connectToWorkbench;
 	private Boolean connectToLtc;
+	private Boolean useMissionControl;
+	private Boolean uploadCalendar;
 
 	private TaskCtrl taskCtrl;
 
@@ -46,6 +52,7 @@ public class Database {
 
 	private Map<String, Object> currentTaskInstanceAmounts;
 	private Map<String, Object> doneTaskInstanceAmounts;
+
 	private Map<String, String> mcInfoNames;
 	private Map<String, String> mcInfoOverviewCaptions;
 	private Map<String, String> mcWebLinks;
@@ -55,23 +62,25 @@ public class Database {
 	private Directory eventListDirectory = null;
 	private String eventListLatest = null;
 
-	private static String PORT = "port";
-	private static String USERNAME = "username";
-	private static String INBOX_CONTENT = "inboxContent";
-	private static String CONNECT_TO_MARI = "connectToMari";
-	private static String CONNECT_TO_TOWA = "connectToTowa";
-	private static String CONNECT_TO_WORKBENCH = "connectToWorkbench";
-	private static String CONNECT_TO_LTC = "connectToLtc";
-	private static String SHORTLIST_ADVANCES = "shortlistAdvances";
-	private static String CURRENT_TASK_INSTANCE_AMOUNTS = "currentTaskInstanceAmounts";
-	private static String DONE_TASK_INSTANCE_AMOUNTS = "doneTaskInstanceAmounts";
-	private static String MEME_PATH = "memepath";
-	private static String EVENT_LIST_URL = "eventListURL";
-	private static String EVENT_LIST_DIR = "eventListDir";
-	private static String EVENT_LIST_LATEST = "eventListLatest";
-	private static String MC_INFO_NAMES = "mcInfoNames";
-	private static String MC_INFO_OVERVIEW_CAPTIONS = "mcInfoOverviewCaptions";
-	private static String MC_WEB_LINKS = "mcWebLinks";
+	private static final String PORT = "port";
+	private static final String USERNAME = "username";
+	private static final String INBOX_CONTENT = "inboxContent";
+	private static final String CONNECT_TO_MARI = "connectToMari";
+	private static final String CONNECT_TO_TOWA = "connectToTowa";
+	private static final String CONNECT_TO_WORKBENCH = "connectToWorkbench";
+	private static final String CONNECT_TO_LTC = "connectToLtc";
+	public static final String USE_MISSION_CONTROL = "useMissionControl";
+	private static final String UPLOAD_CALENDAR = "uploadCalendar";
+	private static final String SHORTLIST_ADVANCES = "shortlistAdvances";
+	private static final String CURRENT_TASK_INSTANCE_AMOUNTS = "currentTaskInstanceAmounts";
+	private static final String DONE_TASK_INSTANCE_AMOUNTS = "doneTaskInstanceAmounts";
+	private static final String MEME_PATH = "memepath";
+	private static final String EVENT_LIST_URL = "eventListURL";
+	private static final String EVENT_LIST_DIR = "eventListDir";
+	private static final String EVENT_LIST_LATEST = "eventListLatest";
+	private static final String MC_INFO_NAMES = "mcInfoNames";
+	private static final String MC_INFO_OVERVIEW_CAPTIONS = "mcInfoOverviewCaptions";
+	private static final String MC_WEB_LINKS = "mcWebLinks";
 
 
 	public Database(Directory dataDir) {
@@ -82,8 +91,13 @@ public class Database {
 
 		this.dbFile = new JsonFile(dataDir, DB_FILE_NAME);
 		this.dbFile.createParentDirectory();
+		this.dbFilePath = this.dbFile.getCanonicalFilename();
+
+		this.taskStatsFile = new JsonFile(dataDir, TASK_STATS_FILE_NAME);
+
 		try {
 			this.root = dbFile.getAllContents();
+			this.taskStatsRoot = dbFile.getAllContents();
 		} catch (JsonParseException e) {
 			System.err.println("Oh no!");
 			e.printStackTrace(System.err);
@@ -106,6 +120,10 @@ public class Database {
 
 		this.connectToLtc = root.getBoolean(CONNECT_TO_LTC);
 
+		this.useMissionControl = root.getBoolean(USE_MISSION_CONTROL);
+
+		this.uploadCalendar = root.getBoolean(UPLOAD_CALENDAR);
+
 
 		this.shortlistAdvances = new HashMap<String, List<String>>();
 
@@ -114,11 +132,6 @@ public class Database {
 		for (Map.Entry<String, Record> entry : shortlistAdvanceMap.entrySet()) {
 			shortlistAdvances.put(entry.getKey(), entry.getValue().getStringValues());
 		}
-
-
-		this.currentTaskInstanceAmounts = root.getObjectMap(CURRENT_TASK_INSTANCE_AMOUNTS);
-
-		this.doneTaskInstanceAmounts = root.getObjectMap(DONE_TASK_INSTANCE_AMOUNTS);
 
 		this.eventListURL = root.getString(EVENT_LIST_URL);
 
@@ -133,6 +146,10 @@ public class Database {
 		this.mcInfoOverviewCaptions = root.getStringMap(MC_INFO_OVERVIEW_CAPTIONS);
 
 		this.mcWebLinks = root.getStringMap(MC_WEB_LINKS);
+
+		this.currentTaskInstanceAmounts = taskStatsRoot.getObjectMap(CURRENT_TASK_INSTANCE_AMOUNTS);
+
+		this.doneTaskInstanceAmounts = taskStatsRoot.getObjectMap(DONE_TASK_INSTANCE_AMOUNTS);
 	}
 
 	public Record getRoot() {
@@ -178,16 +195,11 @@ public class Database {
 
 		root.set(CONNECT_TO_LTC, connectToLtc());
 
+		root.set(USE_MISSION_CONTROL, useMissionControl());
+
+		root.set(UPLOAD_CALENDAR, uploadCalendar());
+
 		root.set(SHORTLIST_ADVANCES, shortlistAdvances);
-
-		boolean ordered = false;
-		currentTaskInstanceAmounts.put(DateUtils.serializeDate(DateUtils.now()),
-			taskCtrl.getCurrentTaskInstances(ordered).size());
-		root.set(CURRENT_TASK_INSTANCE_AMOUNTS, currentTaskInstanceAmounts);
-
-		doneTaskInstanceAmounts.put(DateUtils.serializeDate(DateUtils.now()),
-			taskCtrl.getDoneTaskInstancesAsTasks().size());
-		root.set(DONE_TASK_INSTANCE_AMOUNTS, doneTaskInstanceAmounts);
 
 		root.set(EVENT_LIST_URL, eventListURL);
 
@@ -203,6 +215,18 @@ public class Database {
 
 		dbFile.setAllContents(root);
 		dbFile.save();
+
+		boolean ordered = true;
+		currentTaskInstanceAmounts.put(DateUtils.serializeDate(DateUtils.now()),
+			taskCtrl.getCurrentTaskInstances(ordered).size());
+		taskStatsRoot.set(CURRENT_TASK_INSTANCE_AMOUNTS, currentTaskInstanceAmounts);
+
+		doneTaskInstanceAmounts.put(DateUtils.serializeDate(DateUtils.now()),
+			taskCtrl.getDoneTaskInstancesAsTasks().size());
+		taskStatsRoot.set(DONE_TASK_INSTANCE_AMOUNTS, doneTaskInstanceAmounts);
+
+		taskStatsFile.setAllContents(taskStatsRoot);
+		taskStatsFile.save();
 	}
 
 	public boolean connectToMari() {
@@ -231,6 +255,20 @@ public class Database {
 			return true;
 		}
 		return connectToLtc;
+	}
+
+	public boolean useMissionControl() {
+		if (useMissionControl == null) {
+			return true;
+		}
+		return useMissionControl;
+	}
+
+	public boolean uploadCalendar() {
+		if (uploadCalendar == null) {
+			return true;
+		}
+		return uploadCalendar;
 	}
 
 	public Map<String, List<String>> getShortlistAdvances() {
@@ -279,6 +317,14 @@ public class Database {
 
 	public Map<String, String> getMcWebLinks() {
 		return mcWebLinks;
+	}
+
+	/**
+	 * return a string to inform user about which key in which file to edit to change a certain
+	 * configured behavior
+	 */
+	public String getKeyInfoForPrinting(String key) {
+		return "key '" + key + "' in database file " + dbFilePath;
 	}
 
 }

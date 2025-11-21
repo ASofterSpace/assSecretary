@@ -133,6 +133,10 @@ public class TaskCtrl extends TaskCtrlBase {
 
 	private void startUploadThread() {
 
+		if (!database.uploadCalendar()) {
+			return;
+		}
+
 		TaskCtrl taskCtrl = this;
 
 		this.currentUploadThreadNum++;
@@ -919,6 +923,10 @@ public class TaskCtrl extends TaskCtrlBase {
 	}
 
 	public void uploadPreviewCalendarSoon() {
+		if (!database.uploadCalendar()) {
+			return;
+		}
+
 		System.out.println("Requesting to upload calendar...");
 
 		this.lastUploadRequestTime = System.currentTimeMillis();
@@ -932,6 +940,9 @@ public class TaskCtrl extends TaskCtrlBase {
 	}
 
 	public void uploadPreviewCalendar() {
+		if (!database.uploadCalendar()) {
+			return;
+		}
 
 		System.out.println("Uploading calendar...");
 

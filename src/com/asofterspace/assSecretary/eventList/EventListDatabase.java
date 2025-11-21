@@ -36,6 +36,10 @@ public class EventListDatabase {
 	public static void init(Database databaseArg) {
 		database = databaseArg;
 
+		if ((database.getEventListDirectory() == null) || (!database.getEventListDirectory().exists())) {
+			return;
+		}
+
 		JsonFile lastBackupFile = new JsonFile(
 			database.getEventListDirectory(),
 			BACKUP_PREFIX + database.getEventListLatest() + ".json"
@@ -64,6 +68,9 @@ public class EventListDatabase {
 	}
 
 	public static void runEventListBackup() {
+		if (database.getEventListURL() == null) {
+			return;
+		}
 		// web accessor call is synchronous, as we assume that we are being called in a thread
 		// (e.g. by the startup task thread) anyway
 		String eventListBackupStr = WebAccessor.get(database.getEventListURL());
@@ -106,23 +113,25 @@ public class EventListDatabase {
 			return result;
 		}
 
-		for (Task task : eventsAsTaskInstances) {
-			Date date = task.getReleaseDate();
-			// do not report tasks without date at all
-			if (date == null) {
-				continue;
-			}
-			if (from != null) {
-				if (from.after(date)) {
+		if (eventsAsTaskInstances != null) {
+			for (Task task : eventsAsTaskInstances) {
+				Date date = task.getReleaseDate();
+				// do not report tasks without date at all
+				if (date == null) {
 					continue;
 				}
-			}
-			if (to != null) {
-				if (to.before(date)) {
-					continue;
+				if (from != null) {
+					if (from.after(date)) {
+						continue;
+					}
 				}
+				if (to != null) {
+					if (to.before(date)) {
+						continue;
+					}
+				}
+				result.add(task);
 			}
-			result.add(task);
 		}
 
 		return result;

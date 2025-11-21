@@ -49,8 +49,8 @@ public class AssSecretary {
 	public final static String FACT_DIR = "../assTrainer/config";
 
 	public final static String PROGRAM_TITLE = "assSecretary (Hugo)";
-	public final static String VERSION_NUMBER = "0.1.1.1(" + Utils.TOOLBOX_VERSION_NUMBER + ")";
-	public final static String VERSION_DATE = "21. October 2020 - 12. November 2025";
+	public final static String VERSION_NUMBER = "0.1.1.2(" + Utils.TOOLBOX_VERSION_NUMBER + ")";
+	public final static String VERSION_DATE = "21. October 2020 - 21. November 2025";
 
 	private static Database database;
 	private static LocationDatabase locationDB;
@@ -328,6 +328,10 @@ public class AssSecretary {
 	}
 
 	private static void checkWebAndVmStatus() {
+
+		if (!database.useMissionControl()) {
+			return;
+		}
 
 		webInfo = new WebInfo();
 		vmInfo = new VmInfo();
