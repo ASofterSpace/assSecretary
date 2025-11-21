@@ -891,7 +891,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 					addLine(vmStatsHtml, vmInfo, "database");
 					addLine(vmStatsHtml, webInfo, "skyDb");
 					addLine(vmStatsHtml, vmInfo, "f1");
-					addLine(vmStatsHtml, vmInfo, "f2");
+					// addLine(vmStatsHtml, vmInfo, "f2");
 					addLine(vmStatsHtml, webInfo, "skyApp");
 					addLine(vmStatsHtml, webInfo, "skyWeb");
 
@@ -1588,7 +1588,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 		mcHtml += machineStart + "Webpage<br>" + webInfo.getOv("skyWeb") + machineEnd;
 		mcHtml += machineStart + "App<br>" + webInfo.getOv("skyApp") + machineEnd;
 		mcHtml += machineStart + "F1<br>" + vmInfo.getOv("f1") + machineEnd;
-		mcHtml += machineStart + "F2<br>" + vmInfo.getOv("f2") + machineEnd;
+		// mcHtml += machineStart + "F2<br>" + vmInfo.getOv("f2") + machineEnd;
 		mcHtml += machineStart + "DB<br>" + webInfo.getOv("skyDb") + "<br>" + vmInfo.getOv("database") + machineEnd;
 		mcHtml += "<img class='logo' src='projectlogos/skyhook/logo.png' />";
 		mcHtml += companyEnd;

@@ -128,6 +128,7 @@ public class AssSecretary {
 
 		System.out.println("Starting up task ctrl...");
 		TaskCtrl taskCtrl = new TaskCtrl(database, taskDatabase, locationDB, webRoot, uploadDir);
+		taskCtrl.init();
 
 
 		if (fix_data_mode) {
@@ -355,7 +356,7 @@ public class AssSecretary {
 
 		addVmInfo(vmInfo, "skyhook", "db", missionControlDatabase);
 		addVmInfo(vmInfo, "skyhook", "f1", missionControlDatabase);
-		addVmInfo(vmInfo, "skyhook", "f2", missionControlDatabase);
+		// addVmInfo(vmInfo, "skyhook", "f2", missionControlDatabase);
 		addWebInfo(webInfo, "skyhook", "skyWeb", database, missionControlDatabase);
 		addWebInfo(webInfo, "skyhook", "skyApp", database, missionControlDatabase);
 		addWebInfo(webInfo, "skyhook", "skyDb", database, missionControlDatabase);
@@ -510,6 +511,7 @@ public class AssSecretary {
 			IoUtils.execute(thisDir.getAbsoluteDirname() + "\\" + SCRIPTS_DIR + "\\" + origin + "_df_" + which + ".bat");
 		} else {
 			File scriptFile = new File(scriptsDir, origin + "_df_" + which + ".sh");
+			System.out.println("Attempting to run: " + scriptFile.getCanonicalFilename());
 			IoUtils.execute(scriptFile.getCanonicalFilename());
 		}
 
@@ -540,21 +542,27 @@ public class AssSecretary {
 					continue;
 				}
 
-				// transform "/dev/sda1 ... 50% /" into just "50%"
-				String fs = line.substring(0, line.indexOf(" "));
-				line = line.trim();
-				line = line.substring(0, line.lastIndexOf(" "));
-				line = line.trim();
-				line = line.substring(line.lastIndexOf(" ") + 1);
-				if (line.endsWith("%")) {
-					line = line.substring(0, line.length() - 1);
-					int curPerc = StrUtils.strToInt(line);
-					if (curPerc > highestPerc) {
-						highestPerc = curPerc;
-						highestFs = fs;
+				if (line.indexOf(" ") >= 0) {
+					// transform "/dev/sda1 ... 50% /" into just "50%"
+					String fs = line.substring(0, line.indexOf(" "));
+					line = line.trim();
+					if (line.lastIndexOf(" ") >= 0) {
+						line = line.substring(0, line.lastIndexOf(" "));
+						line = line.trim();
+						if (line.lastIndexOf(" ") >= 0) {
+							line = line.substring(line.lastIndexOf(" ") + 1);
+							if (line.endsWith("%")) {
+								line = line.substring(0, line.length() - 1);
+								int curPerc = StrUtils.strToInt(line);
+								if (curPerc > highestPerc) {
+									highestPerc = curPerc;
+									highestFs = fs;
+								}
+							} else {
+								nonsense = true;
+							}
+						}
 					}
-				} else {
-					nonsense = true;
 				}
 			}
 

@@ -111,6 +111,12 @@ public class TaskCtrl extends TaskCtrlBase {
 		this.webRoot = webRoot;
 
 		this.uploadDir = uploadDir;
+	}
+
+	// call this directly after the contructor (gives warnings inside of constructor though so instead
+	// we have a separate method that NEEDS to be called or otherwise the object is not fully constructed...
+	// yay .-.)
+	public void init() {
 
 		Record root = taskDatabase.getLoadedRoot();
 

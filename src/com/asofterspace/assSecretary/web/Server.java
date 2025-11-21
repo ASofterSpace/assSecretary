@@ -36,7 +36,7 @@ public class Server extends WebServer {
 
 		super(webRoot, db.getPort());
 
-		this.setAcceptLocalConnectionsOnly(true);
+		this.acceptLocalConnectionsOnly = true;
 
 		this.db = db;
 
