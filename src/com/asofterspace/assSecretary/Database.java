@@ -29,7 +29,6 @@ public class Database {
 	private JSON root;
 
 	private JsonFile taskStatsFile;
-	private JSON taskStatsRoot;
 
 	private Integer port;
 
@@ -94,10 +93,11 @@ public class Database {
 		this.dbFilePath = this.dbFile.getCanonicalFilename();
 
 		this.taskStatsFile = new JsonFile(dataDir, TASK_STATS_FILE_NAME);
+		Record taskStatsRoot = new Record();
 
 		try {
 			this.root = dbFile.getAllContents();
-			this.taskStatsRoot = dbFile.getAllContents();
+			taskStatsRoot = taskStatsFile.getAllContents();
 		} catch (JsonParseException e) {
 			System.err.println("Oh no!");
 			e.printStackTrace(System.err);
@@ -216,7 +216,8 @@ public class Database {
 		dbFile.setAllContents(root);
 		dbFile.save();
 
-		boolean ordered = true;
+		Record taskStatsRoot = new Record();
+		boolean ordered = false;
 		currentTaskInstanceAmounts.put(DateUtils.serializeDate(DateUtils.now()),
 			taskCtrl.getCurrentTaskInstances(ordered).size());
 		taskStatsRoot.set(CURRENT_TASK_INSTANCE_AMOUNTS, currentTaskInstanceAmounts);

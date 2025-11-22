@@ -11,20 +11,23 @@ import com.asofterspace.toolbox.utils.Record;
 
 public class MariTaskCtrl extends TaskCtrlBase {
 
+	private Record rootToLoad;
+
 
 	public MariTaskCtrl(MariDatabase database) {
 
-		loadFromDatabase(database);
+		this.rootToLoad = database.getLoadedRoot();
+	}
+
+	// necessary to call after the constructor ugh .-.
+	public void init() {
+
+		loadFromRoot(rootToLoad);
+
+		rootToLoad = null;
 
 		// generate instances, but do not save them!
 		generateNewInstances(DateUtils.now());
-	}
-
-	private void loadFromDatabase(MariDatabase database) {
-
-		Record root = database.getLoadedRoot();
-
-		loadFromRoot(root);
 	}
 
 }

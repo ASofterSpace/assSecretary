@@ -803,14 +803,6 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 						boolean talkedToMari = false;
 
-						MariTaskCtrl mariTaskCtrl = new MariTaskCtrl(mariDatabase);
-
-						List<GenericTask> tasks = mariTaskCtrl.getCurrentTaskInstances();
-						/*
-						int upcomingDays = 5;
-						List<GenericTask> upcomingTasks = mariTaskCtrl.getUpcomingTaskInstances(upcomingDays);
-						*/
-
 						if (!"no problems".equals(problems)) {
 							mariHtml += "<div>";
 							mariHtml += "<div>I talked to Mari and she mentioned these problems:</div>";
@@ -818,6 +810,15 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 							mariHtml += "</div>";
 							talkedToMari = true;
 						}
+
+						MariTaskCtrl mariTaskCtrl = new MariTaskCtrl(mariDatabase);
+						mariTaskCtrl.init();
+
+						List<GenericTask> tasks = mariTaskCtrl.getCurrentTaskInstances();
+						/*
+						int upcomingDays = 5;
+						List<GenericTask> upcomingTasks = mariTaskCtrl.getUpcomingTaskInstances(upcomingDays);
+						*/
 
 						if (tasks.size() > 0) {
 							mariHtml += "<div>";

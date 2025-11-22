@@ -511,7 +511,6 @@ public class AssSecretary {
 			IoUtils.execute(thisDir.getAbsoluteDirname() + "\\" + SCRIPTS_DIR + "\\" + origin + "_df_" + which + ".bat");
 		} else {
 			File scriptFile = new File(scriptsDir, origin + "_df_" + which + ".sh");
-			System.out.println("Attempting to run: " + scriptFile.getCanonicalFilename());
 			IoUtils.execute(scriptFile.getCanonicalFilename());
 		}
 
