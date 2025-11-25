@@ -407,29 +407,28 @@ public class Task extends GenericTask {
 			html.append("<div>");
 		}
 		if (!reducedView) {
+			String dateStr = null;
 			if (isInstance()) {
-				html.append("<span style='width: 5%;'>");
 				if (historicalView) {
 					Date doneDate = getDoneDate();
 					if (doneDate == null) {
 						// on upload calendar view, instead of having null everywhere,
 						// just have the single task dot
-						html.append("· ");
+						dateStr = "· ";
 					} else {
-						html.append(DateUtils.serializeDate(getDoneDate()));
+						dateStr = DateUtils.serializeDate(getDoneDate());
 					}
 				} else {
-					html.append(getReleasedDateStr());
+					dateStr = getReleasedDateStr();
 				}
-				html.append("</span>");
 			} else {
-				String schedDateStr = getScheduleDateStr();
-				html.append("<span style='width: 5%;' title='");
-				html.append(schedDateStr);
-				html.append("'>");
-				html.append(schedDateStr);
-				html.append("</span>");
+				dateStr = getScheduleDateStr();
 			}
+			html.append("<span style='width: 5%;' title='");
+			html.append(dateStr);
+			html.append("'>");
+			html.append(dateStr);
+			html.append("</span>");
 			mainWidth -= 5;
 		}
 
