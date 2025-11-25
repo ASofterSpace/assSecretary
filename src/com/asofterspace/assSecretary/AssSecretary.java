@@ -375,6 +375,11 @@ public class AssSecretary {
 	}
 
 	private static void checkMemeFolder() {
+		String memePath = database.getMemePath();
+		if (memePath == null) {
+			return;
+		}
+		Directory memeDir = new Directory(memePath);
 
 		StringBuilder result = new StringBuilder();
 		result.append("<div>");
@@ -384,11 +389,9 @@ public class AssSecretary {
 		result.append("They are:");
 		result.append("</div>");
 
-		Directory parent = new Directory(database.getMemePath());
-
 		boolean foundSomeProblem = false;
 		boolean recursively = false;
-		List<File> files = parent.getAllFiles(recursively);
+		List<File> files = memeDir.getAllFiles(recursively);
 		List<Long> fileSizes = new ArrayList<>();
 
 		for (int i = 0; i < files.size(); i++) {
