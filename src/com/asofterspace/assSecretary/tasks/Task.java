@@ -424,12 +424,12 @@ public class Task extends GenericTask {
 			} else {
 				dateStr = getScheduleDateStr();
 			}
-			html.append("<span style='width: 5%;' title='");
+			html.append("<span style='width: 5.6%;text-overflow:clip;' title='");
 			html.append(dateStr);
 			html.append("'>");
 			html.append(dateStr);
 			html.append("</span>");
-			mainWidth -= 5;
+			mainWidth -= 5.6f;
 		}
 
 		html.append("<span class='tla'");
