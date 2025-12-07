@@ -2019,7 +2019,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 			if (emptyView) {
 				weeklyHtmlStr.append("<div style='padding: 0 0 0 12pt; position: relative;'>");
-				weeklyHtmlStr.append("<div class='kw_on_month_view'>KW: " + DateUtils.getWeek(today) + "</div>");
+				weeklyHtmlStr.append("<div class='kw_on_month_view'>KW:&nbsp;" + DateUtils.getWeek(today) + "</div>");
 			}
 
 			for (Date day : weekDays) {
