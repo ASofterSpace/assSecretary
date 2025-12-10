@@ -685,7 +685,14 @@ window.secretary = {
 			if (request.readyState == 4 && request.status == 200) {
 				var result = JSON.parse(request.response);
 				if (result.success) {
-					window.location.reload(false);
+					// just moving the task div up is actually perfectly enough, a full refresh is not necessary
+					var newParent = document.getElementById('shortlist')
+					var taskDiv = document.getElementById("task-" + id);
+					if (newParent && taskDiv) {
+						newParent.appendChild(taskDiv);
+					} else {
+						window.location.reload(false);
+					}
 				}
 			}
 		}
@@ -707,10 +714,15 @@ window.secretary = {
 			if (request.readyState == 4 && request.status == 200) {
 				var result = JSON.parse(request.response);
 				if (result.success) {
-					// just hiding the task div is actually perfectly enough, a full refresh is not necessary
+					// just moving the task div down is actually perfectly enough, a full refresh is not necessary
 					var taskDiv = document.getElementById("task-" + id + "-on-shortlist");
 					if (taskDiv) {
-						taskDiv.style.display = 'none';
+						var newParent = document.getElementById('taskContainer')
+						if (newParent) {
+							newParent.appendChild(taskDiv);
+						} else {
+							taskDiv.style.display = 'none';
+						}
 						window.shortlistAmount--;
 						window.reevaluateShortlistAmount();
 					} else {
