@@ -382,7 +382,7 @@ div.kw_on_month_view {
 }
 
 
-/* taken out animations to stress out our processor less
+/* START COMMENT HERE to take out animations to stress out our processor less */
 
 @keyframes pulsating_alarm {
   0% {
@@ -613,4 +613,4 @@ div.kw_on_month_view {
   animation: wobbling_center_8 95s linear infinite;
 }
 
-*/
+/* END COMMENT HERE to take out animations to stress out our processor less */
