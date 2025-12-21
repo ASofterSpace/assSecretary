@@ -366,6 +366,7 @@ window.secretary = {
 
 		request.send(JSON.stringify(data));
 		this.removeTaskFromDOM(id);
+		window.reevaluateShortlistAmount();
 	},
 
 	taskUnDone: function(id) {
@@ -387,6 +388,7 @@ window.secretary = {
 			id: id,
 		};
 
+		window.reevaluateShortlistAmount();
 		request.send(JSON.stringify(data));
 	},
 
@@ -690,6 +692,7 @@ window.secretary = {
 					var taskDiv = document.getElementById("task-" + id);
 					if (newParent && taskDiv) {
 						newParent.appendChild(taskDiv);
+						window.reevaluateShortlistAmount();
 					} else {
 						window.location.reload(false);
 					}
@@ -723,7 +726,6 @@ window.secretary = {
 						} else {
 							taskDiv.style.display = 'none';
 						}
-						window.shortlistAmount--;
 						window.reevaluateShortlistAmount();
 					} else {
 						window.location.reload(false);
@@ -758,8 +760,7 @@ window.secretary = {
 					for (var i = 0; i < ids.length; i++) {
 						var taskDiv = document.getElementById("task-" + ids[i] + "-on-shortlist");
 						if (taskDiv) {
-							taskDiv.style.display = 'none';
-							window.shortlistAmount--;
+							this.removeTaskFromDOM(ids[i]);
 							window.reevaluateShortlistAmount();
 						} else {
 							window.location.reload(false);

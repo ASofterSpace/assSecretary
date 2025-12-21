@@ -693,7 +693,8 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 				// BEHAVIOR NEEDS TO AGREE WITH JAVASCRIPT CODE 50 LINES BELOW
 				String shortlistDivClassName = "";
 				String shortlistFullLabelStDisp = "style='display: none;'";
-				if (shortlistTasks.size() > 36) {
+				int SHORTLIST_RED_CUTOFF_VALUE = 36;
+				if (shortlistTasks.size() > SHORTLIST_RED_CUTOFF_VALUE) {
 					shortlistDivClassName = "class='pulsating_alarm'";
 					shortlistFullLabelStDisp = "style='display: block;'";
 				}
@@ -732,12 +733,12 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 				// BEHAVIOR NEEDS TO AGREE WITH JAVA CODE 50 LINES ABOVE
 				taskShortlistHtml.append("<script>\n");
-				taskShortlistHtml.append("window.shortlistAmount = " + shortlistTasks.size() + ";\n");
 				taskShortlistHtml.append("window.reevaluateShortlistAmount = function() {\n");
 				taskShortlistHtml.append("  var shortlistDiv = document.getElementById('shortlist');\n");
 				taskShortlistHtml.append("  var shortlistFullLabel = document.getElementById('shortlist-full-label');\n");
 				taskShortlistHtml.append("  if (shortlistDiv && shortlistFullLabel) {\n");
-				taskShortlistHtml.append("    if (shortlistAmount > 36) {\n");
+				// -2 because of the two divs at the start
+				taskShortlistHtml.append("    if (shortlistDiv.children.length - 2 > " + SHORTLIST_RED_CUTOFF_VALUE + ") {\n");
 				taskShortlistHtml.append("      shortlistDiv.className = 'pulsating_alarm';\n");
 				taskShortlistHtml.append("      shortlistFullLabel.style.display = 'block';\n");
 				taskShortlistHtml.append("    } else {\n");
