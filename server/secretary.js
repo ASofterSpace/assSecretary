@@ -271,6 +271,7 @@ window.secretary = {
 					} else {
 						window.secretary.removeTaskFromDOM(window.secretary.currentlyEditing);
 						window.secretary.closeSingleTaskModal();
+						window.reevaluateShortlistAmount();
 					}
 				}
 			}
@@ -365,7 +366,7 @@ window.secretary = {
 		};
 
 		request.send(JSON.stringify(data));
-		this.removeTaskFromDOM(id);
+		window.secretary.removeTaskFromDOM(id);
 		window.reevaluateShortlistAmount();
 	},
 
@@ -649,12 +650,13 @@ window.secretary = {
 		window.setTimeout(function() {
 			if (Array.isArray(delIds)) {
 				for (var id of delIds) {
-					secretary.removeTaskFromDOM(id);
+					window.secretary.removeTaskFromDOM(id);
 				}
 			} else {
-				secretary.removeTaskFromDOM(id);
+				window.secretary.removeTaskFromDOM(id);
 			}
 			secretary.closeDeleteTaskModal();
+			window.reevaluateShortlistAmount();
 		}, 100);
 
 		secretary.currentlyDeleting = [];
@@ -760,7 +762,7 @@ window.secretary = {
 					for (var i = 0; i < ids.length; i++) {
 						var taskDiv = document.getElementById("task-" + ids[i] + "-on-shortlist");
 						if (taskDiv) {
-							this.removeTaskFromDOM(ids[i]);
+							window.secretary.removeTaskFromDOM(ids[i]);
 							window.reevaluateShortlistAmount();
 						} else {
 							window.location.reload(false);
