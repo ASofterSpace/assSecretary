@@ -26,6 +26,7 @@ import com.asofterspace.toolbox.io.HTML;
 import com.asofterspace.toolbox.io.JSON;
 import com.asofterspace.toolbox.io.JsonParseException;
 import com.asofterspace.toolbox.io.TextFile;
+import com.asofterspace.toolbox.utils.DateHolder;
 import com.asofterspace.toolbox.utils.DateUtils;
 import com.asofterspace.toolbox.utils.Record;
 import com.asofterspace.toolbox.utils.SortUtils;
@@ -1929,26 +1930,33 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 		Collections.sort(tasks, new Comparator<Task>() {
 			public int compare(Task a, Task b) {
-				Date aDone = a.getDoneDate();
-				Date bDone = b.getDoneDate();
-				if (DateUtils.isSameDay(aDone, bDone)) {
-					// on tasklog, sort tasks within a day by the datetime at which "done" was set
-					Date aSetToDone = a.getSetToDoneDateTime();
-					Date bSetToDone = b.getSetToDoneDateTime();
-					if ((aSetToDone != null) && (bSetToDone != null)) {
-						if (aSetToDone.before(bSetToDone)) {
-							return 1;
-						}
-						if (bSetToDone.before(aSetToDone)) {
-							return -1;
-						}
+				DateHolder aDone = a.getDoneDateHolder();
+				DateHolder bDone = b.getDoneDateHolder();
+				if ((aDone != null) && (bDone != null)) {
+					if (aDone.before(bDone)) {
+						return 1;
 					}
-					return a.getCurrentPriority(aDone, historicalView) - b.getCurrentPriority(bDone, historicalView);
+					if (bDone.before(aDone)) {
+						return -1;
+					}
 				}
-				if (aDone.before(bDone)) {
-					return 1;
+				// on tasklog, sort tasks within a day by the datetime at which "done" was set
+				DateHolder aSetToDone = a.getSetToDoneDateTimeHolder();
+				DateHolder bSetToDone = b.getSetToDoneDateTimeHolder();
+				if ((aSetToDone != null) && (bSetToDone != null)) {
+					if (aSetToDone.before(bSetToDone)) {
+						return 1;
+					}
+					if (bSetToDone.before(aSetToDone)) {
+						return -1;
+					}
 				}
-				return -1;
+				// if even that is the same, sort by priority
+				if ((aDone == null) || (bDone == null)) {
+					return 0;
+				}
+				return a.getCurrentPriority(aDone.getDate(), historicalView) -
+					b.getCurrentPriority(bDone.getDate(), historicalView);
 			}
 		});
 
