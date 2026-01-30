@@ -271,7 +271,10 @@ window.secretary = {
 					} else {
 						window.secretary.removeTaskFromDOM(window.secretary.currentlyEditing);
 						window.secretary.closeSingleTaskModal();
-						window.reevaluateShortlistAmount();
+
+						if (window.reevaluateShortlistAmount) {
+							window.reevaluateShortlistAmount();
+						}
 					}
 				}
 			}
@@ -366,8 +369,12 @@ window.secretary = {
 		};
 
 		request.send(JSON.stringify(data));
+
 		window.secretary.removeTaskFromDOM(id);
-		window.reevaluateShortlistAmount();
+
+		if (window.reevaluateShortlistAmount) {
+			window.reevaluateShortlistAmount();
+		}
 	},
 
 	taskUnDone: function(id) {
@@ -389,8 +396,11 @@ window.secretary = {
 			id: id,
 		};
 
-		window.reevaluateShortlistAmount();
 		request.send(JSON.stringify(data));
+
+		if (window.reevaluateShortlistAmount) {
+			window.reevaluateShortlistAmount();
+		}
 	},
 
 	resetSingleTaskModal: function() {
@@ -656,7 +666,9 @@ window.secretary = {
 				window.secretary.removeTaskFromDOM(id);
 			}
 			secretary.closeDeleteTaskModal();
-			window.reevaluateShortlistAmount();
+			if (window.reevaluateShortlistAmount) {
+				window.reevaluateShortlistAmount();
+			}
 		}, 100);
 
 		secretary.currentlyDeleting = [];
@@ -694,7 +706,9 @@ window.secretary = {
 					var taskDiv = document.getElementById("task-" + id);
 					if (newParent && taskDiv) {
 						newParent.appendChild(taskDiv);
-						window.reevaluateShortlistAmount();
+						if (window.reevaluateShortlistAmount) {
+							window.reevaluateShortlistAmount();
+						}
 					} else {
 						window.location.reload(false);
 					}
@@ -728,7 +742,9 @@ window.secretary = {
 						} else {
 							taskDiv.style.display = 'none';
 						}
-						window.reevaluateShortlistAmount();
+						if (window.reevaluateShortlistAmount) {
+							window.reevaluateShortlistAmount();
+						}
 					} else {
 						window.location.reload(false);
 					}
@@ -763,7 +779,9 @@ window.secretary = {
 						var taskDiv = document.getElementById("task-" + ids[i] + "-on-shortlist");
 						if (taskDiv) {
 							window.secretary.removeTaskFromDOM(ids[i]);
-							window.reevaluateShortlistAmount();
+							if (window.reevaluateShortlistAmount) {
+								window.reevaluateShortlistAmount();
+							}
 						} else {
 							window.location.reload(false);
 						}

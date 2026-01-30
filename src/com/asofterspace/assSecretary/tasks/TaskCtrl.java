@@ -295,7 +295,12 @@ public class TaskCtrl extends TaskCtrlBase {
 			taskRecord.setOrRemove(ORIGIN, ourTask.getOrigin());
 			taskRecord.setOrRemove(PRIORITY, ourTask.getPriority());
 			taskRecord.setOrRemove(PRIORITY_ESCALATION_AFTER_DAYS, ourTask.getPriorityEscalationAfterDays());
-			taskRecord.setOrRemove(DURATION, ourTask.getDuration());
+			Integer dur = ourTask.getDuration();
+			if ((dur == null) || (dur == 0)) {
+				taskRecord.remove(DURATION);
+			} else {
+				taskRecord.set(DURATION, dur);
+			}
 			if (ourTask.hasAnId()) {
 				taskRecord.set(ID, ourTask.getId());
 			}
