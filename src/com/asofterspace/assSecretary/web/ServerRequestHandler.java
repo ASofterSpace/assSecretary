@@ -26,6 +26,7 @@ import com.asofterspace.toolbox.io.HTML;
 import com.asofterspace.toolbox.io.JSON;
 import com.asofterspace.toolbox.io.JsonParseException;
 import com.asofterspace.toolbox.io.TextFile;
+import com.asofterspace.toolbox.projects.GenericProject;
 import com.asofterspace.toolbox.utils.DateHolder;
 import com.asofterspace.toolbox.utils.DateUtils;
 import com.asofterspace.toolbox.utils.Record;
@@ -78,9 +79,14 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 	private final static boolean SHOW_BUTTONS = true;
 
+	private static String taskKeysForWorkFilterCached = null;
+
+	private static String taskOptionsForModalsCached = null;
+
 
 	public ServerRequestHandler(WebServer server, Socket request, Directory webRoot, Directory serverDir,
-		Database database, TaskCtrl taskCtrl, FactDatabase factDatabase, QuickDatabase quickDB, LocationDatabase locationDB) {
+		Database database, TaskCtrl taskCtrl, FactDatabase factDatabase,
+		QuickDatabase quickDB, LocationDatabase locationDB) {
 
 		super(server, request, webRoot);
 
@@ -953,9 +959,8 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 				// System.out.println("debug 12.5");
 
-				indexContent = StrUtils.replaceAll(indexContent, "[[CURDATE]]", DateUtils.serializeDate(DateUtils.now()));
 
-				indexContent = StrUtils.replaceAll(indexContent, "[[MINI_CALENDAR]]", getMiniCalendarHtml());
+				indexContent = performGeneralHtmlReplacements(indexContent);
 
 				indexContent = StrUtils.replaceAll(indexContent, "[[SIDEBAR]]", SideBarCtrl.getSidebarHtmlStr(EMPLOYEE_HUGO));
 
@@ -1077,9 +1082,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 				indexContent = StrUtils.replaceAll(indexContent, "[[INBOX_CONTENT]]", database.getInboxContent());
 
-				indexContent = StrUtils.replaceAll(indexContent, "[[CURDATE]]", DateUtils.serializeDate(DateUtils.now()));
-
-				indexContent = StrUtils.replaceAll(indexContent, "[[MINI_CALENDAR]]", getMiniCalendarHtml());
+				indexContent = performGeneralHtmlReplacements(indexContent);
 
 				indexContent = StrUtils.replaceAll(indexContent, "[[SIDEBAR]]", getSidebarHtmlWithHugo());
 
@@ -1119,8 +1122,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 				indexContent = StrUtils.replaceAll(indexContent, "[[TASKS]]", taskHtml.toString());
 
-				// mini-calendar is needed in case a task is pre-released which opens the single task entry modal
-				indexContent = StrUtils.replaceAll(indexContent, "[[MINI_CALENDAR]]", getMiniCalendarHtml());
+				indexContent = performGeneralHtmlReplacements(indexContent);
 
 				indexContent = StrUtils.replaceAll(indexContent, "[[SIDEBAR]]", getSidebarHtmlWithHugo());
 
@@ -1139,9 +1141,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 				TextFile indexBaseFile = new TextFile(webRoot, locEquiv);
 				String indexContent = indexBaseFile.getContent();
 
-				indexContent = StrUtils.replaceAll(indexContent, "[[CURDATE]]", DateUtils.serializeDate(DateUtils.now()));
-
-				indexContent = StrUtils.replaceAll(indexContent, "[[MINI_CALENDAR]]", getMiniCalendarHtml());
+				indexContent = performGeneralHtmlReplacements(indexContent);
 
 				indexContent = StrUtils.replaceAll(indexContent, "[[SIDEBAR]]", getSidebarHtmlWithHugo());
 
@@ -1220,9 +1220,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 				indexContent = StrUtils.replaceAll(indexContent, "[[NEXT_DATE_MONTH]]", DateUtils.serializeDate(DateUtils.addDays(today, 30)));
 				indexContent = StrUtils.replaceAll(indexContent, "[[NEXT_DATE_YEAR]]", DateUtils.serializeDate(DateUtils.addDays(today, 365)));
 
-				indexContent = StrUtils.replaceAll(indexContent, "[[CURDATE]]", DateUtils.serializeDate(actualToday));
-
-				indexContent = StrUtils.replaceAll(indexContent, "[[MINI_CALENDAR]]", getMiniCalendarHtml());
+				indexContent = performGeneralHtmlReplacements(indexContent);
 
 				indexContent = StrUtils.replaceAll(indexContent, "[[SIDEBAR]]", getSidebarHtmlWithHugo());
 
@@ -1360,9 +1358,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 				indexContent = StrUtils.replaceAll(indexContent, "[[NEXT_DATE_MONTH]]", DateUtils.serializeDate(DateUtils.parseDateNumbers(1, month + 1, year)));
 				indexContent = StrUtils.replaceAll(indexContent, "[[NEXT_DATE_YEAR]]", DateUtils.serializeDate(DateUtils.parseDateNumbers(1, month, year + 1)));
 
-				indexContent = StrUtils.replaceAll(indexContent, "[[CURDATE]]", DateUtils.serializeDate(actualToday));
-
-				indexContent = StrUtils.replaceAll(indexContent, "[[MINI_CALENDAR]]", getMiniCalendarHtml());
+				indexContent = performGeneralHtmlReplacements(indexContent);
 
 				indexContent = StrUtils.replaceAll(indexContent, "[[SIDEBAR]]", getSidebarHtmlWithHugo());
 
@@ -1400,6 +1396,8 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 				indexContent = StrUtils.replaceAll(indexContent, "[[STATISTICS]]", getStatsHtml());
 
+				indexContent = performGeneralHtmlReplacements(indexContent);
+
 				indexContent = StrUtils.replaceAll(indexContent, "[[SIDEBAR]]", getSidebarHtmlWithHugo());
 
 				locEquiv = "_" + locEquiv;
@@ -1417,6 +1415,8 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 				String indexContent = indexBaseFile.getContent();
 
 				indexContent = StrUtils.replaceAll(indexContent, "[[MISSION_CONTROL]]", getMissionControlHtml(true));
+
+				indexContent = performGeneralHtmlReplacements(indexContent);
 
 				indexContent = StrUtils.replaceAll(indexContent, "[[SIDEBAR]]", getSidebarHtmlWithHugo());
 
@@ -2130,6 +2130,40 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 		monthlyHtmlStr.append("<div style='padding-bottom: 25pt;'>");
 		monthlyHtmlStr.append("</div>");
+	}
+
+	private String performGeneralHtmlReplacements(String indexContent) {
+
+		indexContent = StrUtils.replaceAll(indexContent, "[[CURDATE]]", DateUtils.serializeDate(DateUtils.now()));
+
+		indexContent = StrUtils.replaceAll(indexContent, "[[MINI_CALENDAR]]", getMiniCalendarHtml());
+
+		if (taskKeysForWorkFilterCached == null) {
+			StringBuilder sb = new StringBuilder();
+			String sep = "";
+			for (GenericProject proj : SideBarCtrl.getProjectCtrl().getGenericProjects()) {
+				if (proj.isWork()) {
+					sb.append(sep);
+					sep = ", ";
+					sb.append(proj.getShortName());
+				}
+			}
+			taskKeysForWorkFilterCached = sb.toString();
+		}
+
+		indexContent = StrUtils.replaceAll(indexContent, "[[TASK_KEYS_FOR_WORK_FILTER]]", taskKeysForWorkFilterCached);
+
+		if (taskOptionsForModalsCached == null) {
+			StringBuilder sb = new StringBuilder();
+			for (GenericProject proj : SideBarCtrl.getProjectCtrl().getGenericProjects()) {
+				sb.append("<option value='" + proj.getShortName() + "'>" + proj.getFullName() + "</option>\n");
+			}
+			taskOptionsForModalsCached = sb.toString();
+		}
+
+		indexContent = StrUtils.replaceAll(indexContent, "[[TASK_OPTIONS_FOR_MODALS]]", taskOptionsForModalsCached);
+
+		return indexContent;
 	}
 
 }

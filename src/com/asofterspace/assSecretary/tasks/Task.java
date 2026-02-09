@@ -7,8 +7,10 @@ package com.asofterspace.assSecretary.tasks;
 import com.asofterspace.assSecretary.AssSecretary;
 import com.asofterspace.toolbox.calendar.GenericTask;
 import com.asofterspace.toolbox.io.HTML;
+import com.asofterspace.toolbox.projects.GenericProject;
 import com.asofterspace.toolbox.utils.DateUtils;
 import com.asofterspace.toolbox.utils.StrUtils;
+import com.asofterspace.toolbox.virtualEmployees.SideBarCtrl;
 
 import java.util.Date;
 import java.util.List;
@@ -60,6 +62,8 @@ public class Task extends GenericTask {
 	// is this task cleaned up automatically after a week?
 	private Boolean autoCleanTask;
 
+	private String cachedTLA = null;
+
 
 	public Task() {
 		super(null, null, null, null, null, null, null, null, null, null);
@@ -110,66 +114,33 @@ public class Task extends GenericTask {
 	 */
 	public String getOriginTLA() {
 
-		String tla = getOrigin();
+		if (cachedTLA == null) {
 
-		// LABEL :: TO ADD ORIGIN, LOOK HERE (mapping origins to three-letter abbreviations / TLAs)
-		if (tla == null) {
-			return "N/A";
+			String originStr = getOrigin();
+
+			if (originStr == null) {
+				cachedTLA = "N/A";
+			} else {
+				if ("private".equals(originStr)) {
+					originStr = AssSecretary.getDatabase().getUsername();
+				} else {
+					GenericProject proj = SideBarCtrl.getProjectCtrl().resolveFullNameGenerically(originStr);
+					if (proj != null) {
+						originStr = proj.getShortName();
+					}
+				}
+
+				if (originStr.length() > 3) {
+					originStr = originStr.substring(0, 3);
+				}
+
+				originStr = originStr.toUpperCase();
+
+				cachedTLA = originStr;
+			}
 		}
 
-		if (tla.startsWith("dir")) {
-			return "DA";
-		}
-
-		if (tla.startsWith("effect")) {
-			return "EA";
-		}
-
-		if (tla.startsWith("food")) {
-			return "FS";
-		}
-
-		if (tla.startsWith("queeres")) {
-			return "QZT";
-		}
-
-		if (tla.startsWith("queer")) {
-			return "QLD";
-		}
-
-		if (tla.startsWith("wood")) {
-			return "WW";
-		}
-
-		if (tla.startsWith("transition")) {
-			return "TT";
-		}
-
-		switch (tla) {
-			case "private":
-				tla = AssSecretary.getDatabase().getUsername();
-				break;
-			case "asofterspace":
-				return "ASS";
-			case "ppcc":
-				return "PPCC";
-			case "supervisionearth":
-				return "SVE";
-			case "firefighting":
-				return "FF";
-			case "seebruecke":
-				return "SB";
-			case "maibornwolff":
-				return "MW";
-		}
-
-		if (tla.length() > 3) {
-			tla = tla.substring(0, 3);
-		}
-
-		tla = tla.toUpperCase();
-
-		return tla;
+		return cachedTLA;
 	}
 
 	public void setOrigin(String origin) {

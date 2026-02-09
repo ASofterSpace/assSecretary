@@ -822,13 +822,11 @@ window.secretary = {
 				}
 			} else {
 				if (originFilter == "work") {
-					// LABEL :: TO ADD ORIGIN, LOOK HERE (for work-related ones)
-					this.showTasksWithOrigin("skyhook");
-					this.showTasksWithOrigin("maibornwolff");
-					this.showTasksWithOrigin("egscc");
-					this.showTasksWithOrigin("recoded");
-					this.showTasksWithOrigin("supervisionearth");
-					this.showTasksWithOrigin("gsmccc");
+					if (window.serverTaskData && window.serverTaskData.workProjects) {
+						for (var i = 0; i < window.serverTaskData.workProjects.length; i++) {
+							this.showTasksWithOrigin(window.serverTaskData.workProjects[i]);
+						}
+					}
 				} else {
 					this.showTasksWithOrigin(originFilter);
 				}

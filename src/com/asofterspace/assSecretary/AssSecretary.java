@@ -49,8 +49,8 @@ public class AssSecretary {
 	public final static String FACT_DIR = "../assTrainer/config";
 
 	public final static String PROGRAM_TITLE = "assSecretary (Hugo)";
-	public final static String VERSION_NUMBER = "0.1.1.6(" + Utils.TOOLBOX_VERSION_NUMBER + ")";
-	public final static String VERSION_DATE = "21. October 2020 - 30. January 2026";
+	public final static String VERSION_NUMBER = "0.1.1.7(" + Utils.TOOLBOX_VERSION_NUMBER + ")";
+	public final static String VERSION_DATE = "21. October 2020 - 8. February 2026";
 
 	private static Database database;
 	private static LocationDatabase locationDB;
@@ -247,7 +247,8 @@ public class AssSecretary {
 
 			System.out.println("Starting the server on port " + database.getPort() + "...");
 
-			Server server = new Server(webRoot, serverDir, database, taskCtrl, factDatabase, quickDB, locationDB);
+			Server server = new Server(webRoot, serverDir, database, taskCtrl,
+				factDatabase, quickDB, locationDB);
 
 			server.setWhitelist(whitelist);
 
