@@ -446,49 +446,56 @@ window.secretary = {
 		request.setRequestHeader("Content-Type", "application/json");
 
 		request.onreadystatechange = function() {
-			if (request.readyState == 4 && request.status == 200) {
-				var result = JSON.parse(request.response);
-				if (result.success) {
-					var modal = document.getElementById("addSingleTaskModal");
-					if (modal) {
-						modal.style.display = "block";
-						document.getElementById("singleTaskCurrentMode").innerHTML = "editing one single entry";
+			if (request.readyState == 4) {
+				if (request.status == 200) {
+					var result = JSON.parse(request.response);
+					if (result.success) {
+						var modal = document.getElementById("addSingleTaskModal");
+						if (modal) {
+							modal.style.display = "block";
+							document.getElementById("singleTaskCurrentMode").innerHTML = "editing one single entry";
 
-						document.getElementById("modalBackground").style.display = "block";
+							document.getElementById("modalBackground").style.display = "block";
 
-						document.getElementById("singleTaskTitle").value = result.title;
-						document.getElementById("singleTaskDetails").value = result.details;
-						document.getElementById("singleTaskReleaseDate").value = result.releaseDate;
-						document.getElementById("singleTaskDoneDate").value = result.doneDate;
-						document.getElementById("singleTaskOrigin").value = result.origin;
-						document.getElementById("singleTaskPriority").value = result.priority;
-						window.secretary.taskPriorityChange("single");
-						if (result.priorityEscalationAfterDays == null) {
-							document.getElementById("singleTaskPriorityEscalationAfterDays").value = "never";
+							document.getElementById("singleTaskTitle").value = result.title;
+							document.getElementById("singleTaskDetails").value = result.details;
+							document.getElementById("singleTaskReleaseDate").value = result.releaseDate;
+							document.getElementById("singleTaskDoneDate").value = result.doneDate;
+							document.getElementById("singleTaskOrigin").value = result.origin;
+							document.getElementById("singleTaskPriority").value = result.priority;
+							window.secretary.taskPriorityChange("single");
+							if (result.priorityEscalationAfterDays == null) {
+								document.getElementById("singleTaskPriorityEscalationAfterDays").value = "never";
+							} else {
+								document.getElementById("singleTaskPriorityEscalationAfterDays").value = result.priorityEscalationAfterDays;
+							}
+							document.getElementById("singleTaskDuration").value = result.duration;
+							document.getElementById("singleTaskReleaseUntil").value = "";
+
+							if (result.releasedBasedOnId) {
+								window.secretary.currentlyRepeatingParent = result.releasedBasedOnId;
+								document.getElementById("singleTaskBasedOnRepeating").style.display="block";
+							} else {
+								document.getElementById("singleTaskBasedOnRepeating").style.display="none";
+							}
+							if (result.showAsScheduled == null) {
+								result.showAsScheduled = true;
+							}
+							document.getElementById("singleTaskShowAsScheduled").checked = result.showAsScheduled;
+							if (result.autoCleanTask == null) {
+								result.autoCleanTask = false;
+							}
+							document.getElementById("singleTaskAutoCleanTask").checked = result.autoCleanTask;
+
+							window.secretary.currentlyEditing = id;
 						} else {
-							document.getElementById("singleTaskPriorityEscalationAfterDays").value = result.priorityEscalationAfterDays;
+							alert("Modal could not be found!");
 						}
-						document.getElementById("singleTaskDuration").value = result.duration;
-						document.getElementById("singleTaskReleaseUntil").value = "";
-
-						if (result.releasedBasedOnId) {
-							window.secretary.currentlyRepeatingParent = result.releasedBasedOnId;
-							document.getElementById("singleTaskBasedOnRepeating").style.display="block";
-						} else {
-							document.getElementById("singleTaskBasedOnRepeating").style.display="none";
-						}
-						if (result.showAsScheduled == null) {
-							result.showAsScheduled = true;
-						}
-						document.getElementById("singleTaskShowAsScheduled").checked = result.showAsScheduled;
-						if (result.autoCleanTask == null) {
-							result.autoCleanTask = false;
-						}
-						document.getElementById("singleTaskAutoCleanTask").checked = result.autoCleanTask;
-
-						window.secretary.currentlyEditing = id;
+						return;
 					}
 				}
+
+				alert("I lost connection to my backend :/\nError code: " + request.status)
 			}
 		}
 
