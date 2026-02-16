@@ -2145,7 +2145,9 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 				if (proj.isWork()) {
 					sb.append(sep);
 					sep = ", ";
+					sb.append("\"");
 					sb.append(proj.getShortName());
+					sb.append("\"");
 				}
 			}
 			taskKeysForWorkFilterCached = sb.toString();

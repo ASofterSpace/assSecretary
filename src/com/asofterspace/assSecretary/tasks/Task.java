@@ -118,9 +118,7 @@ public class Task extends GenericTask {
 
 			String originStr = getOrigin();
 
-			if (originStr == null) {
-				cachedTLA = "N/A";
-			} else {
+			if (originStr != null) {
 				if ("private".equals(originStr)) {
 					originStr = AssSecretary.getDatabase().getUsername();
 				} else {
@@ -135,7 +133,11 @@ public class Task extends GenericTask {
 				}
 
 				originStr = originStr.toUpperCase();
+			}
 
+			if ((originStr == null) || "".equals(originStr)) {
+				cachedTLA = "N/A";
+			} else {
 				cachedTLA = originStr;
 			}
 		}
