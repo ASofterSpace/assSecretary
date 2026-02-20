@@ -1,5 +1,4 @@
 body {
-	font-family: "Calibri";
 	overflow: hidden;
 	background: linear-gradient(179deg, #102, #201, #102, #201, #102, #201, #102, #201, #102);
 	padding-left: 212pt;
@@ -8,6 +7,11 @@ body {
 
 body.dirty {
 	background: linear-gradient(179deg, #102, #ACF, #102, #201, #FFA, #AFF, #102, #201, #FBF);
+}
+
+body, input, textarea, select {
+	font-family: "Lexend";
+	# font-family: "Droid Sans Fallback";
 }
 
 a {
@@ -26,7 +30,6 @@ input, textarea, select {
 	border: 1px solid rgb(80, 60, 160);
 	border-radius: 4pt;
 	padding: 0pt 4pt 1pt 4pt;
-	font-family: "Calibri";
 	font-size: 1em;
 }
 
