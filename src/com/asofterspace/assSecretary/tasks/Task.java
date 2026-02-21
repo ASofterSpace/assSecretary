@@ -129,6 +129,9 @@ public class Task extends GenericTask {
 				}
 
 				if (originStr.length() > 3) {
+					if ("asofterspace".equals(originStr)) {
+						originStr = "ass";
+					}
 					originStr = originStr.substring(0, 3);
 				}
 

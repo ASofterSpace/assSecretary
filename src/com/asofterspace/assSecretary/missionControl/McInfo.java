@@ -6,18 +6,47 @@ package com.asofterspace.assSecretary.missionControl;
 
 import com.asofterspace.assSecretary.Database;
 
+import java.util.ArrayList;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.List;
 import java.util.Map;
 
 
-public abstract class McInfo {
+public class McInfo {
 
+	private final static String DEFAULT = "<span class='warning'>Has not yet responded</span>";
+
+	private List<String> entryKeys = new ArrayList<>();
+	private Map<String, String> entries = new ConcurrentHashMap<>();
 	private static Map<String, String> names;
 	private static Map<String, String> overviewCaptions;
 
 
-	public abstract void set(String key, String value);
+	public McInfo() {
+	}
 
-	public abstract String get(String key);
+	public synchronized void clear(String key) {
+		entries.put(key, DEFAULT);
+		if (!entryKeys.contains(key)) {
+			entryKeys.add(key);
+		}
+	}
+
+	public void set(String key, String value) {
+		entries.put(key, value);
+	}
+
+	public List<String> getKeys() {
+		return entryKeys;
+	}
+
+	public String get(String key) {
+		String result = entries.get(key);
+		if (result == null) {
+			return DEFAULT;
+		}
+		return result;
+	}
 
 	public String getOv(String key) {
 		String result = getOverviewCaption(key);

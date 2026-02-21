@@ -62,11 +62,10 @@ public class MissionControlDatabase {
 		return root;
 	}
 
-	public synchronized void addDfDatapoint(Date timestamp, String origin, String whichServer, Integer highestPerc) {
+	public synchronized void addDfDatapoint(Date timestamp, String whichServer, Integer highestPerc) {
 
 		Record cur = Record.emptyObject();
 		cur.set("timestamp", timestamp);
-		cur.set("origin", origin);
 		cur.set("server", whichServer);
 		cur.set("highestPerc", highestPerc);
 		entries.add(cur);
@@ -74,11 +73,10 @@ public class MissionControlDatabase {
 		save();
 	}
 
-	public synchronized void addWebpageDatapoint(Date timestamp, String origin, String whichWebpage, Integer httpCode) {
+	public synchronized void addWebpageDatapoint(Date timestamp, String whichWebpage, Integer httpCode) {
 
 		Record cur = Record.emptyObject();
 		cur.set("timestamp", timestamp);
-		cur.set("origin", origin);
 		cur.set("webpage", whichWebpage);
 		cur.set("httpCode", httpCode);
 		entries.add(cur);

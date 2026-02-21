@@ -10,8 +10,6 @@ import com.asofterspace.assSecretary.locations.LocationDatabase;
 import com.asofterspace.assSecretary.ltc.LtcDatabase;
 import com.asofterspace.assSecretary.missionControl.McInfo;
 import com.asofterspace.assSecretary.missionControl.MissionControlDatabase;
-import com.asofterspace.assSecretary.missionControl.VmInfo;
-import com.asofterspace.assSecretary.missionControl.WebInfo;
 import com.asofterspace.assSecretary.missionControl.WebInfoCallback;
 import com.asofterspace.assSecretary.tasks.Task;
 import com.asofterspace.assSecretary.tasks.TaskCtrl;
@@ -49,15 +47,14 @@ public class AssSecretary {
 	public final static String FACT_DIR = "../assTrainer/config";
 
 	public final static String PROGRAM_TITLE = "assSecretary (Hugo)";
-	public final static String VERSION_NUMBER = "0.1.1.8(" + Utils.TOOLBOX_VERSION_NUMBER + ")";
-	public final static String VERSION_DATE = "21. October 2020 - 16. February 2026";
+	public final static String VERSION_NUMBER = "0.1.1.9(" + Utils.TOOLBOX_VERSION_NUMBER + ")";
+	public final static String VERSION_DATE = "21. October 2020 - 21. February 2026";
 
 	private static Database database;
 	private static LocationDatabase locationDB;
 
 	private static MissionControlDatabase missionControlDatabase;
-	private static VmInfo vmInfo = new VmInfo();
-	private static WebInfo webInfo = new WebInfo();
+	private static McInfo mcInfo = new McInfo();
 
 	private static String localInfo = "";
 	private static String localInfoShort = "";
@@ -297,12 +294,8 @@ public class AssSecretary {
 		return database;
 	}
 
-	public static VmInfo getVmInfo() {
-		return vmInfo;
-	}
-
-	public static WebInfo getWebInfo() {
-		return webInfo;
+	public static McInfo getMcInfo() {
+		return mcInfo;
 	}
 
 	public static void runStartupTasks() {
@@ -335,44 +328,43 @@ public class AssSecretary {
 			return;
 		}
 
-		webInfo = new WebInfo();
-		vmInfo = new VmInfo();
+		mcInfo = new McInfo();
 
-		addWebInfo(webInfo, "asofterspace", "assEn", database, missionControlDatabase);
-		addWebInfo(webInfo, "asofterspace", "assDe", database, missionControlDatabase);
+		addWebInfo(mcInfo, "assEn", database, missionControlDatabase);
+		addWebInfo(mcInfo, "assDe", database, missionControlDatabase);
 
-		addWebInfo(webInfo, "fem*streik", "femOrg", database, missionControlDatabase);
+		addWebInfo(mcInfo, "femOrg", database, missionControlDatabase);
 
-		addWebInfo(webInfo, "AGSG", "agsgOrg", database, missionControlDatabase);
+		addWebInfo(mcInfo, "agsgOrg", database, missionControlDatabase);
 
-		addWebInfo(webInfo, "HERA", "heraTasks", database, missionControlDatabase);
+		addWebInfo(mcInfo, "heraTasks", database, missionControlDatabase);
 
-		addWebInfo(webInfo, "QZT", "qztIPC", database, missionControlDatabase);
-		addWebInfo(webInfo, "CSD", "csdWeb", database, missionControlDatabase);
+		addWebInfo(mcInfo, "qztIPC", database, missionControlDatabase);
+		addWebInfo(mcInfo, "csdWeb", database, missionControlDatabase);
 
-		addWebInfo(webInfo, "SB", "sbWW", database, missionControlDatabase);
+		addWebInfo(mcInfo, "sbWW", database, missionControlDatabase);
 
-		addWebInfo(webInfo, "WoodWatchers", "wwFrontend", database, missionControlDatabase);
-		addWebInfo(webInfo, "WoodWatchers", "wwBackend", database, missionControlDatabase);
+		addWebInfo(mcInfo, "wwFrontend", database, missionControlDatabase);
+		addWebInfo(mcInfo, "wwBackend", database, missionControlDatabase);
 
-		addVmInfo(vmInfo, "skyhook", "db", missionControlDatabase);
-		addVmInfo(vmInfo, "skyhook", "f1", missionControlDatabase);
-		// addVmInfo(vmInfo, "skyhook", "f2", missionControlDatabase);
-		addWebInfo(webInfo, "skyhook", "skyWeb", database, missionControlDatabase);
-		addWebInfo(webInfo, "skyhook", "skyApp", database, missionControlDatabase);
-		addWebInfo(webInfo, "skyhook", "skyDb", database, missionControlDatabase);
+		addVmInfo(mcInfo, "db", missionControlDatabase);
+		addVmInfo(mcInfo, "f1", missionControlDatabase);
+		// addVmInfo(mcInfo, "f2", missionControlDatabase);
+		addWebInfo(mcInfo, "skyWeb", database, missionControlDatabase);
+		addWebInfo(mcInfo, "skyApp", database, missionControlDatabase);
+		addWebInfo(mcInfo, "skyDb", database, missionControlDatabase);
 
-		addWebInfo(webInfo, "SB", "sbWeb", database, missionControlDatabase);
-		addWebInfo(webInfo, "SB", "gsWeb", database, missionControlDatabase);
-		addWebInfo(webInfo, "SB", "sbCms", database, missionControlDatabase);
-		addWebInfo(webInfo, "SB", "sbCloud", database, missionControlDatabase);
-		addWebInfo(webInfo, "SB", "sbPort", database, missionControlDatabase);
-		addWebInfo(webInfo, "SB", "sbMails", database, missionControlDatabase);
-		addWebInfo(webInfo, "SB", "sbZam", database, missionControlDatabase);
-		addWebInfo(webInfo, "SB", "sbOrg", database, missionControlDatabase);
-		addWebInfo(webInfo, "SB", "sbWiki", database, missionControlDatabase);
-		addWebInfo(webInfo, "SB", "sbDA", database, missionControlDatabase);
-		addWebInfo(webInfo, "SB", "bkhWeb", database, missionControlDatabase);
+		addWebInfo(mcInfo, "sbWeb", database, missionControlDatabase);
+		addWebInfo(mcInfo, "gsWeb", database, missionControlDatabase);
+		addWebInfo(mcInfo, "sbCms", database, missionControlDatabase);
+		addWebInfo(mcInfo, "sbCloud", database, missionControlDatabase);
+		addWebInfo(mcInfo, "sbPort", database, missionControlDatabase);
+		addWebInfo(mcInfo, "sbMails", database, missionControlDatabase);
+		addWebInfo(mcInfo, "sbZam", database, missionControlDatabase);
+		addWebInfo(mcInfo, "sbOrg", database, missionControlDatabase);
+		addWebInfo(mcInfo, "sbWiki", database, missionControlDatabase);
+		addWebInfo(mcInfo, "sbDA", database, missionControlDatabase);
+		addWebInfo(mcInfo, "bkhWeb", database, missionControlDatabase);
 	}
 
 	private static void checkMemeFolder() {
@@ -500,8 +492,10 @@ public class AssSecretary {
 		}
 	}
 
-	private static void addVmInfo(VmInfo vmInfo, String origin, String which,
+	private static void addVmInfo(McInfo mcInfo, String which,
 		MissionControlDatabase missionControlDatabase) {
+
+		mcInfo.clear(which);
 
 		if (thisDir == null) {
 			thisDir = new Directory(".");
@@ -512,13 +506,13 @@ public class AssSecretary {
 		}
 
 		if ("\\".equals(System.lineSeparator())) {
-			IoUtils.execute(thisDir.getAbsoluteDirname() + "\\" + SCRIPTS_DIR + "\\" + origin + "_df_" + which + ".bat");
+			IoUtils.execute(thisDir.getAbsoluteDirname() + "\\" + SCRIPTS_DIR + "\\df_" + which + ".bat");
 		} else {
-			File scriptFile = new File(scriptsDir, origin + "_df_" + which + ".sh");
+			File scriptFile = new File(scriptsDir, "df_" + which + ".sh");
 			IoUtils.execute(scriptFile.getCanonicalFilename());
 		}
 
-		SimpleFile dfDbFile = new SimpleFile(thisDir, origin + "_out_" + which + ".txt");
+		SimpleFile dfDbFile = new SimpleFile(thisDir, "out_" + which + ".txt");
 		List<String> lines = dfDbFile.getContents();
 
 		boolean nonsense = false;
@@ -529,7 +523,7 @@ public class AssSecretary {
 
 		if (lines == null) {
 			result += "<span class='error'>Could not be connected to!</span>";
-			missionControlDatabase.addDfDatapoint(new Date(), origin, which, null);
+			missionControlDatabase.addDfDatapoint(new Date(), which, null);
 		} else {
 			for (String line : lines) {
 				if ("".equals(line.trim())) {
@@ -571,7 +565,7 @@ public class AssSecretary {
 
 			if (nonsense) {
 				result += "<span class='error'>Responded with nonsense!</span>";
-				missionControlDatabase.addDfDatapoint(new Date(), origin, which, null);
+				missionControlDatabase.addDfDatapoint(new Date(), which, null);
 			} else {
 				if (highestPerc < 30) {
 					result += "<span class='awesome'>";
@@ -587,17 +581,19 @@ public class AssSecretary {
 				if ((highestPerc < 30) || (highestPerc >= 80)) {
 					result += "</span>";
 				}
-				missionControlDatabase.addDfDatapoint(new Date(), origin, which, highestPerc);
+				missionControlDatabase.addDfDatapoint(new Date(), which, highestPerc);
 			}
 		}
 
-		vmInfo.set(which, result);
+		mcInfo.set(which, result);
 	}
 
-	private static void addWebInfo(WebInfo webInfo, String origin, String which, Database database,
+	private static void addWebInfo(McInfo mcInfo, String which, Database database,
 		MissionControlDatabase missionControlDatabase) {
 
-		WebAccessedCallback callback = new WebInfoCallback(webInfo, origin, which, missionControlDatabase);
+		mcInfo.clear(which);
+
+		WebAccessedCallback callback = new WebInfoCallback(mcInfo, which, missionControlDatabase);
 
 		WebAccessor.getAsynch(database.getMcWebLinks().get(which), callback);
 	}

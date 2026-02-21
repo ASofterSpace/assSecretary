@@ -10,20 +10,16 @@ import com.asofterspace.toolbox.web.WebAccessedCallback;
 
 public class WebInfoCallback implements WebAccessedCallback {
 
-	private WebInfo webInfo;
-
-	private String origin;
+	private McInfo mcInfo;
 
 	private String which;
 
 	private MissionControlDatabase missionControlDatabase;
 
 
-	public WebInfoCallback(WebInfo webInfo, String origin, String which,
-		MissionControlDatabase missionControlDatabase) {
+	public WebInfoCallback(McInfo mcInfo, String which, MissionControlDatabase missionControlDatabase) {
 
-		this.webInfo = webInfo;
-		this.origin = origin;
+		this.mcInfo = mcInfo;
 		this.which = which;
 		this.missionControlDatabase = missionControlDatabase;
 	}
@@ -48,7 +44,7 @@ public class WebInfoCallback implements WebAccessedCallback {
 	 */
 	public void gotResponseCode(Integer code) {
 
-		missionControlDatabase.addWebpageDatapoint(DateUtils.now(), this.origin, this.which, code);
+		missionControlDatabase.addWebpageDatapoint(DateUtils.now(), this.which, code);
 
 		String result = "";
 		if (code == null) {
@@ -71,6 +67,6 @@ public class WebInfoCallback implements WebAccessedCallback {
 			result += "</span>";
 		}
 
-		webInfo.set(which, result);
+		mcInfo.set(which, result);
 	}
 }
