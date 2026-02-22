@@ -150,6 +150,7 @@ public class Task extends GenericTask {
 
 	public void setOrigin(String origin) {
 		this.origin = origin;
+		this.cachedTLA = null;
 	}
 
 	public Integer getPriority() {
