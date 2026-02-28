@@ -768,7 +768,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 				for (Map.Entry<String, List<String>> entry : tlas.entrySet()) {
 					String tla = entry.getKey();
 					List<String> tlaList = entry.getValue();
-					scriptHtml.append("  " + tla + ": [");
+					scriptHtml.append("  " + Task.makeTLAsafeAsKey(tla) + ": [");
 					for (String id : tlaList) {
 						scriptHtml.append("'" + id + "',");
 					}

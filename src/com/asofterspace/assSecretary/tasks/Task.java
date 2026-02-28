@@ -683,7 +683,7 @@ public class Task extends GenericTask {
 						html.append(miniBtnStyle);
 						// explicitly add the own id so that even a timed entry gets moved forward if and only if that entry itself is clicked
 						// for multi-move-forward
-						html.append("' class='button' onclick='secretary.tasksPutOnShortListTomorrow(secretary.arrayAdd(window.shortlistTLAs." + tla + ", \"" + id + "\"))'>");
+						html.append("' class='button' onclick='secretary.tasksPutOnShortListTomorrow(secretary.arrayAdd(window.shortlistTLAs." + makeTLAsafeAsKey(tla) + ", \"" + id + "\"))'>");
 						html.append("&#x21F6;");
 						html.append("</span>");
 						mainWidth -= 3;
@@ -730,6 +730,15 @@ public class Task extends GenericTask {
 		html.append("</div>");
 
 		html.insert(charsBeforeWidth, mainWidth + "%");
+	}
+
+	public static String makeTLAsafeAsKey(String tla) {
+		if (tla == null) {
+			tla = "N/A";
+		}
+		// N/A does not work as key due to the slash character :/
+		tla = tla.replace('/', '_');
+		return tla;
 	}
 
 	public static String makePlainTextLineInteractive(String text) {
