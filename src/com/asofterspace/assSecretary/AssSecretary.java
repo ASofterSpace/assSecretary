@@ -47,8 +47,8 @@ public class AssSecretary {
 	public final static String FACT_DIR = "../assTrainer/config";
 
 	public final static String PROGRAM_TITLE = "assSecretary (Hugo)";
-	public final static String VERSION_NUMBER = "0.1.2.0(" + Utils.TOOLBOX_VERSION_NUMBER + ")";
-	public final static String VERSION_DATE = "21. October 2020 - 28. February 2026";
+	public final static String VERSION_NUMBER = "0.1.2.1(" + Utils.TOOLBOX_VERSION_NUMBER + ")";
+	public final static String VERSION_DATE = "21. October 2020 - 5. April 2026";
 
 	private static Database database;
 	private static LocationDatabase locationDB;
@@ -305,8 +305,6 @@ public class AssSecretary {
 		localInfo = "";
 		localInfoShort = "";
 
-		checkWebAndVmStatus();
-
 		checkMemeFolder();
 
 		checkMusicFolder();
@@ -318,6 +316,8 @@ public class AssSecretary {
 		}
 
 		locationDB.reload();
+
+		checkWebAndVmStatus();
 
 		System.out.println("Startup tasks done!");
 	}
@@ -347,12 +347,11 @@ public class AssSecretary {
 		addWebInfo(mcInfo, "wwFrontend", database, missionControlDatabase);
 		addWebInfo(mcInfo, "wwBackend", database, missionControlDatabase);
 
-		addVmInfo(mcInfo, "db", missionControlDatabase);
-		addVmInfo(mcInfo, "f1", missionControlDatabase);
-		// addVmInfo(mcInfo, "f2", missionControlDatabase);
+		// addVmInfo(mcInfo, "db", missionControlDatabase);
+		addVmInfo(mcInfo, "app", missionControlDatabase);
 		addWebInfo(mcInfo, "skyWeb", database, missionControlDatabase);
 		addWebInfo(mcInfo, "skyApp", database, missionControlDatabase);
-		addWebInfo(mcInfo, "skyDb", database, missionControlDatabase);
+		// addWebInfo(mcInfo, "skyDb", database, missionControlDatabase);
 
 		addWebInfo(mcInfo, "sbWeb", database, missionControlDatabase);
 		addWebInfo(mcInfo, "gsWeb", database, missionControlDatabase);

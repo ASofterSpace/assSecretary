@@ -1554,10 +1554,8 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 		mcHtml += companyStart;
 		mcHtml += machineStart + "Webpage<br>" + mcInfo.getOv("skyWeb") + machineEnd;
-		mcHtml += machineStart + "App<br>" + mcInfo.getOv("skyApp") + machineEnd;
-		mcHtml += machineStart + "F1<br>" + mcInfo.getOv("f1") + machineEnd;
-		// mcHtml += machineStart + "F2<br>" + mcInfo.getOv("f2") + machineEnd;
-		mcHtml += machineStart + "DB<br>" + mcInfo.getOv("skyDb") + "<br>" + mcInfo.getOv("db") + machineEnd;
+		mcHtml += machineStart + "App<br>" + mcInfo.getOv("skyApp") + "<br>" + mcInfo.getOv("app") + machineEnd;
+		// mcHtml += machineStart + "DB<br>" + mcInfo.getOv("skyDb") + "<br>" + mcInfo.getOv("db") + machineEnd;
 		mcHtml += "<img class='logo' src='projectlogos/skyhook/logo.png' />";
 		mcHtml += companyEnd;
 
