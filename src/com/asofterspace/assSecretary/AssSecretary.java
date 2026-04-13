@@ -23,6 +23,7 @@ import com.asofterspace.toolbox.io.JSON;
 import com.asofterspace.toolbox.io.JsonFile;
 import com.asofterspace.toolbox.io.JsonParseException;
 import com.asofterspace.toolbox.io.SimpleFile;
+import com.asofterspace.toolbox.io.TextFile;
 import com.asofterspace.toolbox.utils.DateHolder;
 import com.asofterspace.toolbox.utils.DateUtils;
 import com.asofterspace.toolbox.utils.Record;
@@ -47,8 +48,8 @@ public class AssSecretary {
 	public final static String FACT_DIR = "../assTrainer/config";
 
 	public final static String PROGRAM_TITLE = "assSecretary (Hugo)";
-	public final static String VERSION_NUMBER = "0.1.2.1(" + Utils.TOOLBOX_VERSION_NUMBER + ")";
-	public final static String VERSION_DATE = "21. October 2020 - 5. April 2026";
+	public final static String VERSION_NUMBER = "0.1.2.2(" + Utils.TOOLBOX_VERSION_NUMBER + ")";
+	public final static String VERSION_DATE = "21. October 2020 - 13. April 2026";
 
 	private static Database database;
 	private static LocationDatabase locationDB;
@@ -240,6 +241,14 @@ public class AssSecretary {
 			WebTemplateEngine engine = new WebTemplateEngine(serverDir, jsonConfig);
 
 			engine.compileTo(webRoot);
+
+			System.out.println("Applying extra-templating from config...");
+
+			TextFile styleCss = new TextFile(webRoot, "style.css");
+			String styleContent = styleCss.getContent();
+			styleContent = StrUtils.replaceAll(styleContent, "%CONFIGURED_FONT%", database.getFontCss());
+
+			styleCss.saveContent(styleContent);
 
 
 			System.out.println("Starting the server on port " + database.getPort() + "...");

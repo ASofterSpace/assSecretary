@@ -60,6 +60,7 @@ public class Database {
 	private String eventListDir = null;
 	private Directory eventListDirectory = null;
 	private String eventListLatest = null;
+	private String fontCss = null;
 
 	private static final String PORT = "port";
 	private static final String USERNAME = "username";
@@ -80,6 +81,7 @@ public class Database {
 	private static final String MC_INFO_NAMES = "mcInfoNames";
 	private static final String MC_INFO_OVERVIEW_CAPTIONS = "mcInfoOverviewCaptions";
 	private static final String MC_WEB_LINKS = "mcWebLinks";
+	private static final String FONT_CSS = "fontCSS";
 
 
 	public Database(Directory dataDir) {
@@ -150,6 +152,8 @@ public class Database {
 		this.currentTaskInstanceAmounts = taskStatsRoot.getObjectMap(CURRENT_TASK_INSTANCE_AMOUNTS);
 
 		this.doneTaskInstanceAmounts = taskStatsRoot.getObjectMap(DONE_TASK_INSTANCE_AMOUNTS);
+
+		this.fontCss = root.getString(FONT_CSS);
 	}
 
 	public Record getRoot() {
@@ -212,6 +216,8 @@ public class Database {
 		root.set(MC_INFO_OVERVIEW_CAPTIONS, mcInfoOverviewCaptions);
 
 		root.set(MC_WEB_LINKS, mcWebLinks);
+
+		root.set(FONT_CSS, getFontCss());
 
 		dbFile.setAllContents(root);
 		dbFile.save();
@@ -326,6 +332,21 @@ public class Database {
 	 */
 	public String getKeyInfoForPrinting(String key) {
 		return "key '" + key + "' in database file " + dbFilePath;
+	}
+
+	public String getFontCss() {
+		/*
+		usual font configurations are e.g.:
+		font-family: serif; font-size: 11pt;
+		font-family: "Calibri"; font-size: 12pt;
+		font-family: "Lexend"; font-size: 12pt;
+		font-family: "Droid Sans Fallback"; font-size: 12pt;
+		*/
+
+		if (fontCss == null) {
+			return "font-family: \"Calibri\"; font-size: 12pt;";
+		}
+		return fontCss;
 	}
 
 }
