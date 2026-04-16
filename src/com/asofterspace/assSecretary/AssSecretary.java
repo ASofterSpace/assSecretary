@@ -48,8 +48,8 @@ public class AssSecretary {
 	public final static String FACT_DIR = "../assTrainer/config";
 
 	public final static String PROGRAM_TITLE = "assSecretary (Hugo)";
-	public final static String VERSION_NUMBER = "0.1.2.2(" + Utils.TOOLBOX_VERSION_NUMBER + ")";
-	public final static String VERSION_DATE = "21. October 2020 - 13. April 2026";
+	public final static String VERSION_NUMBER = "0.1.2.3(" + Utils.TOOLBOX_VERSION_NUMBER + ")";
+	public final static String VERSION_DATE = "21. October 2020 - 16. April 2026";
 
 	private static Database database;
 	private static LocationDatabase locationDB;
@@ -247,6 +247,12 @@ public class AssSecretary {
 			TextFile styleCss = new TextFile(webRoot, "style.css");
 			String styleContent = styleCss.getContent();
 			styleContent = StrUtils.replaceAll(styleContent, "%CONFIGURED_FONT%", database.getFontCss());
+			String animationsCss = "";
+			if (database.getAnimationsCss()) {
+				TextFile styleAnimationsCssFile = new TextFile(serverDir, "style_animations.css");
+				animationsCss = styleAnimationsCssFile.getContent();
+			}
+			styleContent = StrUtils.replaceAll(styleContent, "%CONFIGURED_ANIMATIONS%", animationsCss);
 
 			styleCss.saveContent(styleContent);
 

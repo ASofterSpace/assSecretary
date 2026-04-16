@@ -61,6 +61,7 @@ public class Database {
 	private Directory eventListDirectory = null;
 	private String eventListLatest = null;
 	private String fontCss = null;
+	private Boolean animationsCss = null;
 
 	private static final String PORT = "port";
 	private static final String USERNAME = "username";
@@ -82,6 +83,7 @@ public class Database {
 	private static final String MC_INFO_OVERVIEW_CAPTIONS = "mcInfoOverviewCaptions";
 	private static final String MC_WEB_LINKS = "mcWebLinks";
 	private static final String FONT_CSS = "fontCSS";
+	private static final String ANIMATIONS_CSS = "animationsCSS";
 
 
 	public Database(Directory dataDir) {
@@ -154,6 +156,8 @@ public class Database {
 		this.doneTaskInstanceAmounts = taskStatsRoot.getObjectMap(DONE_TASK_INSTANCE_AMOUNTS);
 
 		this.fontCss = root.getString(FONT_CSS);
+
+		this.animationsCss = root.getBoolean(ANIMATIONS_CSS, true);
 	}
 
 	public Record getRoot() {
@@ -218,6 +222,8 @@ public class Database {
 		root.set(MC_WEB_LINKS, mcWebLinks);
 
 		root.set(FONT_CSS, getFontCss());
+
+		root.set(ANIMATIONS_CSS, getAnimationsCss());
 
 		dbFile.setAllContents(root);
 		dbFile.save();
@@ -347,6 +353,14 @@ public class Database {
 			return "font-family: \"Calibri\"; font-size: 12pt;";
 		}
 		return fontCss;
+	}
+
+	public boolean getAnimationsCss() {
+
+		if (animationsCss == null) {
+			return true;
+		}
+		return animationsCss;
 	}
 
 }
