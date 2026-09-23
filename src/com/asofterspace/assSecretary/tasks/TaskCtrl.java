@@ -207,7 +207,7 @@ public class TaskCtrl extends TaskCtrlBase {
 	}
 
 	@Override
-	protected GenericTask createTask(String title, Integer scheduledOnXDayOfMonth, Integer scheduledOnDay,
+	protected GenericTask createTask(String title, List<Integer> scheduledOnXDayOfMonth, Integer scheduledOnDay,
 		List<String> scheduledOnDaysOfWeek, List<Integer> scheduledInMonths, List<Integer> scheduledInYears,
 		List<String> details, List<String> onDone,
 		Boolean biweeklyEven, Boolean biweeklyOdd) {

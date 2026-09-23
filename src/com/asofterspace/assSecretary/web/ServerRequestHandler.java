@@ -1753,7 +1753,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 		task.setPriority(json.getInteger("priority"));
 		task.setPriorityEscalationAfterDays(json.getInteger("priorityEscalationAfterDays"));
 		task.setDurationStr(json.getString("duration"));
-		task.setScheduledOnXDayOfMonth(json.getInteger("xDayOfMonth"));
+		task.setScheduledOnXDayOfMonthStr(json.getString("xDayOfMonth"));
 
 		// get integer will just return null if there is a problem
 		task.setScheduledOnDay(json.getInteger("day"));
