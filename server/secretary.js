@@ -64,8 +64,8 @@ window.secretary = {
 		var modal = document.getElementById("addSingleTaskModal");
 		if (modal) {
 			modal.style.display = "block";
-			document.getElementById("singleTaskCurrentMode").innerHTML = "adding new single entry";
 
+			document.getElementById("singleTaskCurrentMode").innerHTML = "adding new single entry";
 			this.currentlyEditing = null;
 
 			document.getElementById("modalBackground").style.display = "block";
@@ -82,8 +82,8 @@ window.secretary = {
 		var modal = document.getElementById("addRepeatingTaskModal");
 		if (modal) {
 			modal.style.display = "block";
-			document.getElementById("repeatingTaskCurrentMode").innerHTML = "adding new repeating tasks";
 
+			document.getElementById("repeatingTaskCurrentMode").innerHTML = "adding new repeating tasks";
 			this.currentlyEditingRepeating = null;
 
 			document.getElementById("modalBackground").style.display = "block";
@@ -263,10 +263,10 @@ window.secretary = {
 							window.setTimeout(function () {
 								singleTaskSavedLabel.style.display = "none";
 							}, 3000);
+							document.getElementById("singleTaskCurrentMode").innerHTML = "editing one single entry";
 							window.secretary.currentlyEditing = result.id;
 							document.getElementById("singleTaskReleaseDate").value = result.newReleaseDate;
 							document.getElementById("singleTaskDoneDate").value = "";
-							document.getElementById("singleTaskCurrentMode").innerHTML = "editing one single entry";
 						}
 					} else {
 						window.secretary.removeTaskFromDOM(window.secretary.currentlyEditing);
@@ -418,6 +418,10 @@ window.secretary = {
 		document.getElementById("singleTaskReleaseUntil").value = "";
 		document.getElementById("singleTaskShowAsScheduled").checked = true;
 		document.getElementById("singleTaskAutoCleanTask").checked = false;
+		document.getElementById("singleTaskBasedOnRepeating").style.display = "none";
+
+		document.getElementById("singleTaskCurrentMode").innerHTML = "adding one single entry";
+		this.currentlyEditing = null;
 	},
 
 	resetRepeatingTaskModal: function() {
@@ -437,6 +441,9 @@ window.secretary = {
 		document.getElementById("repeatingTaskAutoCleanTask").checked = false;
 		document.getElementById("repeatingTaskBiweeklyEven").checked = false;
 		document.getElementById("repeatingTaskBiweeklyOdd").checked = false;
+
+		document.getElementById("repeatingTaskCurrentMode").innerHTML = "adding new repeating tasks";
+		this.currentlyEditingRepeating = null;
 	},
 
 	taskEdit: function(id) {
@@ -453,7 +460,6 @@ window.secretary = {
 						var modal = document.getElementById("addSingleTaskModal");
 						if (modal) {
 							modal.style.display = "block";
-							document.getElementById("singleTaskCurrentMode").innerHTML = "editing one single entry";
 
 							document.getElementById("modalBackground").style.display = "block";
 
@@ -487,6 +493,7 @@ window.secretary = {
 							}
 							document.getElementById("singleTaskAutoCleanTask").checked = result.autoCleanTask;
 
+							document.getElementById("singleTaskCurrentMode").innerHTML = "editing one single entry";
 							window.secretary.currentlyEditing = id;
 						} else {
 							alert("Modal could not be found!");
@@ -514,7 +521,6 @@ window.secretary = {
 					var modal = document.getElementById("addRepeatingTaskModal");
 					if (modal) {
 						modal.style.display = "block";
-						document.getElementById("repeatingTaskCurrentMode").innerHTML = "editing a repeating task";
 
 						document.getElementById("modalBackground").style.display = "block";
 
@@ -550,6 +556,7 @@ window.secretary = {
 						}
 						document.getElementById("repeatingTaskBiweeklyOdd").checked = result.biweeklyOdd;
 
+						document.getElementById("repeatingTaskCurrentMode").innerHTML = "editing a repeating task";
 						window.secretary.currentlyEditingRepeating = id;
 					}
 				}
