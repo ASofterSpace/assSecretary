@@ -9,6 +9,7 @@ import com.asofterspace.toolbox.io.Directory;
 import com.asofterspace.toolbox.io.JSON;
 import com.asofterspace.toolbox.io.JsonFile;
 import com.asofterspace.toolbox.io.JsonParseException;
+import com.asofterspace.toolbox.io.TextFile;
 import com.asofterspace.toolbox.utils.DateUtils;
 import com.asofterspace.toolbox.utils.Record;
 
@@ -20,6 +21,7 @@ import java.util.Map;
 public class Database {
 
 	private static final String DB_FILE_NAME = "database.json";
+	private static final String INBOX_FILE_NAME = "inbox.txt";
 	private static final String TASK_STATS_FILE_NAME = "task-stats.json";
 
 	private Directory dataDir;
@@ -27,8 +29,8 @@ public class Database {
 	private JsonFile dbFile;
 	private String dbFilePath;
 	private JSON root;
-
 	private JsonFile taskStatsFile;
+	private TextFile inboxFile;
 
 	private Integer port;
 
@@ -99,6 +101,8 @@ public class Database {
 		this.taskStatsFile = new JsonFile(dataDir, TASK_STATS_FILE_NAME);
 		Record taskStatsRoot = new Record();
 
+		this.inboxFile = new TextFile(dataDir, INBOX_FILE_NAME);
+
 		try {
 			this.root = dbFile.getAllContents();
 			taskStatsRoot = taskStatsFile.getAllContents();
@@ -114,7 +118,13 @@ public class Database {
 
 		this.memePath = root.getString(MEME_PATH);
 
-		this.inboxContent = root.getString(INBOX_CONTENT);
+		// default: use inbox file
+		boolean complainIfMissing = false;
+		this.inboxContent = inboxFile.getContent(complainIfMissing);
+		if ((this.inboxContent == null) || "".equals(inboxContent)) {
+			// legacy: if no inbox file given, use inbox content from database json
+			this.inboxContent = root.getString(INBOX_CONTENT);
+		}
 
 		this.connectToMari = root.getBoolean(CONNECT_TO_MARI);
 
@@ -193,8 +203,6 @@ public class Database {
 
 		root.set(MEME_PATH, memePath);
 
-		root.set(INBOX_CONTENT, inboxContent);
-
 		root.set(CONNECT_TO_MARI, connectToMari());
 
 		root.set(CONNECT_TO_TOWA, connectToTowa());
@@ -225,8 +233,12 @@ public class Database {
 
 		root.set(ANIMATIONS_CSS, getAnimationsCss());
 
+		root.remove(INBOX_CONTENT);
+
 		dbFile.setAllContents(root);
 		dbFile.save();
+
+		inboxFile.saveContent(inboxContent);
 
 		Record taskStatsRoot = new Record();
 		boolean ordered = false;

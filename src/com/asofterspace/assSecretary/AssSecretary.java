@@ -48,8 +48,8 @@ public class AssSecretary {
 	public final static String FACT_DIR = "../assTrainer/config";
 
 	public final static String PROGRAM_TITLE = "assSecretary (Hugo)";
-	public final static String VERSION_NUMBER = "0.1.2.6(" + Utils.TOOLBOX_VERSION_NUMBER + ")";
-	public final static String VERSION_DATE = "21. October 2020 - 23. September 2026";
+	public final static String VERSION_NUMBER = "0.1.2.7(" + Utils.TOOLBOX_VERSION_NUMBER + ")";
+	public final static String VERSION_DATE = "21. October 2020 - 29. September 2026";
 
 	private static Database database;
 	private static LocationDatabase locationDB;
@@ -356,6 +356,10 @@ public class AssSecretary {
 
 		addWebInfo(mcInfo, "qztIPC", database, missionControlDatabase);
 		addWebInfo(mcInfo, "csdWeb", database, missionControlDatabase);
+
+		addWebInfo(mcInfo, "ttvWeb", database, missionControlDatabase);
+		addWebInfo(mcInfo, "ttvQR", database, missionControlDatabase);
+		addWebInfo(mcInfo, "ttvPad", database, missionControlDatabase);
 
 		addWebInfo(mcInfo, "sbWW", database, missionControlDatabase);
 

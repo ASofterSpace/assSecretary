@@ -1548,7 +1548,8 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 		mcHtml += companyStart;
 		mcHtml += machineStart + "ASS Chaotic Joy MOYA-XV<br>" + AssSecretary.getLocalInfoShort() + machineEnd;
 		mcHtml += machineStart + "asofterspace<br>" + mcInfo.getOv("assEn") + "<br>" + mcInfo.getOv("assDe") + machineEnd;
-		mcHtml += machineStart + "Hera Tasks<br>" + mcInfo.getOv("heraTasks") + machineEnd;
+		mcHtml += machineStart + "QZT InstaPostCreator<br>" + mcInfo.getOv("qztIPC") + machineEnd;
+		mcHtml += machineStart + "Ash and Hera Tasks<br>" + mcInfo.getOv("heraTasks") + machineEnd;
 		mcHtml += "<img class='logo' src='projectlogos/asofterspace/logo.png' />";
 		mcHtml += companyEnd;
 
@@ -1573,7 +1574,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 		mcHtml += machineStart + "WoodWatchers<br>front: " + mcInfo.getOv("wwFrontend") + "<br>" +
 			"back: " + mcInfo.getOv("wwBackend") + machineEnd;
 		mcHtml += machineStart + "CSD Tübingen<br>" + mcInfo.getOv("csdWeb") + machineEnd;
-		mcHtml += machineStart + "QZT InstaPostCreator<br>" + mcInfo.getOv("qztIPC") + machineEnd;
+		mcHtml += machineStart + "Tantive-7<br>" + mcInfo.getOv("ttvWeb") + "<br>" + mcInfo.getOv("ttvQR") + "<br>" + mcInfo.getOv("ttvPad") + machineEnd;
 
 		mcHtml += "<img class='logo' src='projectlogos/da/logo.png' />";
 		mcHtml += companyEnd;
