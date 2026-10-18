@@ -813,7 +813,7 @@ public class TaskCtrl extends TaskCtrlBase {
 		if (database.connectToMari()) {
 			try {
 				// get scheduled tasks from Mari
-				JSON mariTasks = new JSON(WebAccessor.get("http://localhost:3011/tasks"));
+				JSON mariTasks = new JSON(WebAccessor.get("http://127.0.0.1:3011/tasks"));
 
 				// copy the task list we are currently looking at
 				baseTasksForSchedule = new ArrayList<>(baseTasksForSchedule);
@@ -861,7 +861,7 @@ public class TaskCtrl extends TaskCtrlBase {
 		if (database.connectToMari()) {
 			try {
 				// get task instances from Mari
-				JSON mariTasks = new JSON(WebAccessor.get("http://localhost:3011/taskInstances" + dateStr));
+				JSON mariTasks = new JSON(WebAccessor.get("http://127.0.0.1:3011/taskInstances" + dateStr));
 
 				// copy the task list we are currently looking at
 				tasks = new ArrayList<>(tasks);
@@ -891,7 +891,7 @@ public class TaskCtrl extends TaskCtrlBase {
 		if (database.connectToWorkbench()) {
 			try {
 				// get task instances from assWorkbench
-				JSON workbenchTasks = new JSON(WebAccessor.get("http://localhost:3010/taskInstances" + dateStr));
+				JSON workbenchTasks = new JSON(WebAccessor.get("http://127.0.0.1:3010/taskInstances" + dateStr));
 
 				// copy the task list we are currently looking at
 				tasks = new ArrayList<>(tasks);

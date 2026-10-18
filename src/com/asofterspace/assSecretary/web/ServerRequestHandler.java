@@ -787,7 +787,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 				if (database.connectToMari()) {
 
-					String problems = WebAccessor.get("http://localhost:3011/unacknowledged-problems");
+					String problems = WebAccessor.get("http://127.0.0.1:3011/unacknowledged-problems");
 
 					MariDatabase mariDatabase = new MariDatabase(MARI_DATABASE_FILE);
 
@@ -905,7 +905,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 				if (database.connectToTowa()) {
 
-					String currentAdvice = WebAccessor.get("http://localhost:3016/currentAdvice");
+					String currentAdvice = WebAccessor.get("http://127.0.0.1:3016/currentAdvice");
 
 					if ((currentAdvice == null) || "".equals(currentAdvice)) {
 						towaHtml += "<div>";
@@ -1930,8 +1930,8 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 	private String getSidebarHtmlWithHugo() {
 		String result = SideBarCtrl.getSidebarHtmlStr();
 		// do not actually open links to Hugo in a new tab while looking at Hugo (e.g. when in the inbox)
-		result = StrUtils.replaceAll(result, "href=\"http://localhost:3012/\" target=\"_blank\"",
-			"href=\"http://localhost:3012/\"");
+		result = StrUtils.replaceAll(result, "href=\"http://127.0.0.1:3012/\" target=\"_blank\"",
+			"href=\"http://127.0.0.1:3012/\"");
 		return result;
 	}
 
