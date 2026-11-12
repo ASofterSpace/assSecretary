@@ -1594,7 +1594,8 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 		String html = "";
 		Date today = DateUtils.now();
 		boolean beforeToday = true;
-		for (int weekCounter = 0; weekCounter < 6; weekCounter++) {
+		int HOW_MANY_WEEKS_TO_SHOW_ON_MINI_CALENDAR = 7;
+		for (int weekCounter = 0; weekCounter < HOW_MANY_WEEKS_TO_SHOW_ON_MINI_CALENDAR; weekCounter++) {
 			List<Date> week = DateUtils.getWeekForDate(today);
 			html += "<tr>";
 			html += "<td>";

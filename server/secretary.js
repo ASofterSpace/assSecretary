@@ -140,6 +140,10 @@ window.secretary = {
 					}
 
 					document.getElementById("singleTaskReleaseUntil").value = "";
+
+					// especially if we are on:
+					// document.location.pathname == "/currenttasklog.htm"
+					// then we do want to reload... at least once it did not - was that an accident / one-off? ^^'
 					if (closeOnSubmit) {
 						window.location.reload(false);
 					}
