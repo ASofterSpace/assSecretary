@@ -411,7 +411,7 @@ public class Task extends GenericTask {
 
 		html.append("<span class='tla'");
 		if (reducedView) {
-			html.append(" style='vertical-align: 1pt;'");
+			html.append(" style='vertical-align: 0.5pt;'");
 		}
 		html.append(">");
 		html.append(getOriginTLA());
